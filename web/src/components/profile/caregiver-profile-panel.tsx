@@ -360,6 +360,9 @@ export function CaregiverProfilePanel({
   const [displayName, setDisplayName] = useState("");
   const [relationshipLabel, setRelationshipLabel] = useState("");
   const [creating, setCreating] = useState(false);
+  const [createNotice, setCreateNotice] = useState<
+    "created" | "error" | null
+  >(null);
 
   useEffect(() => {
     let active = true;
@@ -422,7 +425,7 @@ export function CaregiverProfilePanel({
   async function createProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setCreating(true);
-    setError(false);
+    setCreateNotice(null);
     try {
       const response = await fetch("/api/v1/patient-profiles", {
         method: "POST",
@@ -435,9 +438,10 @@ export function CaregiverProfilePanel({
       setProfiles((current) => [...(current ?? []), result.data]);
       setDisplayName("");
       setRelationshipLabel("");
+      setCreateNotice("created");
       chooseProfile(result.data.id);
     } catch {
-      setError(true);
+      setCreateNotice("error");
     } finally {
       setCreating(false);
     }
@@ -458,6 +462,23 @@ export function CaregiverProfilePanel({
         <Alert variant="destructive">
           <AlertTitle>Patient Profile belum dapat dimuat</AlertTitle>
           <AlertDescription>Muat ulang halaman untuk mencoba lagi.</AlertDescription>
+        </Alert>
+      ) : null}
+      {createNotice ? (
+        <Alert
+          variant={createNotice === "error" ? "destructive" : "default"}
+          aria-live="polite"
+        >
+          <AlertTitle>
+            {createNotice === "created"
+              ? "Patient Profile berhasil dibuat"
+              : "Patient Profile belum dapat dibuat"}
+          </AlertTitle>
+          <AlertDescription>
+            {createNotice === "created"
+              ? "Data opsional tetap Belum diketahui dan dapat diisi nanti."
+              : "Periksa nama dan label hubungan, lalu coba lagi."}
+          </AlertDescription>
         </Alert>
       ) : null}
 
@@ -498,6 +519,10 @@ export function CaregiverProfilePanel({
           <Separator />
           <form className="space-y-3" onSubmit={createProfile}>
             <h3 className="font-medium">Tambah Patient Profile</h3>
+            <p className="text-sm text-muted-foreground">
+              Nama dan label hubungan cukup untuk membuat profil. Data opsional
+              dapat diisi nanti tanpa menebak.
+            </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="new-profile-name">Nama tampilan</Label>

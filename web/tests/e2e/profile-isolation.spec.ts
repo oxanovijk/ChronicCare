@@ -5,11 +5,13 @@ import { expect, test } from "@playwright/test";
 const ownerEmail = process.env.CAREGIVER_DEMO_OWNER_EMAIL;
 const ownerPassword = process.env.CAREGIVER_DEMO_OWNER_PASSWORD;
 const mayaCode = process.env.PATIENT_DEMO_MAYA_CODE;
+const rakaCode = process.env.PATIENT_DEMO_RAKA_CODE;
 const coreServerConfigured = Boolean(
   process.env.DATABASE_URL &&
     process.env.DIRECT_URL &&
     process.env.PATIENT_SESSION_SECRET,
 );
+const mayaProfileId = "10000000-0000-4000-8000-000000000004";
 const rakaProfileId = "10000000-0000-4000-8000-000000000005";
 
 test.describe.configure({ mode: "serial" });
@@ -67,6 +69,28 @@ test("Maya Patient session cannot read Raka or open caregiver UI", async ({
 
   await page.goto("/caregiver");
   await expect(page).toHaveURL(/\/patient$/);
+
+  await page.getByRole("button", { name: "Keluar" }).click();
+  await expect(page).toHaveURL(/\/patient\/login$/);
+  expect((await page.request.get("/api/v1/auth/me")).status()).toBe(401);
+});
+
+test("Raka Patient session cannot read Maya", async ({ page }) => {
+  test.skip(!rakaCode, "Local synthetic Raka Patient code is unavailable.");
+  test.skip(!coreServerConfigured, "Local core server env is unavailable.");
+
+  await page.goto("/patient/login");
+  await page.getByLabel("Kode akses Patient").fill(rakaCode ?? "");
+  await page.getByRole("button", { name: "Masuk" }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Halo, Raka Pratama" }),
+  ).toBeVisible({ timeout: 15_000 });
+
+  const crossProfile = await page.request.get(
+    `/api/v1/patient-profiles/${mayaProfileId}`,
+  );
+  expect(crossProfile.status()).toBe(403);
+  expect(JSON.stringify(await crossProfile.json())).not.toContain("Maya Pratama");
 });
 
 test("caregiver switches Maya and Raka without stale profile details", async ({

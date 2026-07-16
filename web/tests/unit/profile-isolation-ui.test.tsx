@@ -65,4 +65,39 @@ describe("caregiver profile switching", () => {
       await screen.findByRole("heading", { level: 3, name: "Raka Pratama" }),
     ).toBeInTheDocument();
   });
+
+  it("shows a specific create error without claiming the profile list failed", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+      const url = String(input);
+      if (url === "/api/v1/patient-profiles" && !init?.method) {
+        return Response.json({ data: [] });
+      }
+      if (url === "/api/v1/patient-profiles" && init?.method === "POST") {
+        return Response.json(
+          { error: { code: "CONFLICT", message: "generic" } },
+          { status: 409 },
+        );
+      }
+      return new Response(null, { status: 404 });
+    });
+
+    const user = userEvent.setup();
+    render(<CaregiverProfilePanel role="OWNER" />);
+    expect(
+      await screen.findByText("Belum ada Patient Profile pada Care Circle ini."),
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("Nama tampilan"), "Profil QA");
+    await user.type(screen.getByLabelText("Label hubungan"), "QA");
+    await user.click(
+      screen.getByRole("button", { name: "Buat profil minimum" }),
+    );
+
+    expect(
+      await screen.findByText("Patient Profile belum dapat dibuat"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Patient Profile belum dapat dimuat"),
+    ).not.toBeInTheDocument();
+  });
 });

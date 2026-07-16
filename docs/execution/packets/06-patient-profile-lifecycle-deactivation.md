@@ -1,6 +1,6 @@
 # Packet 06: Patient Profile Lifecycle Deactivation
 
-Status: Draft
+Status: Ready
 
 Driver / DRI: Bernard
 
@@ -43,6 +43,28 @@ Owner can safely remove a Patient Profile from active care flows with careful co
 - Completed Packet 05 profile isolation and Patient session helpers.
 - A resettable synthetic profile fixture exists for lifecycle testing.
 - Human verdict: end-of-care/deactivate profile is in MVP; subscription/payment remains dummy/contextual only.
+
+## Entry Readiness Evidence
+
+- Packet 05 is `Done`; Patient sessions are profile-bound, cross-profile access
+  is denied in both directions, and caregiver profile selection uses active
+  server-authorized profiles.
+- Packet 03 already provides `PatientStatus`, deactivation reason/note/actor/time
+  fields, `PatientAccessCode.status`, and `PatientSession.revokedAt`; no schema
+  migration is required to begin P6.
+- Packet 04 provides server-resolved membership context and `requireOwner`;
+  Family Member and Patient denial can be enforced without trusting client
+  roles.
+- P5 provides `resolvePatientAuthContext`, `requireBoundPatientProfile`, and
+  current-session revocation. P6 will add the locked profile-wide atomic
+  revocation of active codes and sessions in the lifecycle transaction.
+- Maya and Raka remain resettable synthetic fixtures. P6 manual QA must use a
+  temporary/resettable profile and leave both main demo profiles active.
+- The ignored local database inputs and `PATIENT_SESSION_SECRET` are available;
+  no credential needs to be committed or exposed.
+- No hard blocker or unresolved soft dependency remains. Confirmation copy,
+  lifecycle API/service, audit action, active-list exclusion, and reset proof
+  remain normal P6 implementation work.
 
 ## Hard Dependencies
 

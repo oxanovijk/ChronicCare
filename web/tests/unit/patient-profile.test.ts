@@ -8,6 +8,7 @@ import {
 import {
   createPatientProfile,
   deriveSetupChecklist,
+  patientProfileDto,
   PatientProfileError,
   updatePatientProfile,
 } from "@/lib/patient-profile/service";
@@ -92,6 +93,21 @@ describe("Patient Profile progressive API", () => {
       "ADD_USUAL_FACILITY",
     ]);
     expect(checklist).not.toHaveProperty("completionPercentage");
+  });
+
+  it("whitelists the profile DTO and excludes internal or future context", () => {
+    const dto = patientProfileDto({
+      ...profile(),
+      careCircleId: "must-not-leak",
+      codeHash: "must-not-leak",
+      sessionToken: "must-not-leak",
+      unconfirmedExtraction: { summary: "must-not-leak" },
+    } as ProfileRecord);
+
+    expect(dto).not.toHaveProperty("careCircleId");
+    expect(dto).not.toHaveProperty("codeHash");
+    expect(dto).not.toHaveProperty("sessionToken");
+    expect(dto).not.toHaveProperty("unconfirmedExtraction");
   });
 
   it("creates a minimum profile with all optional facts UNKNOWN", async () => {

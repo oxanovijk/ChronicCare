@@ -118,8 +118,23 @@ export function deriveSetupChecklist(profile: ProfileRecord) {
 
 export function patientProfileDto(profile: ProfileRecord) {
   return {
-    ...profile,
+    id: profile.id,
+    displayName: profile.displayName,
+    relationshipLabel: profile.relationshipLabel,
     dateOfBirth: profile.dateOfBirth?.toISOString().slice(0, 10) ?? null,
+    city: profile.city,
+    locationLabel: profile.locationLabel,
+    primaryConditions: profile.primaryConditions,
+    primaryConditionsStatus: profile.primaryConditionsStatus,
+    allergies: profile.allergies,
+    allergiesStatus: profile.allergiesStatus,
+    currentMedicationsStatus: profile.currentMedicationsStatus,
+    emergencyContactName: profile.emergencyContactName,
+    emergencyContactPhone: profile.emergencyContactPhone,
+    emergencyContactStatus: profile.emergencyContactStatus,
+    bpjsMembershipStatus: profile.bpjsMembershipStatus,
+    bpjsNumberLast4: profile.bpjsNumberLast4,
+    usualFacilityName: profile.usualFacilityName,
     setupChecklist: deriveSetupChecklist(profile),
   };
 }

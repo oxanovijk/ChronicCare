@@ -82,7 +82,7 @@ describe("Patient access code and session", () => {
     );
   });
 
-  it("returns the same generic auth failure for wrong and expired codes", async () => {
+  it("returns the same generic auth failure for wrong, expired, and revoked codes", async () => {
     const wrongDb = {
       patientAccessCode: { findMany: vi.fn().mockResolvedValue([]) },
     };
@@ -90,6 +90,13 @@ describe("Patient access code and session", () => {
       patientAccessCode: {
         findMany: vi.fn().mockResolvedValue([
           candidate({ expiresAt: new Date("2026-07-16T00:00:00.000Z") }),
+        ]),
+      },
+    };
+    const revokedDb = {
+      patientAccessCode: {
+        findMany: vi.fn().mockResolvedValue([
+          candidate({ status: "REVOKED" }),
         ]),
       },
     };
@@ -104,6 +111,12 @@ describe("Patient access code and session", () => {
       authenticatePatientCode(
         { code: syntheticCode, fingerprint: "expired-test", now },
         { db: expiredDb as never, secret: "s".repeat(32) },
+      ),
+    ).rejects.toEqual(new PatientAuthError("UNAUTHENTICATED"));
+    await expect(
+      authenticatePatientCode(
+        { code: syntheticCode, fingerprint: "revoked-test", now },
+        { db: revokedDb as never, secret: "s".repeat(32) },
       ),
     ).rejects.toEqual(new PatientAuthError("UNAUTHENTICATED"));
   });
