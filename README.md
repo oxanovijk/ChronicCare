@@ -1,14 +1,14 @@
-# Navicare
+# ChroniCare
 
 Care Circle berbasis web untuk membantu pasien chronic illness dan caregiver menjaga rutinitas perawatan jangka panjang. Patient mendapat antarmuka yang cheerful, sederhana, dan suportif untuk check-in, reminder, chatbot, dan SOS. Caregiver mendapat dashboard yang lebih informatif untuk melihat konteks Patient aktif, meninjau dokumen hasil OCR, menangani SOS, serta mencari faskes/BPJS di Tangerang.
 
 Status repo: documentation-first, pre-scaffold. Stack dan kontrak sudah dikunci, tetapi aplikasi dan command belum tersedia sampai Packet 01 membuat `/web`.
 
-Refinement status: positioning sudah berubah dari elderly/parent care menjadi chronic illness care. Istilah internal sedang dimigrasikan dari `Parent Profile` ke `Patient Profile`; technical docs detail akan diselaraskan pada refinement berikutnya sebelum implementasi dimulai.
+Refinement status: positioning sudah berubah menjadi chronic illness care. Istilah internal untuk MVP memakai `Patient Profile`, `patientProfileId`, dan route `patient-profiles` pada technical docs dan execution packets.
 
 ## Product Boundary
 
-Navicare membantu navigasi, rutinitas, dan koordinasi perawatan jangka panjang untuk pasien chronic illness. Produk ini bukan alat diagnosis, pengganti dokter/IGD/ambulans/BPJS, hospital information system, nutrition prescription system, atau klaim compliance produksi.
+ChroniCare membantu navigasi, rutinitas, dan koordinasi perawatan jangka panjang untuk pasien chronic illness. Produk ini bukan alat diagnosis, pengganti dokter/IGD/ambulans/BPJS, hospital information system, nutrition prescription system, atau klaim compliance produksi.
 
 ## Challenge
 
@@ -16,11 +16,11 @@ Hackathon challenge yang dipilih:
 
 > How can we improve how people manage and live with chronic illness over the long term?
 
-Navicare menjawab challenge ini dengan menjaga konteks perawatan harian, dokumen kesehatan, dukungan caregiver, dan eskalasi bantuan berada dalam satu Care Circle yang aman dan mudah dipakai.
+ChroniCare menjawab challenge ini dengan menjaga konteks perawatan harian, dokumen kesehatan, dukungan caregiver, dan eskalasi bantuan berada dalam satu Care Circle yang aman dan mudah dipakai.
 
 Demo condition: diabetes tipe 2.
 
-Diabetes tipe 2 dipakai sebagai skenario demo agar cerita chronic illness terasa konkret. Navicare tetap diposisikan sebagai care coordination platform, bukan aplikasi klinis khusus diabetes.
+Diabetes tipe 2 dipakai sebagai skenario demo agar cerita chronic illness terasa konkret. ChroniCare tetap diposisikan sebagai care coordination platform, bukan aplikasi klinis khusus diabetes.
 
 ## Actors
 
@@ -118,7 +118,7 @@ AZURE_DOCUMENT_INTELLIGENCE_MODEL=prebuilt-layout
 OCR_FALLBACK_MODE=disabled
 ```
 
-Note: detailed env docs may still contain legacy `PARENT_*` names until the technical-contract refinement step is completed. Do not implement before that terminology pass is done.
+Note: env docs now use `PATIENT_SESSION_SECRET`. Do not reintroduce legacy `PARENT_*` names unless a human explicitly requests a backward-compatibility note.
 
 ## Team
 
@@ -158,6 +158,23 @@ Execution and demo:
 - [Demo Readiness Checklist](docs/qa/demo-readiness-checklist.md)
 - [Agent Rules](AGENTS.md)
 
+## Implementation Entry Point
+
+Saat mulai coding, baca berurutan:
+
+1. [AGENTS.md](AGENTS.md)
+2. [Packet Index](docs/execution/packets.md)
+3. Packet yang diminta, misalnya `docs/execution/packets/01-scaffold-and-tooling-baseline.md`
+4. Technical docs yang dirujuk packet tersebut
+
+Implementation truth saat ini:
+
+- Gunakan Patient terminology: `Patient Profile`, `patientProfileId`, `patient_profiles`, dan route `patient-profiles`.
+- Demo utama memakai Maya Pratama dengan diabetes tipe 2 dan Raka Pratama untuk isolation.
+- End-of-care/deactivate Patient Profile masuk MVP sebagai flow non-destructive dan Owner-only.
+- Food/menu/pantangan serta real subscription/payment tetap out of scope.
+- Jangan mengklaim fitur berjalan sampai ada implementasi dan checks.
+
 ## Demo Data
 
 Use fictional data only. Demo story uses a synthetic diabetes tipe 2 scenario, synthetic health documents, dummy contacts/BPJS numbers, and versioned facility data. Do not copy real patient records, family messages, lab files, or medication data.
@@ -165,8 +182,8 @@ Use fictional data only. Demo story uses a synthetic diabetes tipe 2 scenario, s
 ## Known MVP Limitations
 
 - The application is not scaffolded yet.
-- Detailed technical docs are still being refined from Parent terminology to Patient terminology.
-- Demo condition is diabetes tipe 2, but Navicare is not a diabetes diagnosis or treatment app.
+- Documentation has been refined to Patient terminology, but the application is still pre-scaffold.
+- Demo condition is diabetes tipe 2, but ChroniCare is not a diabetes diagnosis or treatment app.
 - OCR accepts one PDF/JPEG/PNG up to 5 MB and three pages; a labeled synthetic fallback may be used.
 - OCR output needs caregiver confirmation and is not medical truth.
 - SOS alert and sound require an open, connected caregiver dashboard. Browser audio needs user opt-in.

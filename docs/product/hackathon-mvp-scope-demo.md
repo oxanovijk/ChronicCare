@@ -1,6 +1,6 @@
 # Hackathon MVP Scope and Demo Narrative
 
-Produk: Navicare
+Produk: ChroniCare
 Status: Locked for Hackathon MVP v1, Step 2 chronic illness product-scope refinement
 DRI: Ozan (Product Manager dan QA)
 Kontributor: Daniel (UI/UX), Bernard (API dan database), Al (AI)
@@ -18,7 +18,7 @@ Hipotesis MVP:
 
 > Satu Care Circle dengan Patient Profile yang terpisah, rutinitas perawatan harian, dokumen yang dapat ditinjau, AI yang dibatasi, dan koordinasi SOS di web dapat membantu pasien chronic illness dan caregiver menjaga care continuity jangka panjang.
 
-Demo memakai diabetes tipe 2 sebagai skenario konkret. Navicare tetap bukan aplikasi diagnosis, penentuan dosis, interpretasi lab final, atau rekomendasi nutrisi personal.
+Demo memakai diabetes tipe 2 sebagai skenario konkret. ChroniCare tetap bukan aplikasi diagnosis, penentuan dosis, interpretasi lab final, atau rekomendasi nutrisi personal.
 
 ## 2. Prinsip Scope
 
@@ -156,7 +156,7 @@ Tidak boleh memakai nama, nomor telepon, nomor identitas, dokumen, hasil lab, ob
 | Area | Acceptance Minimum |
 | --- | --- |
 | Auth | Caregiver dan Patient masuk melalui mekanisme terpisah |
-| Isolation | Request dengan `patientProfileId` yang tidak boleh diakses ditolak API/database setelah technical rename selesai |
+| Isolation | Request dengan `patientProfileId` yang tidak boleh diakses ditolak API/database |
 | Profile switch | Semua panel dan query mengikuti Patient aktif tanpa data lama tertinggal |
 | Daily care | Check-in dan reminder diabetes demo tampil sebagai data yang dicatat, bukan saran klinis |
 | OCR | File privat; extraction pending; caregiver dapat edit dan confirm |
@@ -216,9 +216,10 @@ Status checklist QA tetap `Not Run` sampai pemeriksaan benar-benar dilakukan.
 - Product positioning: chronic illness Patient care.
 - Demo condition: diabetes tipe 2.
 
-Tidak ada keputusan provider besar yang masih pending untuk memulai scaffold, tetapi technical terminology rename dari Parent ke Patient harus diselesaikan sebelum implementasi.
+Tidak ada keputusan provider besar yang masih pending untuk memulai scaffold. Technical terminology untuk implementasi memakai Patient, bukan Parent.
 
 ## 18. Change Log
 
 - 15 Juli 2026: Mengunci scope OCR, review manusia, Supabase private storage, dan SOS web Realtime.
 - 16 Juli 2026: Step 2 refinement, mengganti demo narrative dari elderly/Parent care ke chronic illness Patient care dengan diabetes tipe 2 sebagai demo condition.
+- 16 Juli 2026: Step 6/7 consistency pass, menegaskan bahwa technical terminology untuk scaffold memakai Patient.

@@ -1,6 +1,6 @@
 # Feature Scope
 
-Produk: Navicare
+Produk: ChroniCare
 Status: Locked for Hackathon MVP v1, Step 2 chronic illness feature-scope refinement
 DRI: Ozan (Product Manager dan QA)
 Kontributor: Daniel (UI/UX), Bernard (API dan database), Al (AI)
@@ -60,7 +60,7 @@ Outcome:
 
 Acceptance:
 
-- Query, mutation, upload, chat, dan SOS menggunakan `patientProfileId` eksplisit setelah technical rename selesai.
+- Query, mutation, upload, chat, dan SOS menggunakan `patientProfileId` eksplisit.
 - Cache/state profile lama dibersihkan saat berpindah.
 - Request cross-profile yang tidak sah gagal meskipun UI dimanipulasi.
 
@@ -80,7 +80,7 @@ Owner: Daniel. API: Bernard. QA: Ozan.
 
 Patient memilih kondisi singkat dan boleh menambahkan catatan pendek. Caregiver melihat check-in terbaru pada Patient Profile yang benar.
 
-Minimum data: status, catatan opsional, waktu, actor, dan `patientProfileId` setelah technical rename.
+Minimum data: status, catatan opsional, waktu, actor, dan `patientProfileId`.
 
 Untuk demo diabetes tipe 2, check-in boleh mencatat rutinitas/keluhan umum secara non-klinis. Produk tidak menyimpulkan kontrol gula darah, target klinis, atau keputusan terapi.
 
@@ -274,11 +274,12 @@ Jika waktu kurang:
 
 ## 11. Change Control
 
-Status dokumen ini locked untuk product scope Step 2. Perubahan kategori P0/P1/P2/out-of-scope membutuhkan verdict Ozan. Perubahan yang memengaruhi API/data membutuhkan review Bernard, UX membutuhkan review Daniel, dan OCR/AI membutuhkan review Al.
+Status dokumen ini locked untuk product scope MVP v1 setelah chronic illness refinement. Perubahan kategori P0/P1/P2/out-of-scope membutuhkan verdict Ozan. Perubahan yang memengaruhi API/data membutuhkan review Bernard, UX membutuhkan review Daniel, dan OCR/AI membutuhkan review Al.
 
-Technical docs masih perlu refinement untuk mengganti legacy Parent terminology menjadi Patient terminology sebelum implementasi dimulai.
+Technical docs dan execution packets sekarang memakai Patient terminology sebagai implementasi truth. Legacy Parent terminology di luar change log historis harus dianggap drift.
 
 ## 12. Change Log
 
 - 15 Juli 2026: OCR dengan caregiver review menjadi P0; SOS dikunci sebagai alert web Realtime dengan bunyi opt-in.
 - 16 Juli 2026: Step 2 refinement, mengganti feature scope dari Parent/elderly care ke chronic illness Patient care, menambahkan diabetes tipe 2 sebagai demo condition, dan memasukkan end-of-care/deactivate Patient Profile sebagai MVP lifecycle flow.
+- 16 Juli 2026: Step 6/7 consistency pass, menghapus catatan rename teknis yang sudah selesai dan mengunci `patientProfileId` sebagai implementation truth.

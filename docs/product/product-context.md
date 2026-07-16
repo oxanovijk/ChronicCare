@@ -1,6 +1,6 @@
 # Product Context
 
-Produk: Navicare
+Produk: ChroniCare
 Status: Locked for Hackathon MVP v1, Step 1 chronic illness positioning refinement
 DRI: Ozan (Product Manager dan QA)
 Kontributor: Daniel (UI/UX), Al (AI), Bernard (API dan database)
@@ -9,11 +9,11 @@ Challenge: How can we improve how people manage and live with chronic illness ov
 
 ## 1. Ringkasan
 
-Navicare adalah aplikasi web Care Circle untuk membantu pasien chronic illness dan caregiver menjaga rutinitas perawatan jangka panjang. Produk menyatukan konteks Patient Profile, check-in, obat dan reminder, dokumen kesehatan, chatbot, SOS caregiver/family, serta pencarian faskes/BPJS Tangerang.
+ChroniCare adalah aplikasi web Care Circle untuk membantu pasien chronic illness dan caregiver menjaga rutinitas perawatan jangka panjang. Produk menyatukan konteks Patient Profile, check-in, obat dan reminder, dokumen kesehatan, chatbot, SOS caregiver/family, serta pencarian faskes/BPJS Tangerang.
 
-Demo condition untuk hackathon adalah diabetes tipe 2. Kondisi ini dipilih agar cerita long-term chronic illness terasa konkret melalui rutinitas, dokumen kontrol, persiapan kunjungan dokter, dan kebutuhan dukungan caregiver. Navicare tetap bukan aplikasi klinis khusus diabetes.
+Demo condition untuk hackathon adalah diabetes tipe 2. Kondisi ini dipilih agar cerita long-term chronic illness terasa konkret melalui rutinitas, dokumen kontrol, persiapan kunjungan dokter, dan kebutuhan dukungan caregiver. ChroniCare tetap bukan aplikasi klinis khusus diabetes.
 
-Navicare bukan alat diagnosis, pengganti dokter, IGD, ambulans, BPJS, layanan darurat resmi, atau sistem rekomendasi nutrisi klinis. Semua bantuan AI dibatasi pada navigasi, peringkasan administratif, persiapan pertanyaan untuk tenaga kesehatan, dan eskalasi aman.
+ChroniCare bukan alat diagnosis, pengganti dokter, IGD, ambulans, BPJS, layanan darurat resmi, atau sistem rekomendasi nutrisi klinis. Semua bantuan AI dibatasi pada navigasi, peringkasan administratif, persiapan pertanyaan untuk tenaga kesehatan, dan eskalasi aman.
 
 ## 2. Masalah Pengguna
 
@@ -49,7 +49,7 @@ Patient UI harus terasa cheerful, sederhana, dan suportif. Cheerful tidak berart
 
 ## 4. Nilai Produk
 
-Navicare memberi pasien dan caregiver satu konteks yang dapat dipercaya untuk satu Patient Profile pada satu waktu:
+ChroniCare memberi pasien dan caregiver satu konteks yang dapat dipercaya untuk satu Patient Profile pada satu waktu:
 
 - Patient dapat menjaga rutinitas harian tanpa menavigasi dashboard rumit.
 - Caregiver melihat kondisi, catatan, obat, dan dokumen dalam profile yang benar.
@@ -143,7 +143,7 @@ Prinsip:
 - UI tidak boleh memakai istilah kasar seperti "mark as dead".
 - Gunakan wording seperti "Akhiri perawatan", "Nonaktifkan profil pasien", atau "Pasien meninggal dunia" hanya sebagai alasan sensitif bila perlu.
 - Flow tidak melakukan hard delete secara default.
-- Profile yang dinonaktifkan menjadi archived/read-only atau disembunyikan dari alur harian sesuai kontrak teknis berikutnya.
+- Profile yang dinonaktifkan menjadi archived/read-only atau disembunyikan dari alur harian sesuai kontrak teknis di `docs/technical/data-model.md` dan `docs/technical/api.md`.
 - Action harus diaudit.
 - Subscription/payment nyata tidak masuk MVP. Jika ada layar cancel subscription, itu hanya dummy/contextual dan tidak memproses pembayaran.
 
@@ -210,11 +210,12 @@ Perubahan yang memengaruhi scope, role, Patient Profile isolation, medical safet
 
 ## 16. Refinement Status
 
-Step 1 selesai pada dokumen positioning ini: arah produk, challenge, target user, Patient terminology, diabetes tipe 2 demo condition, end-of-care, dan food/menu parking lot.
+Refinement chronic illness sudah diselaraskan lintas product, technical, execution, pitch, QA, README, dan AGENTS untuk MVP v1 docs.
 
-Dokumen teknis detail masih perlu refinement lanjutan untuk mengganti legacy `Parent Profile`, `ParentAccessCode`, `ParentSession`, dan endpoint terkait menjadi `Patient Profile` equivalents sebelum implementasi dimulai.
+Dokumen teknis detail sudah diarahkan ke `Patient Profile`, `PatientAccessCode`, `PatientSession`, `patientProfileId`, dan endpoint `patient-profiles`. Jika masih ada legacy `Parent` di luar change log historis, anggap itu drift yang harus diperbaiki sebelum implementasi packet.
 
 ## 17. Change Log
 
 - 15 Juli 2026: Mengunci Next.js full-stack, OCR dengan caregiver review, Supabase private storage, dan SOS web Realtime dengan bunyi opt-in.
 - 16 Juli 2026: Mengubah positioning dari elderly/Parent care menjadi chronic illness Patient care, mengunci demo condition diabetes tipe 2, menambahkan Patient terminology verdict, end-of-care MVP lifecycle note, dan food/menu parking lot.
+- 16 Juli 2026: Step 6/7 consistency pass, mencatat bahwa Patient terminology sudah menjadi implementation truth lintas dokumen.

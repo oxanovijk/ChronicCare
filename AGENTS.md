@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Primary guardrail for agentic work in Navicare.
+Primary guardrail for agentic work in ChroniCare.
 
 Priority order:
 
@@ -14,20 +14,20 @@ Higher-priority system or developer instructions always win.
 
 ## 1. Project State
 
-Navicare is a 30-hour hackathon MVP for chronic illness care coordination.
+ChroniCare is a 30-hour hackathon MVP for chronic illness care coordination.
 
 Current state:
 
 - Documentation-first.
 - Pre-scaffold.
 - Stack and provider decisions are locked.
-- Product positioning is being refined from elderly/parent care to chronic illness patient care.
-- Human verdict on 2026-07-16: use `Patient Profile`, not `Parent Profile`, going forward.
-- Data model and API documents still need a dedicated technical terminology refinement before implementation.
+- Product positioning has been refined to chronic illness patient care.
+- Human verdict on 2026-07-16: implementation terminology is `Patient Profile`, not legacy parent-care terminology.
+- Locked technical docs now use `Patient Profile`, `patientProfileId`, `patient_profiles`, Patient access code/session, and `/patient-profiles`.
 - `/web` and `package.json` do not exist yet.
 - Install, dev, lint, typecheck, test, seed, build, and deploy commands remain unavailable until Packet 01 creates them.
 
-Do not claim an app feature exists because its document is complete. Do not scaffold or implement until the Patient terminology pass reaches the technical contracts.
+Do not claim an app feature exists because its document is complete. Do not scaffold or implement until the requested packet is explicitly selected and current docs are checked.
 
 ## 2. Challenge and Positioning
 
@@ -35,11 +35,11 @@ Selected hackathon challenge:
 
 > How can we improve how people manage and live with chronic illness over the long term?
 
-Navicare helps patients with chronic illness and their caregivers maintain long-term care routines through check-ins, reminders, reviewed health documents, safe AI navigation, caregiver coordination, SOS escalation, and faskes/BPJS support.
+ChroniCare helps patients with chronic illness and their caregivers maintain long-term care routines through check-ins, reminders, reviewed health documents, safe AI navigation, caregiver coordination, SOS escalation, and faskes/BPJS support.
 
 Demo condition: diabetes tipe 2.
 
-Diabetes tipe 2 is a concrete demo scenario only. Navicare must not become a diabetes diagnosis, treatment, dosing, lab-interpretation, or nutrition-prescription product.
+Diabetes tipe 2 is a concrete demo scenario only. ChroniCare must not become a diabetes diagnosis, treatment, dosing, lab-interpretation, or nutrition-prescription product.
 
 ## 3. Locked Stack
 
@@ -89,7 +89,7 @@ Main flow:
 
 ## 6. Product Boundary
 
-Navicare is not:
+ChroniCare is not:
 
 - Medical diagnosis or clinical decision support.
 - Drug recommendation or dose calculator.
@@ -139,8 +139,8 @@ Patient may access only the bound Patient Profile: homepage, check-in, reminder,
 
 Hard rules:
 
-- Every patient-bound operation takes explicit `patientProfileId` after the technical terminology pass.
-- Until technical docs are refined, legacy `parentProfileId` references should be treated as pending rename, not as new implementation truth.
+- Every patient-bound operation takes explicit `patientProfileId`.
+- Legacy parent-care technical names such as `parentProfileId`, `parent_profiles`, `parent_access_codes`, `parent_sessions`, and `/parent-profiles` are stale unless they appear inside an explicit historical change log.
 - Server authorization validates membership and Patient Profile relation.
 - Active profile UI state is not authorization.
 - Patient Profile and Care Circle data may never cross.
@@ -238,7 +238,7 @@ Human verdict already given for this refinement:
 
 - Target is all chronic illness patients, not only elderly parents.
 - Demo condition is diabetes tipe 2.
-- `Parent Profile` should become `Patient Profile`.
+- `Patient Profile` is the active implementation term.
 - End-of-care/deactivate profile enters MVP.
 - Subscription/payment remains dummy/contextual only, not a real feature.
 
@@ -246,7 +246,7 @@ Human verdict already given for this refinement:
 
 - Work inside one packet when possible.
 - Keep Route Handlers thin and domain services isolated.
-- Use locked API and schema names exactly after the technical Patient rename is complete.
+- Use locked API and schema names exactly.
 - Add tests with the implementation.
 - Do not add dependency/provider without approval and docs update.
 - Do not use production or real patient/family data.
@@ -313,4 +313,5 @@ Before saying done, fixed, working, passing, ready, implemented, or deployed:
 
 | Date | Change | Reason | DRI | Reviewer |
 | --- | --- | --- | --- | --- |
-| 2026-07-16 | Updated guardrail positioning from elderly/Parent care to chronic illness Patient care; recorded diabetes tipe 2 demo condition and Patient terminology verdict | Human challenge update and scope verdict | Ozan | Bernard |
+| 2026-07-16 | Finalized Patient terminology as current implementation truth across guardrails | Step 6/7 consistency pass | Ozan | Bernard |
+| 2026-07-16 | Updated guardrail positioning to chronic illness Patient care; recorded diabetes tipe 2 demo condition, Patient terminology, and deactivation verdict | Human challenge update and scope verdict | Ozan | Bernard |

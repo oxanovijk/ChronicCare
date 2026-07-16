@@ -1,6 +1,6 @@
 # User Journeys
 
-Produk: Navicare
+Produk: ChroniCare
 Status: Locked for Hackathon MVP v1, Step 2 chronic illness journey refinement
 DRI: Ozan (Product Manager dan QA)
 UX owner: Daniel
@@ -98,7 +98,7 @@ Success copy harus singkat. Retry tidak boleh membuat duplikasi yang membingungk
 4. API memvalidasi membership dan Patient Profile.
 5. Patient melihat reminder terkait miliknya.
 
-Produk tidak menyimpulkan dosis, target diabetes, atau rekomendasi klinis. Copy harus memakai "catatan yang dimasukkan caregiver" atau "sesuai instruksi yang dicatat", bukan "resep dari Navicare".
+Produk tidak menyimpulkan dosis, target diabetes, atau rekomendasi klinis. Copy harus memakai "catatan yang dimasukkan caregiver" atau "sesuai instruksi yang dicatat", bukan "resep dari ChroniCare".
 
 ## 8. Caregiver: Upload dan Review OCR
 
@@ -149,7 +149,7 @@ Patient flow:
 1. Patient menekan tombol SOS.
 2. UI meminta konfirmasi singkat agar tidak terpencet.
 3. API membuat event `new` untuk profile dari session.
-4. Patient melihat pesan bahwa caregiver/family telah diberi tahu melalui Navicare.
+4. Patient melihat pesan bahwa caregiver/family telah diberi tahu melalui ChroniCare.
 
 Caregiver flow:
 
@@ -185,7 +185,7 @@ Empty state menjelaskan bahwa hasil tidak ditemukan dalam dataset, bukan bahwa f
 3. UI menjelaskan bahwa tindakan ini sensitif dan tidak menghapus data secara permanen secara default.
 4. Owner memilih alasan, misalnya "Perawatan berakhir", "Pasien berpindah perawatan", atau "Pasien meninggal dunia".
 5. Owner mengonfirmasi.
-6. Sistem mengubah status Patient Profile sesuai kontrak teknis berikutnya dan mencatat audit event.
+6. Sistem mengubah status Patient Profile sesuai kontrak teknis di `docs/technical/data-model.md` dan mencatat audit event.
 
 Rules:
 
@@ -238,11 +238,12 @@ Ozan memverifikasi bahwa copy tidak membuat janji medis, emergency delivery, BPJ
 
 ## 17. Change Control
 
-Dokumen ini locked untuk product journey Step 2. Perubahan role atau data access memerlukan verdict Ozan dan review Bernard. Perubahan AI/OCR memerlukan review Al. Perubahan alur Patient dan accessibility memerlukan review Daniel.
+Dokumen ini locked untuk product journey MVP v1 setelah chronic illness refinement. Perubahan role atau data access memerlukan verdict Ozan dan review Bernard. Perubahan AI/OCR memerlukan review Al. Perubahan alur Patient dan accessibility memerlukan review Daniel.
 
-Technical docs masih perlu refinement untuk mengganti legacy Parent terminology menjadi Patient terminology sebelum implementasi dimulai.
+Technical docs dan execution packets sekarang memakai Patient terminology sebagai implementasi truth. Legacy Parent terminology di luar change log historis harus dianggap drift.
 
 ## 18. Change Log
 
 - 15 Juli 2026: Menambahkan journey OCR lengkap dan mengganti SOS eksternal dengan alert web Realtime dan bunyi opt-in.
 - 16 Juli 2026: Step 2 refinement, mengganti journey dari Parent/elderly care ke chronic illness Patient care, menambahkan diabetes tipe 2 sebagai demo condition, end-of-care lifecycle, dan food/menu parking lot.
+- 16 Juli 2026: Step 6/7 consistency pass, mengarahkan lifecycle ke data model teknis yang sudah memakai Patient terminology.
