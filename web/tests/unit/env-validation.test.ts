@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+
+import { parse } from "dotenv";
 import { describe, expect, it } from "vitest";
 
 import { EnvironmentConfigurationError } from "@/lib/env/errors";
@@ -73,6 +76,17 @@ describe("environment validation", () => {
 
   it("applies locked safe defaults and parses false as false", () => {
     expect(parseProviderFlags({})).toEqual({
+      OCR_FALLBACK_MODE: "disabled",
+      OCR_MAX_FILE_BYTES: 5_242_880,
+      OCR_MAX_PAGES: 3,
+      SOS_AUDIO_ENABLED_BY_DEFAULT: false,
+    });
+  });
+
+  it("ships an .env.example whose locked defaults parse as written", () => {
+    const example = parse(readFileSync(".env.example", "utf8"));
+
+    expect(parseProviderFlags(example)).toEqual({
       OCR_FALLBACK_MODE: "disabled",
       OCR_MAX_FILE_BYTES: 5_242_880,
       OCR_MAX_PAGES: 3,
