@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +5,238 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum MemberRole {
+  OWNER
+  FAMILY_MEMBER
+
+  @@map("member_role")
+}
+
+enum MemberStatus {
+  INVITED
+  ACTIVE
+  REMOVED
+
+  @@map("member_status")
+}
+
+enum PatientStatus {
+  ACTIVE
+  INACTIVE
+  END_OF_CARE
+  DECEASED
+
+  @@map("patient_status")
+}
+
+enum PatientDeactivationReason {
+  NO_LONGER_CARED
+  PATIENT_DECEASED
+  OTHER
+
+  @@map("patient_deactivation_reason")
+}
+
+enum ProfileFactStatus {
+  UNKNOWN
+  NONE_REPORTED
+  REPORTED
+
+  @@map("profile_fact_status")
+}
+
+enum BpjsMembershipStatus {
+  UNKNOWN
+  NOT_REGISTERED
+  REGISTERED
+
+  @@map("bpjs_membership_status")
+}
+
+enum AccessCodeStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+
+  @@map("access_code_status")
+}
+
+enum ActorType {
+  CAREGIVER
+  PATIENT
+  SYSTEM
+
+  @@map("actor_type")
+}
+
+model User {
+  id                         String                 @id @db.Uuid
+  displayName                String                 @map("display_name") @db.VarChar(120)
+  phoneNumber                String?                @map("phone_number") @db.VarChar(32)
+  avatarPath                 String?                @map("avatar_path") @db.Text
+  createdAt                  DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                  DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdCareCircles         CareCircle[]           @relation("CareCircleCreatedBy")
+  memberships                CareCircleMember[]     @relation("CareCircleMemberUser")
+  invitedMemberships         CareCircleMember[]     @relation("CareCircleMemberInviter")
+  createdInvitations         CareCircleInvitation[] @relation("CareCircleInvitationCreatedBy")
+  acceptedInvitations        CareCircleInvitation[] @relation("CareCircleInvitationAcceptedBy")
+  createdPatientProfiles     PatientProfile[]       @relation("PatientProfileCreatedBy")
+  updatedPatientProfiles     PatientProfile[]       @relation("PatientProfileUpdatedBy")
+  deactivatedPatientProfiles PatientProfile[]       @relation("PatientProfileDeactivatedBy")
+  createdPatientAccessCodes  PatientAccessCode[]    @relation("PatientAccessCodeCreatedBy")
+  auditEvents                AuditEvent[]           @relation("AuditActorUser")
+
+  @@map("users")
+}
+
+model CareCircle {
+  id              String                 @id @default(uuid()) @db.Uuid
+  name            String                 @db.VarChar(120)
+  createdByUserId String                 @map("created_by_user_id") @db.Uuid
+  isActive        Boolean                @default(true) @map("is_active")
+  createdAt       DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime               @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdBy       User                   @relation("CareCircleCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  members         CareCircleMember[]
+  invitations     CareCircleInvitation[]
+  patientProfiles PatientProfile[]
+  auditEvents     AuditEvent[]
+
+  @@map("care_circles")
+}
+
+model CareCircleMember {
+  id              String       @id @default(uuid()) @db.Uuid
+  careCircleId    String       @map("care_circle_id") @db.Uuid
+  userId          String       @map("user_id") @db.Uuid
+  role            MemberRole
+  status          MemberStatus
+  invitedByUserId String?      @map("invited_by_user_id") @db.Uuid
+  joinedAt        DateTime?    @map("joined_at") @db.Timestamptz(6)
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+  careCircle      CareCircle   @relation(fields: [careCircleId], references: [id], onDelete: Restrict)
+  user            User         @relation("CareCircleMemberUser", fields: [userId], references: [id], onDelete: Restrict)
+  invitedBy       User?        @relation("CareCircleMemberInviter", fields: [invitedByUserId], references: [id], onDelete: Restrict)
+
+  @@unique([careCircleId, userId])
+  @@index([userId, status])
+  @@map("care_circle_members")
+}
+
+model CareCircleInvitation {
+  id               String     @id @default(uuid()) @db.Uuid
+  careCircleId     String     @map("care_circle_id") @db.Uuid
+  codeHash         String     @unique @map("code_hash") @db.VarChar(255)
+  expiresAt        DateTime   @map("expires_at") @db.Timestamptz(6)
+  createdByUserId  String     @map("created_by_user_id") @db.Uuid
+  acceptedByUserId String?    @map("accepted_by_user_id") @db.Uuid
+  acceptedAt       DateTime?  @map("accepted_at") @db.Timestamptz(6)
+  revokedAt        DateTime?  @map("revoked_at") @db.Timestamptz(6)
+  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  careCircle       CareCircle @relation(fields: [careCircleId], references: [id], onDelete: Restrict)
+  createdBy        User       @relation("CareCircleInvitationCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  acceptedBy       User?      @relation("CareCircleInvitationAcceptedBy", fields: [acceptedByUserId], references: [id], onDelete: Restrict)
+
+  @@map("care_circle_invitations")
+}
+
+model PatientProfile {
+  id                       String                     @id @default(uuid()) @db.Uuid
+  careCircleId             String                     @map("care_circle_id") @db.Uuid
+  displayName              String                     @map("display_name") @db.VarChar(120)
+  relationshipLabel        String                     @map("relationship_label") @db.VarChar(32)
+  dateOfBirth              DateTime?                  @map("date_of_birth") @db.Date
+  city                     String?                    @db.VarChar(80)
+  locationLabel            String?                    @map("location_label") @db.VarChar(160)
+  primaryConditions        String[]                   @default([]) @map("primary_conditions")
+  primaryConditionsStatus  ProfileFactStatus          @default(UNKNOWN) @map("primary_conditions_status")
+  allergies                String[]                   @default([])
+  allergiesStatus          ProfileFactStatus          @default(UNKNOWN) @map("allergies_status")
+  currentMedicationsStatus ProfileFactStatus          @default(UNKNOWN) @map("current_medications_status")
+  bpjsNumberLast4          String?                    @map("bpjs_number_last4") @db.VarChar(4)
+  bpjsMembershipStatus     BpjsMembershipStatus       @default(UNKNOWN) @map("bpjs_membership_status")
+  usualFacilityName        String?                    @map("usual_facility_name") @db.VarChar(160)
+  emergencyContactName     String?                    @map("emergency_contact_name") @db.VarChar(120)
+  emergencyContactPhone    String?                    @map("emergency_contact_phone") @db.VarChar(32)
+  emergencyContactStatus   ProfileFactStatus          @default(UNKNOWN) @map("emergency_contact_status")
+  status                   PatientStatus              @default(ACTIVE)
+  deactivationReason       PatientDeactivationReason? @map("deactivation_reason")
+  deactivationNote         String?                    @map("deactivation_note") @db.VarChar(500)
+  deactivatedByUserId      String?                    @map("deactivated_by_user_id") @db.Uuid
+  deactivatedAt            DateTime?                  @map("deactivated_at") @db.Timestamptz(6)
+  createdByUserId          String                     @map("created_by_user_id") @db.Uuid
+  updatedByUserId          String?                    @map("updated_by_user_id") @db.Uuid
+  createdAt                DateTime                   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime                   @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt                DateTime?                  @map("deleted_at") @db.Timestamptz(6)
+  careCircle               CareCircle                 @relation(fields: [careCircleId], references: [id], onDelete: Restrict)
+  createdBy                User                       @relation("PatientProfileCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy                User?                      @relation("PatientProfileUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: Restrict)
+  deactivatedBy            User?                      @relation("PatientProfileDeactivatedBy", fields: [deactivatedByUserId], references: [id], onDelete: Restrict)
+  accessCodes              PatientAccessCode[]
+  sessions                 PatientSession[]
+  auditEvents              AuditEvent[]               @relation("AuditTargetPatientProfile")
+  actorAuditEvents         AuditEvent[]               @relation("AuditActorPatientProfile")
+
+  @@index([careCircleId, status])
+  @@map("patient_profiles")
+}
+
+model PatientAccessCode {
+  id                 String           @id @default(uuid()) @db.Uuid
+  patientProfileId   String           @map("patient_profile_id") @db.Uuid
+  codeHash           String           @unique @map("code_hash") @db.VarChar(255)
+  status             AccessCodeStatus @default(ACTIVE)
+  failedAttemptCount Int              @default(0) @map("failed_attempt_count") @db.SmallInt
+  lockedUntil        DateTime?        @map("locked_until") @db.Timestamptz(6)
+  lastUsedAt         DateTime?        @map("last_used_at") @db.Timestamptz(6)
+  expiresAt          DateTime?        @map("expires_at") @db.Timestamptz(6)
+  createdByUserId    String           @map("created_by_user_id") @db.Uuid
+  createdAt          DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  patientProfile     PatientProfile   @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
+  createdBy          User             @relation("PatientAccessCodeCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@map("patient_access_codes")
+}
+
+model PatientSession {
+  id               String         @id @default(uuid()) @db.Uuid
+  patientProfileId String         @map("patient_profile_id") @db.Uuid
+  tokenHash        String         @unique @map("token_hash") @db.VarChar(255)
+  expiresAt        DateTime       @map("expires_at") @db.Timestamptz(6)
+  lastSeenAt       DateTime       @map("last_seen_at") @db.Timestamptz(6)
+  revokedAt        DateTime?      @map("revoked_at") @db.Timestamptz(6)
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  patientProfile   PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
+
+  @@map("patient_sessions")
+}
+
+model AuditEvent {
+  id                    String          @id @default(uuid()) @db.Uuid
+  careCircleId          String          @map("care_circle_id") @db.Uuid
+  patientProfileId      String?         @map("patient_profile_id") @db.Uuid
+  actorType             ActorType       @map("actor_type")
+  actorUserId           String?         @map("actor_user_id") @db.Uuid
+  actorPatientProfileId String?         @map("actor_patient_profile_id") @db.Uuid
+  actorRole             String?         @map("actor_role") @db.VarChar(32)
+  action                String          @db.VarChar(80)
+  targetType            String          @map("target_type") @db.VarChar(80)
+  targetId              String?         @map("target_id") @db.Uuid
+  summary               String          @db.VarChar(500)
+  requestId             String?         @map("request_id") @db.VarChar(80)
+  createdAt             DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  careCircle            CareCircle      @relation(fields: [careCircleId], references: [id], onDelete: Restrict)
+  patientProfile        PatientProfile? @relation("AuditTargetPatientProfile", fields: [patientProfileId], references: [id], onDelete: Restrict)
+  actorUser             User?           @relation("AuditActorUser", fields: [actorUserId], references: [id], onDelete: Restrict)
+  actorPatientProfile   PatientProfile? @relation("AuditActorPatientProfile", fields: [actorPatientProfileId], references: [id], onDelete: Restrict)
+
+  @@index([careCircleId, createdAt(sort: Desc)])
+  @@index([patientProfileId, createdAt(sort: Desc)])
+  @@map("audit_events")
 }
