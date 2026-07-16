@@ -1,37 +1,43 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import CaregiverShellPage from "@/app/caregiver/page";
+import CaregiverPage from "@/app/caregiver/page";
 
-describe("caregiver shell page", () => {
+vi.mock("@/components/auth/caregiver-auth-panel", () => ({
+  CaregiverAuthPanel: () => <div>Caregiver auth panel</div>,
+}));
+
+describe("caregiver page", () => {
   it("renders the caregiver area heading", () => {
-    render(<CaregiverShellPage />);
+    render(<CaregiverPage />);
 
     expect(
       screen.getByRole("heading", { level: 1, name: "Area Caregiver" }),
     ).toBeInTheDocument();
   });
 
-  it("states that no feature or data is live yet", () => {
-    render(<CaregiverShellPage />);
+  it("states that caregiver authentication is active", () => {
+    render(<CaregiverPage />);
 
     expect(
-      screen.getByText("Shell awal — belum ada fitur aktif"),
+      screen.getByText("Autentikasi caregiver aktif"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Belum ada data yang ditampilkan"),
+      screen.getByText(/Dashboard Patient belum tersedia/),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Login caregiver.*belum tersedia/),
+    ).not.toBeInTheDocument();
   });
 
-  it("marks every planned area as in development", () => {
-    render(<CaregiverShellPage />);
+  it("renders the caregiver auth panel", () => {
+    render(<CaregiverPage />);
 
-    const badges = screen.getAllByText("Dalam pengembangan");
-    expect(badges).toHaveLength(4);
+    expect(screen.getByText("Caregiver auth panel")).toBeInTheDocument();
   });
 
   it("links back to the home page", () => {
-    render(<CaregiverShellPage />);
+    render(<CaregiverPage />);
 
     expect(
       screen.getByRole("link", { name: "Kembali ke beranda" }),

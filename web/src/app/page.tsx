@@ -15,7 +15,9 @@ export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-16">
       <div className="flex max-w-2xl flex-col items-center gap-4 text-center">
-        <Badge variant="secondary">Pra-rilis — fitur belum aktif</Badge>
+        <Badge variant="secondary">
+          Pra-rilis - autentikasi caregiver aktif
+        </Badge>
         <h1 className="text-4xl font-semibold tracking-tight">ChroniCare</h1>
         <p className="text-lg text-muted-foreground">
           Membantu pasien chronic illness dan caregiver menjaga rutinitas

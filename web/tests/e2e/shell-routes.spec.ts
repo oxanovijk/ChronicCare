@@ -17,14 +17,16 @@ test.describe("shell routes", () => {
     ).toBeVisible();
   });
 
-  test("caregiver shell renders without blank page", async ({ page }) => {
+  test("caregiver login renders without blank page", async ({ page }) => {
     await page.goto("/caregiver");
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Area Caregiver" }),
     ).toBeVisible();
+    await expect(page.getByLabel("Email caregiver")).toBeVisible();
+    await expect(page.getByLabel("Kata sandi")).toBeVisible();
     await expect(
-      page.getByText("Belum ada data yang ditampilkan"),
+      page.getByRole("button", { name: "Masuk sebagai caregiver" }),
     ).toBeVisible();
   });
 

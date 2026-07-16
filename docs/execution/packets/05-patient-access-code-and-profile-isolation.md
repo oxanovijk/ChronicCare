@@ -1,6 +1,6 @@
 # Packet 05: Patient Access Code and Profile Isolation
 
-Status: Draft
+Status: Ready
 
 Driver / DRI: Bernard
 
@@ -43,6 +43,25 @@ Owner can create a profile without guessing optional data, caregivers can comple
 - Seeded Maya and Raka Patient Profiles and hashed access-code fixture.
 - Confirmed cookie/session naming from API docs.
 - No real patient/family data is used.
+
+## Entry Readiness Evidence
+
+- Packet 04 is `Done`; `resolveCaregiverAuthContext`, `CaregiverAuthContext`, and
+  `requireOwner` provide the caregiver identity and role boundary that Packet 05
+  must reuse.
+- Packet 03 remains `Done`; the development Supabase contains the synthetic Maya
+  and Raka Patient Profiles plus one hash-only access-code fixture per profile.
+- `PATIENT_SESSION_SECRET` is present in ignored local `web/.env` and meets the
+  locked minimum length without exposing its value.
+- `chronicare_patient_session` remains the locked opaque Patient cookie name;
+  no contract change is required.
+- Supabase Auth contains only the two synthetic caregiver users. Patient mode
+  remains a separate access-code and opaque-session flow as required.
+- Database and direct migration connection values remain available locally;
+  Packet 05 may use the existing schema without a provider or role decision.
+- Usable synthetic Maya/Raka Patient codes will be generated or rotated during
+  Packet 05, stored only as local demo inputs, and persisted only as hashes.
+- No P5 blocker or unresolved soft dependency remains.
 
 ## Hard Dependencies
 
