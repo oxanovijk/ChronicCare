@@ -727,6 +727,6 @@ Minimum automated scenarios:
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
-| 2026-07-16 | Mengunci minimum Patient Profile create, progressive PATCH fields, explicit fact/BPJS statuses, dan derived setup checklist | Mendukung caregiver yang belum mengetahui semua data tanpa menghasilkan fakta palsu | Ozan | Pending: Bernard |
+| 2026-07-16 | Mengunci minimum Patient Profile create, progressive PATCH fields, explicit fact/BPJS statuses, dan derived setup checklist | Mendukung caregiver yang belum mengetahui semua data tanpa menghasilkan fakta palsu | Ozan | Bernard |
 | 2026-07-16 | Mengubah API ke Patient Profile, demo diabetes tipe 2, dan endpoint deactivation | Challenge pivot ke chronic illness | Bernard | Ozan |
 | 2026-07-15 | Mengunci REST `/api/v1`, auth, daily care, OCR review, chatbot, SOS Realtime, dan facility endpoints | Human verdict untuk Next.js full-stack MVP | Bernard | Ozan |

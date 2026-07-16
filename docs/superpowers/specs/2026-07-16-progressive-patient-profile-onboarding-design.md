@@ -2,7 +2,7 @@
 
 Produk: ChroniCare
 
-Status: Product decision approved by Ozan; required domain reviews pending before implementation
+Status: Approved by Ozan, Bernard, Daniel, and Al; ready for implementation
 
 Decision owner: Ozan
 
@@ -11,6 +11,34 @@ Required technical reviewer: Bernard
 Required UX reviewer: Daniel
 
 Required AI/OCR reviewer: Al
+
+## Review Confirmation
+
+| Reviewer | Domain confirmation | Decision |
+| --- | --- | --- |
+| Bernard | Schema/API contract, Prisma mapping, fact-state constraints, profile limits, and Supabase implementation suitability | Approved |
+| Daniel | Minimum Patient Profile fields, progressive onboarding UX, sparse/unknown states, setup checklist, and synthetic seed suitability for Patient/caregiver UI | Approved |
+| Al | Synthetic seed privacy, audit minimization, OCR non-automation boundary, and `UNKNOWN`/`NONE_REPORTED` handling in AI context | Approved |
+| Ozan | Product scope, acceptance semantics, QA gate, and Packet 03 readiness | Approved |
+
+The reviewers confirmed that the design can proceed without changing locked
+role permissions, provider choices, medical-safety boundaries, privacy rules,
+or the two-minute demo promise.
+
+## Implementation Review Confirmation
+
+Commit `9c5daf3` was reviewed after implementation:
+
+| Reviewer role | Result | Implementation conclusion |
+| --- | --- | --- |
+| Daniel | Pass | Stored fields and explicit sparse states are sufficient and understandable for the upcoming Patient/caregiver UI. |
+| Al | Pass | Synthetic seed, hash-only Patient fixtures, generic logging, and bounded audit summaries meet the approved privacy/minimization contract. |
+| Ozan | Pass | Database evidence and fresh automated checks satisfy all Packet 03 acceptance criteria. |
+
+The implementation intentionally leaves Maya's
+`current_medications_status = UNKNOWN` until Packet 08 introduces an active
+Medication row. Setting it to `REPORTED` in Packet 03 would contradict the
+approved cross-table rule.
 
 ## 1. Decision
 

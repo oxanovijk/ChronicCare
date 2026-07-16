@@ -358,6 +358,6 @@ Do not rescue scope by adding food/menu recommendation, real subscription, push 
 
 | Date | Change | Reason | DRI | Reviewer |
 | --- | --- | --- | --- | --- |
-| 2026-07-16 | Added progressive Patient Profile work across schema, profile API, dashboard, and chatbot packets | Preserve unknown data honestly through the implementation sequence | Ozan | Pending: Bernard |
+| 2026-07-16 | Added progressive Patient Profile work across schema, profile API, dashboard, and chatbot packets | Preserve unknown data honestly through the implementation sequence | Ozan | Bernard |
 | 2026-07-16 | Refined execution workflow from 9 broad packets to 13 one-prompt-sized execution packets | Align packet scope with human request for single-prompt implementability while preserving 30-hour delivery | Ozan | Bernard |
 | 2026-07-16 | Refined execution flow for chronic illness Patient positioning, diabetes tipe 2 demo, deactivation, and food/menu cut line | Challenge update and human scope verdict | Ozan | Bernard |

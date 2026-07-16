@@ -523,7 +523,7 @@ Minimum seed:
 - Family Member `Rina Pratama`.
 - Patient Profile `Maya Pratama` with type 2 diabetes as the main demo condition.
 - Patient Profile `Raka Pratama` with different chronic-care data for isolation checks.
-- Maya uses `REPORTED` condition/medication statuses, while at least one optional fact on Raka remains `UNKNOWN` to test sparse-profile behavior.
+- Maya uses a `REPORTED` primary-condition status and keeps `current_medications_status = UNKNOWN` until Packet 08 creates an active Medication row; at least one optional fact on Raka remains `UNKNOWN` to test sparse-profile behavior.
 - One active access code per Patient Profile, stored only as a hash after seeding.
 - Distinct check-in, medication, reminder, health note, and document states per Patient Profile.
 - One synthetic confirmed OCR result and one document ready for live OCR.
@@ -546,6 +546,6 @@ Minimum seed:
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
-| 2026-07-16 | Menambahkan progressive profile fact statuses, BPJS membership status, minimum profile creation, dan derived setup checklist contract | Mencegah data yang belum diketahui dianggap sebagai `tidak ada` atau dipaksa untuk ditebak | Ozan | Pending: Bernard |
+| 2026-07-16 | Menambahkan progressive profile fact statuses, BPJS membership status, minimum profile creation, dan derived setup checklist contract | Mencegah data yang belum diketahui dianggap sebagai `tidak ada` atau dipaksa untuk ditebak | Ozan | Bernard |
 | 2026-07-16 | Mengubah schema kontrak ke Patient Profile, demo diabetes tipe 2, dan deactivation non-destruktif | Challenge pivot ke chronic illness | Bernard | Ozan |
 | 2026-07-15 | Mengunci PostgreSQL, Prisma 7, Supabase Auth/Storage/Realtime, Patient session, OCR tables, dan SOS web | Human verdict untuk memulai scaffold | Bernard | Ozan |
