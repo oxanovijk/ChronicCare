@@ -14,8 +14,8 @@ Timebox: hours 14 to 16
 
 ## Role Work
 
-- Role A - Caregiver UI, DRI: Daniel: build informative active-profile dashboard, medication/reminder panels, and daily-care states.
-- Role B - Daily-care API/data, DRI: Bernard: implement profile-bound caregiver reads/writes for dashboard, medication text, reminders, and check-in summary.
+- Role A - Caregiver UI, DRI: Daniel: build informative active-profile dashboard, setup checklist, medication/reminder panels, and daily-care states.
+- Role B - Daily-care API/data, DRI: Bernard: implement profile-bound caregiver reads/writes for dashboard, derived setup checklist, medication text, reminders, and check-in summary.
 - Role C - Demo QA, DRI: Ozan: verify Maya/Raka switching, Owner/Family Member access, and dashboard readiness for later packets.
 - Role D - Safety consult, DRI: Al: review medication/reminder copy so it does not recommend dosing or treatment changes.
 
@@ -83,6 +83,10 @@ Caregiver can see the latest Patient check-in, medication/reminder basics, and c
 
 - Caregiver dashboard shows active Patient Profile clearly.
 - Dashboard shows latest check-in, medication text/log basics, reminder state, and clear empty states.
+- Dashboard distinguishes `Belum diketahui`, explicit `Tidak ada yang dilaporkan`, and a recorded value.
+- Setup checklist is compact, advisory, and does not block daily-care, document, chatbot, or SOS entry points.
+- Creating/reactivating an active Medication sets `currentMedicationsStatus = REPORTED` atomically.
+- Pausing/ending the last active Medication sets `currentMedicationsStatus = UNKNOWN`, not `NONE_REPORTED`.
 - Owner and Family Member can perform only allowed daily-care actions.
 - Profile switching updates dashboard data without stale Maya/Raka leakage.
 - Patient cannot access caregiver dashboard or daily-care admin routes.
@@ -104,6 +108,9 @@ Caregiver can see the latest Patient check-in, medication/reminder basics, and c
 - Submit Maya check-in from Patient flow and view it on caregiver dashboard.
 - Switch to Raka and confirm Maya data disappears.
 - Add/update medication/reminder text where allowed.
+- Verify an empty Medication list with status `UNKNOWN` is not labeled as `tidak ada obat`.
+- Verify an explicit `NONE_REPORTED` state uses qualified caregiver-reported wording.
+- Verify profile PATCH cannot set `REPORTED` without an active Medication.
 - Confirm Family Member cannot perform Owner-only actions.
 - Check 390x844 and 1440x900 layouts.
 
@@ -122,5 +129,4 @@ Caregiver can see the latest Patient check-in, medication/reminder basics, and c
 
 ## Handoff Notes
 
-Provide dashboard route paths, daily-care selector names, active profile state source, tests run, and known placeholder entry points. Packet 09 uses the dashboard document entry; Packet 11 uses daily-care context.
-
+Provide dashboard route paths, setup checklist component/selector names, daily-care selector names, active profile state source, sparse-state tests, and known placeholder entry points. Packet 09 uses the dashboard document entry; Packet 11 uses daily-care context.

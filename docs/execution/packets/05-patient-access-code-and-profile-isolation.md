@@ -14,18 +14,18 @@ Timebox: hours 9 to 10.5
 
 ## Role Work
 
-- Role A - Patient session/API, DRI: Bernard: implement Patient access code verification, profile-bound session, and authorization helpers.
-- Role B - Profile UX, DRI: Daniel: implement caregiver active Patient Profile switching and Patient login/session states.
+- Role A - Patient session/API, DRI: Bernard: implement minimum Patient Profile create/update API, Patient access code verification, profile-bound session, and authorization helpers.
+- Role B - Profile UX, DRI: Daniel: implement progressive profile setup states, caregiver active Patient Profile switching, and Patient login/session states.
 - Role C - Isolation QA, DRI: Ozan: verify Maya/Raka separation, wrong-code behavior, and wrong-role access.
 - Role D - Privacy consult, DRI: Al: review that no hidden profile/context can be exposed to AI/OCR later.
 
 ## Goal
 
-Implement Patient access code login and explicit Patient Profile isolation for both caregiver profile switching and Patient mode.
+Implement progressive minimum Patient Profile API behavior, Patient access code login, and explicit Patient Profile isolation for caregiver switching and Patient mode.
 
 ## User-Visible Outcome
 
-Caregiver can switch Maya/Raka safely, and a Patient code opens exactly one bound Patient experience without exposing caregiver UI or another Patient Profile.
+Owner can create a profile without guessing optional data, caregivers can complete it progressively and switch Maya/Raka safely, and a Patient code opens exactly one bound Patient experience.
 
 ## Covered Canonical Sources
 
@@ -66,6 +66,7 @@ Caregiver can switch Maya/Raka safely, and a Patient code opens exactly one boun
 - `web/src/components/profile/`
 - `web/tests/**/patient-session*`
 - `web/tests/**/profile-isolation*`
+- `web/tests/**/patient-profile*`
 
 ## Out of Scope
 
@@ -81,6 +82,12 @@ Caregiver can switch Maya/Raka safely, and a Patient code opens exactly one boun
 ## Acceptance Criteria
 
 - Patient access code is verified against hashed storage and returns generic errors for wrong/expired codes.
+- Owner can create a Patient Profile with only `displayName` and `relationshipLabel`.
+- Owner or Family Member can update allowed optional details with locked status/value validation.
+- Skipped details remain `UNKNOWN`; the API never converts empty arrays into `NONE_REPORTED`.
+- Full BPJS numbers are rejected; optional four-digit suffix is accepted only for `REGISTERED`.
+- Profile PATCH rejects client-supplied `currentMedicationsStatus = REPORTED`; that state belongs to Packet 08 Medication transactions.
+- Profile response includes the derived setup checklist and no stored completion percentage.
 - Patient session is bound to exactly one `patientProfileId`.
 - Patient session cannot open caregiver routes, caregiver APIs, documents admin, membership, settings, or another Patient Profile.
 - Caregiver active profile switching clears stale Maya/Raka state.
@@ -95,6 +102,7 @@ Caregiver can switch Maya/Raka safely, and a Patient code opens exactly one boun
 | --- | --- |
 | `npm test -- patient-session` from `/web` if supported | Valid code creates bound session; invalid/expired code rejects safely. |
 | `npm test -- profile-isolation` from `/web` if supported | Maya/Raka cross-profile access is denied. |
+| `npm test -- patient-profile` from `/web` if supported | Minimum create, progressive update, status contradictions, and setup checklist cases pass. |
 | `npm run typecheck` from `/web` | Patient session and profile helper types compile. |
 | `npm run lint` from `/web` | Auth/profile code lint cleanly. |
 | `npm run test:e2e` from `/web` if profile routes exist | Patient login and caregiver profile switch happy/negative paths pass. |
@@ -102,6 +110,8 @@ Caregiver can switch Maya/Raka safely, and a Patient code opens exactly one boun
 ## Manual QA
 
 - Log in as caregiver and switch Maya to Raka and back.
+- Create a profile with only name/relationship, choose `Isi nanti`, and confirm optional facts remain `Belum diketahui`.
+- Set one fact to `NONE_REPORTED` explicitly and confirm UI wording remains qualified.
 - Log in with Maya Patient code and try to open Raka route directly.
 - Try wrong, expired, or revoked Patient code and confirm generic copy.
 - Confirm Patient UI is simpler than caregiver UI and has no admin/document/member access.
@@ -121,5 +131,4 @@ Caregiver can switch Maya/Raka safely, and a Patient code opens exactly one boun
 
 ## Handoff Notes
 
-Provide active profile type, Patient session helper names, route paths, cookie/session behavior, test evidence, and Maya/Raka isolation proof. Packet 06 and daily-care packets must reuse these helpers.
-
+Provide profile create/update service names, setup checklist selector, active profile type, Patient session helper names, route paths, cookie/session behavior, test evidence, and Maya/Raka isolation proof. Packet 06 and daily-care packets must reuse these helpers.

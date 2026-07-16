@@ -52,6 +52,11 @@ Format evidence yang disarankan:
 | AUTH-08 | Rapid profile switching tidak menampilkan respons profile lama | Daniel | Belum diisi | Not Run |
 | AUTH-09 | Deactivate Patient Profile hanya dapat dilakukan Owner dan revokes Patient code/session | Bernard | Belum diisi | Not Run |
 | AUTH-10 | Deactivated Patient Profile tidak muncul di active flows tetapi history tetap aman untuk caregiver berhak | Ozan | Belum diisi | Not Run |
+| AUTH-11 | Owner dapat membuat Patient Profile hanya dengan nama tampilan dan label hubungan | Bernard | Belum diisi | Not Run |
+| AUTH-12 | Optional data yang dilewati tetap `UNKNOWN`, bukan otomatis `NONE_REPORTED` | Ozan | Belum diisi | Not Run |
+| AUTH-13 | Kombinasi fact status/value yang kontradiktif ditolak API/database | Bernard | Belum diisi | Not Run |
+| AUTH-14 | Setup checklist berasal dari state tersimpan dan tidak memakai completion percentage persisten | Bernard | Belum diisi | Not Run |
+| AUTH-15 | Unknown optional data tidak memblokir Patient code, check-in, dokumen, chatbot, atau SOS | Ozan | Belum diisi | Not Run |
 
 ## 4. Patient dan Daily Care
 
@@ -63,6 +68,8 @@ Format evidence yang disarankan:
 | CARE-04 | Copy tidak memberi rekomendasi obat/dosis | Ozan | Belum diisi | Not Run |
 | CARE-05 | Empty/loading/error states dapat dibedakan | Daniel | Belum diisi | Not Run |
 | CARE-06 | Demo check-in diabetes tipe 2 tidak memberi target klinis atau advice treatment | Al | Belum diisi | Not Run |
+| CARE-07 | Dashboard membedakan `Belum diketahui`, `Tidak ada yang dilaporkan`, dan nilai tercatat | Daniel | Belum diisi | Not Run |
+| CARE-08 | Medication create/reactivate mengatur `REPORTED`; pause/end terakhir mengatur `UNKNOWN` secara atomik | Bernard | Belum diisi | Not Run |
 
 ## 5. Document, Storage, dan OCR
 
@@ -95,6 +102,8 @@ Format evidence yang disarankan:
 | AI-10 | Raw OCR dan extraction pending tidak dikirim ke model | Al | Belum diisi | Not Run |
 | AI-11 | Provider failure menghasilkan fallback yang aman dan berlabel | Al | Belum diisi | Not Run |
 | AI-12 | Prompt/log tidak menyimpan data sensitif mentah | Bernard | Belum diisi | Not Run |
+| AI-13 | Fact profile `UNKNOWN` tidak dikirim sebagai fakta atau diubah menjadi `none` | Al | Belum diisi | Not Run |
+| AI-14 | Fact `NONE_REPORTED` mempertahankan qualifier caregiver dalam context dan response | Al | Belum diisi | Not Run |
 
 ## 7. SOS Web
 
@@ -141,6 +150,8 @@ Format evidence yang disarankan:
 | SEC-04 | API error tidak membocorkan stack/SQL/provider secret | Bernard | Belum diisi | Not Run |
 | SEC-05 | Destructive/sensitive action memiliki authorization server | Bernard | Belum diisi | Not Run |
 | SEC-06 | End-of-care/deactivation tidak hard delete dan tidak memakai copy kasar di UI | Daniel | Belum diisi | Not Run |
+| SEC-07 | Profile API menolak nomor BPJS penuh dan hanya menyimpan empat digit terakhir opsional | Bernard | Belum diisi | Not Run |
+| SEC-08 | Onboarding/upload UI tidak meminta KTP dan memberi copy agar identitas resmi tidak diunggah | Daniel | Belum diisi | Not Run |
 
 ## 11. Pitch dan Rehearsal
 
@@ -176,5 +187,6 @@ Dokumen ini tetap `Not Run` sampai pemeriksaan nyata dilakukan.
 
 ## 13. Change Log
 
+- 16 Juli 2026: Menambahkan checks progressive minimum profile, fact-state consistency, sparse dashboard, dan sparse AI context; semua status tetap `Not Run`.
 - 16 Juli 2026: Menambahkan checks Patient Profile, diabetes tipe 2 safety, deactivation lifecycle, dan chronic illness demo framing.
 - 15 Juli 2026: Menambahkan ownership per domain, OCR/private storage checks, SOS Realtime/audio checks, dan claim evidence rules.

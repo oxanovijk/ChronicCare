@@ -35,6 +35,8 @@ Aturan global:
 | `member_status` | `INVITED`, `ACTIVE`, `REMOVED` |
 | `patient_status` | `ACTIVE`, `INACTIVE`, `END_OF_CARE`, `DECEASED` |
 | `patient_deactivation_reason` | `NO_LONGER_CARED`, `PATIENT_DECEASED`, `OTHER` |
+| `profile_fact_status` | `UNKNOWN`, `NONE_REPORTED`, `REPORTED` |
+| `bpjs_membership_status` | `UNKNOWN`, `NOT_REGISTERED`, `REGISTERED` |
 | `access_code_status` | `ACTIVE`, `REVOKED`, `EXPIRED` |
 | `check_in_mood` | `GOOD`, `OKAY`, `UNWELL` |
 | `medication_status` | `ACTIVE`, `PAUSED`, `ENDED` |
@@ -128,24 +130,26 @@ P1 support. Boleh tidak memiliki UI penuh dalam demo.
 | `display_name` | `varchar(120)` | required |
 | `relationship_label` | `varchar(32)` | required, display label seperti `Maya`, `Raka`, atau relasi caregiver bila relevan |
 | `date_of_birth` | `date` | nullable |
-| `gender` | `varchar(24)` | nullable |
-| `phone_number` | `varchar(32)` | nullable |
-| `address_text` | `text` | nullable |
 | `city` | `varchar(80)` | nullable |
-| `province` | `varchar(80)` | nullable |
 | `location_label` | `varchar(160)` | nullable |
 | `primary_conditions` | `text[]` | default empty array |
+| `primary_conditions_status` | `profile_fact_status` | default `UNKNOWN` |
 | `allergies` | `text[]` | default empty array |
-| `bpjs_number_encrypted` | `text` | nullable, never returned raw by default |
+| `allergies_status` | `profile_fact_status` | default `UNKNOWN` |
+| `current_medications_status` | `profile_fact_status` | default `UNKNOWN` |
+| `bpjs_number_last4` | `varchar(4)` | nullable, exactly four digits; full BPJS number is not stored |
+| `bpjs_membership_status` | `bpjs_membership_status` | default `UNKNOWN` |
 | `usual_facility_name` | `varchar(160)` | nullable |
 | `emergency_contact_name` | `varchar(120)` | nullable |
 | `emergency_contact_phone` | `varchar(32)` | nullable |
+| `emergency_contact_status` | `profile_fact_status` | default `UNKNOWN` |
 | `status` | `patient_status` | default `ACTIVE` |
 | `deactivation_reason` | `patient_deactivation_reason` | nullable |
 | `deactivation_note` | `varchar(500)` | nullable, no raw medical detail |
 | `deactivated_by_user_id` | `uuid` | FK `users.id`, nullable |
 | `deactivated_at` | `timestamptz` | nullable |
 | `created_by_user_id` | `uuid` | FK `users.id`, required |
+| `updated_by_user_id` | `uuid` | FK `users.id`, nullable |
 | `created_at` | `timestamptz` | default `now()` |
 | `updated_at` | `timestamptz` | required |
 | `deleted_at` | `timestamptz` | nullable |
@@ -157,8 +161,36 @@ Constraints and indexes:
 - Database trigger rejects a third row with `deleted_at IS NULL` for the same Care Circle.
 - `age` is never stored. UI derives age from `date_of_birth`.
 - Latitude and longitude are not modeled because live or precise location is out of scope.
+- Patient gender, personal phone number, full address, and province are not modeled because no locked MVP workflow consumes them.
+- A profile can be created with only `display_name`, `relationship_label`, ownership fields, and default statuses.
 - `DECEASED` is an internal status only. UI must use careful wording such as `Akhiri perawatan profil` or `Profil tidak aktif`.
 - Deactivated Patient Profiles are excluded from default dashboard, reminder, chat, document upload, and SOS creation flows.
+
+Progressive setup semantics:
+
+- `UNKNOWN` means the caregiver does not know or has not reviewed the fact.
+- `NONE_REPORTED` means the caregiver explicitly reports that none is currently known; it is not clinical proof.
+- `REPORTED` means one or more related values are stored.
+- Nullable demographic fields such as `date_of_birth`, `city`, and `usual_facility_name` use `null` for unknown/not recorded. They do not need a `NONE_REPORTED` state.
+- Profile completeness is derived by the API. It is not stored as a percentage or status column.
+
+Same-row checks:
+
+- `primary_conditions_status = REPORTED` requires `cardinality(primary_conditions) > 0`; other statuses require an empty array.
+- `allergies_status = REPORTED` requires `cardinality(allergies) > 0`; other statuses require an empty array.
+- `emergency_contact_status = REPORTED` requires at least one of `emergency_contact_name` or `emergency_contact_phone`; other statuses require both fields to be null.
+- `bpjs_membership_status = NOT_REGISTERED` or `UNKNOWN` requires `bpjs_number_last4` to be null.
+- `bpjs_membership_status = REGISTERED` allows `bpjs_number_last4` to remain null when membership is known but the card is unavailable.
+- When present, `bpjs_number_last4` must match `^[0-9]{4}$`.
+- `NOT_REGISTERED` is caregiver-reported administrative information, not verification from BPJS.
+
+Medication status is a cross-table rule:
+
+- Patient Profile PATCH cannot set `current_medications_status = REPORTED` directly.
+- Creating or reactivating an active Medication sets `patient_profiles.current_medications_status = REPORTED` in the same transaction.
+- `current_medications_status = REPORTED` requires at least one active Medication.
+- `current_medications_status = NONE_REPORTED` or `UNKNOWN` is rejected while an active Medication exists.
+- Pausing or ending the last active Medication sets `current_medications_status = UNKNOWN`; the system never silently chooses `NONE_REPORTED`.
 
 ### 4.2 `patient_access_codes`
 
@@ -236,6 +268,8 @@ Exactly one submitter mode is required: caregiver user or Patient. Index `(patie
 | `updated_at` | `timestamptz` | required |
 
 Index `(patient_profile_id, status)`. AI may quote recorded text but may not interpret or change it.
+
+Medication creation and status changes update `patient_profiles.current_medications_status` according to the progressive setup rules in section 4.1. Profile PATCH cannot manufacture `REPORTED`, and OCR confirmation never creates or updates a Medication automatically.
 
 ### 5.3 `medication_logs`
 
@@ -471,11 +505,13 @@ Locked enforcement:
 ## 11. Transaction Rules
 
 - Creating a Care Circle, Owner membership, and first Patient Profile uses one transaction.
+- Creating a minimum Patient Profile initializes fact and BPJS statuses to `UNKNOWN`; optional detail updates occur separately and do not create another profile.
 - Creating or regenerating a Patient access code revokes the previous active code in one transaction.
 - Deactivating a Patient Profile sets status, stores reason metadata, revokes active Patient access codes and sessions, and writes audit in one transaction.
 - Confirming OCR updates extraction and document status atomically.
 - Handling SOS uses conditional update `status = NEW`; a second handler receives conflict instead of overwriting the first.
 - Medication log creation verifies the Medication and log share the same Patient Profile.
+- Creating/reactivating an active Medication sets `current_medications_status = REPORTED` atomically; pausing/ending the last active Medication sets it to `UNKNOWN`; profile updates cannot set `REPORTED` directly.
 - Profile creation locks the Care Circle row before checking the two-profile limit.
 
 ## 12. Demo Seed
@@ -487,6 +523,7 @@ Minimum seed:
 - Family Member `Rina Pratama`.
 - Patient Profile `Maya Pratama` with type 2 diabetes as the main demo condition.
 - Patient Profile `Raka Pratama` with different chronic-care data for isolation checks.
+- Maya uses `REPORTED` condition/medication statuses, while at least one optional fact on Raka remains `UNKNOWN` to test sparse-profile behavior.
 - One active access code per Patient Profile, stored only as a hash after seeding.
 - Distinct check-in, medication, reminder, health note, and document states per Patient Profile.
 - One synthetic confirmed OCR result and one document ready for live OCR.
@@ -500,6 +537,7 @@ Minimum seed:
 - Personalized diabetes target, insulin adjustment, lab interpretation, and diet/pantangan prescription.
 - Live location, wearable, ambulance dispatch, family chat, payment, subscription, hospital booking, and real-time faskes scraping.
 - More than one Care Circle per caregiver or more than two Patient Profiles.
+- Patient gender, personal phone number, full address, province, KTP, and other identity-verification fields.
 - Real subscription or payment lifecycle. Any "cancel subscription" copy is only a dummy entry point for the end-of-care flow.
 - Background push notification delivery.
 - Production retention, consent, compliance, and legal hold workflows.
@@ -508,5 +546,6 @@ Minimum seed:
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
+| 2026-07-16 | Menambahkan progressive profile fact statuses, BPJS membership status, minimum profile creation, dan derived setup checklist contract | Mencegah data yang belum diketahui dianggap sebagai `tidak ada` atau dipaksa untuk ditebak | Ozan | Pending: Bernard |
 | 2026-07-16 | Mengubah schema kontrak ke Patient Profile, demo diabetes tipe 2, dan deactivation non-destruktif | Challenge pivot ke chronic illness | Bernard | Ozan |
 | 2026-07-15 | Mengunci PostgreSQL, Prisma 7, Supabase Auth/Storage/Realtime, Patient session, OCR tables, dan SOS web | Human verdict untuk memulai scaffold | Bernard | Ozan |

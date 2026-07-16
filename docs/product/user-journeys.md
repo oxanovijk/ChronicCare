@@ -20,6 +20,7 @@ Demo condition: diabetes tipe 2
 - Chatbot hanya menggunakan konteks profile aktif yang diizinkan.
 - SOS hanya memberi alert kepada dashboard web caregiver yang sedang terbuka.
 - Demo diabetes tipe 2 tidak boleh berubah menjadi diagnosis, dosing, lab interpretation, atau nutrition prescription.
+- Data optional yang dilewati tetap `UNKNOWN`; sistem tidak boleh mengubahnya menjadi `NONE_REPORTED` atau fakta kosong.
 
 ## 2. Owner: Membuat Care Circle
 
@@ -28,15 +29,30 @@ Precondition: Owner telah masuk melalui Supabase Auth.
 Alur:
 
 1. Owner membuat Care Circle.
-2. Owner membuat Patient Profile pertama.
-3. Sistem menampilkan identitas Patient Profile dan meminta konfirmasi.
-4. Owner membuat kode akses Patient.
-5. Sistem menampilkan kode satu kali atau sesuai kebijakan demo.
-6. Owner masuk ke dashboard dengan Patient Profile pertama aktif.
+2. Owner memasukkan nama tampilan dan label hubungan Patient.
+3. Sistem menampilkan identitas minimum dan meminta konfirmasi.
+4. Sistem membuat Patient Profile dengan kondisi, alergi, obat aktif, kontak darurat, dan status BPJS sebagai `UNKNOWN`.
+5. Owner memilih `Lengkapi sekarang` atau `Isi nanti`.
+6. Jika melengkapi sekarang, setiap kelompok data menyediakan pilihan menambah informasi, menyatakan tidak ada yang diketahui/dilaporkan, atau tetap belum tahu.
+   Untuk obat aktif, `Tambahkan informasi` membuka flow Medication; status `REPORTED` tidak ditulis langsung oleh form profile.
+7. Upload dokumen bersifat opsional dan hanya dilakukan setelah Patient Profile memiliki ID.
+8. Owner membuat kode akses Patient.
+9. Sistem menampilkan kode satu kali atau sesuai kebijakan demo.
+10. Owner masuk ke dashboard dengan Patient Profile pertama aktif dan setup checklist yang tidak memblokir penggunaan.
 
-Success: Care Circle, membership Owner, Patient Profile, dan hashed access code tersimpan atomically.
+Success: Care Circle, membership Owner, minimum Patient Profile, dan hashed access code tersimpan sesuai transaction boundary. Optional profile details dapat disimpan pada request berikutnya tanpa membuat profile kedua.
 
 Failure states: nama kosong, Patient kedua melebihi batas, transaksi gagal, atau kode gagal dibuat. UI tidak boleh menunjukkan setup selesai jika transaksi belum berhasil.
+
+Sparse-data rules:
+
+- `UNKNOWN` tampil sebagai `Belum diketahui` atau `Belum diisi`.
+- `NONE_REPORTED` tampil sebagai `Tidak ada yang diketahui/dilaporkan`, bukan kepastian klinis.
+- `REPORTED` hanya dipakai jika nilai terkait benar-benar tersimpan.
+- Untuk obat aktif, `REPORTED` berarti minimal satu Medication aktif tersimpan.
+- BPJS `REGISTERED` boleh memiliki empat digit terakhir; nomor lengkap tidak diminta atau disimpan.
+- Melewati optional step tidak menghapus data yang sudah pernah dicatat.
+- Profile minimum tetap dapat memakai check-in, dokumen, chatbot, dan SOS.
 
 ## 3. Owner: Mengundang Family Member
 
@@ -212,6 +228,7 @@ AI tidak boleh menentukan makanan yang "boleh" atau "dilarang" secara personal u
 
 | Prioritas | Journey | Bukti Demo |
 | --- | --- | --- |
+| P0 | Progressive Patient Profile setup | Profile minimum dapat dibuat tanpa data tebakan dan status unknown tetap eksplisit |
 | P0 | Patient login dan homepage | Session terikat profile dan UI cheerful sederhana |
 | P0 | Patient Profile switch | Data Maya/Raka terpisah |
 | P0 | Check-in/daily care | Perubahan Patient terlihat caregiver |
@@ -233,6 +250,8 @@ Daniel bertanggung jawab atas:
 - Bahasa Indonesia sederhana, warm, dan konsisten.
 - Patient UI yang cheerful tanpa menjadi childish.
 - Caregiver UI yang informatif tanpa menjadi terlalu padat.
+- Optional field memiliki aksi `Isi nanti`; tidak menggunakan validasi required atau copy yang mendorong tebakan.
+- UI membedakan `Belum diketahui`, `Tidak ada yang dilaporkan`, dan data yang benar-benar tercatat.
 
 Ozan memverifikasi bahwa copy tidak membuat janji medis, emergency delivery, BPJS, OCR accuracy, diabetes outcome, atau nutrition advice yang tidak terbukti.
 
@@ -247,3 +266,4 @@ Technical docs dan execution packets sekarang memakai Patient terminology sebaga
 - 15 Juli 2026: Menambahkan journey OCR lengkap dan mengganti SOS eksternal dengan alert web Realtime dan bunyi opt-in.
 - 16 Juli 2026: Step 2 refinement, mengganti journey dari Parent/elderly care ke chronic illness Patient care, menambahkan diabetes tipe 2 sebagai demo condition, end-of-care lifecycle, dan food/menu parking lot.
 - 16 Juli 2026: Step 6/7 consistency pass, mengarahkan lifecycle ke data model teknis yang sudah memakai Patient terminology.
+- 16 Juli 2026: Mengunci journey progressive Patient Profile onboarding dengan identitas minimum, optional completion, dan semantik unknown/none/reported.

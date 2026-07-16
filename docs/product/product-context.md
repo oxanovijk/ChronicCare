@@ -21,6 +21,7 @@ Pasien chronic illness dan caregiver sering menghadapi kondisi berikut:
 
 - Rutinitas perawatan berlangsung lama dan mudah terputus: check-in, obat, reminder, dokumen kontrol, dan follow-up.
 - Informasi kesehatan tersebar di percakapan, foto, berkas, dan ingatan caregiver.
+- Caregiver tidak selalu mengetahui diagnosis yang tercatat, alergi, obat aktif, status BPJS, atau kontak darurat saat pertama membuat profil.
 - Caregiver tidak selalu mengetahui kondisi terbaru atau siapa yang sedang menangani kebutuhan pasien.
 - Data dua Patient Profile mudah tercampur jika produk hanya bergantung pada state antarmuka.
 - Patient membutuhkan antarmuka yang cheerful, sederhana, suportif, dan tidak terasa seperti dashboard klinis.
@@ -69,6 +70,8 @@ ChroniCare memberi pasien dan caregiver satu konteks yang dapat dipercaya untuk 
 6. Semua data demo harus sintetis.
 7. Keterbatasan provider dan browser harus disampaikan secara jujur.
 8. Patient UI harus warm dan supportive; caregiver UI harus informatif dan scannable.
+9. Data yang belum diketahui boleh dilengkapi bertahap; `belum diketahui` tidak boleh disamakan dengan `tidak ada`.
+10. ChroniCare tidak meminta caregiver menebak data kesehatan untuk menyelesaikan onboarding.
 
 ## 6. Pengalaman Utama
 
@@ -84,6 +87,7 @@ ChroniCare memberi pasien dan caregiver satu konteks yang dapat dipercaya untuk 
 ### 6.2 Caregiver experience
 
 - Masuk menggunakan Supabase Auth.
+- Membuat Patient Profile dengan nama tampilan dan label hubungan sebagai minimum, lalu melengkapi data lain secara bertahap.
 - Memilih Patient Profile aktif, maksimal dua profile per Care Circle untuk MVP.
 - Melihat dashboard informatif dengan identitas profile aktif yang selalu terlihat.
 - Mengelola check-in, obat, reminder, dan dokumen untuk profile aktif.
@@ -91,6 +95,20 @@ ChroniCare memberi pasien dan caregiver satu konteks yang dapat dipercaya untuk 
 - Memakai chatbot yang menerima hanya konteks Patient aktif dan data terkonfirmasi.
 - Melihat SOS baru secara Realtime, mendengar bunyi jika audio sudah diaktifkan, lalu memilih "Saya tangani".
 - Mencari faskes Tangerang dan melihat panduan BPJS yang tidak menjanjikan penerimaan atau ketersediaan.
+
+### 6.3 Progressive Patient Profile setup
+
+Owner dapat membuat Patient Profile hanya dengan `displayName` dan `relationshipLabel`. Tanggal lahir, lokasi umum, kondisi yang dilaporkan, alergi, obat aktif, status BPJS, fasilitas biasa, kontak darurat, dan dokumen bersifat opsional saat onboarding.
+
+Untuk kelompok kondisi, alergi, obat aktif, dan kontak darurat, produk membedakan:
+
+- `UNKNOWN`: caregiver belum tahu atau belum meninjau.
+- `NONE_REPORTED`: caregiver menyatakan tidak ada yang diketahui/dilaporkan.
+- `REPORTED`: ada informasi yang dicatat.
+
+Status BPJS memakai `UNKNOWN`, `NOT_REGISTERED`, atau `REGISTERED`. ChroniCare tidak menyimpan nomor BPJS lengkap untuk MVP; maksimal empat digit terakhir boleh dicatat secara opsional meskipun statusnya `REGISTERED`.
+
+Setelah profil minimum dibuat, caregiver dapat memilih `Lengkapi sekarang` atau `Isi nanti`. Dashboard menampilkan checklist ringan `Profil belum lengkap` tanpa memblokir Patient access code, check-in, document upload, chatbot, atau SOS. Data kosong tidak boleh ditampilkan sebagai fakta medis negatif.
 
 ## 7. Demo Diabetes Tipe 2
 
@@ -167,6 +185,7 @@ Termasuk dalam MVP:
 - Satu Care Circle per user.
 - Satu Owner dan beberapa Family Member.
 - Maksimal dua Patient Profile.
+- Progressive Patient Profile setup dengan identitas minimum dan status informasi eksplisit.
 - Kode akses Patient yang terikat satu profile.
 - Dashboard caregiver dan beranda Patient.
 - Check-in, obat, reminder, dan catatan dasar.
@@ -219,3 +238,4 @@ Dokumen teknis detail sudah diarahkan ke `Patient Profile`, `PatientAccessCode`,
 - 15 Juli 2026: Mengunci Next.js full-stack, OCR dengan caregiver review, Supabase private storage, dan SOS web Realtime dengan bunyi opt-in.
 - 16 Juli 2026: Mengubah positioning dari elderly/Parent care menjadi chronic illness Patient care, mengunci demo condition diabetes tipe 2, menambahkan Patient terminology verdict, end-of-care MVP lifecycle note, dan food/menu parking lot.
 - 16 Juli 2026: Step 6/7 consistency pass, mencatat bahwa Patient terminology sudah menjadi implementation truth lintas dokumen.
+- 16 Juli 2026: Mengunci progressive Patient Profile onboarding; hanya nama tampilan dan label hubungan yang wajib, sementara data yang belum diketahui memakai status eksplisit dan dapat dilengkapi kemudian.
