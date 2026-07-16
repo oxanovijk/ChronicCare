@@ -1,6 +1,6 @@
 # Packet 03: Data Schema, Prisma, and Seed Base
 
-Status: Draft
+Status: Ready
 
 Driver / DRI: Bernard
 
@@ -40,9 +40,20 @@ Prisma can generate a typed client for core identity/profile data, preserve unkn
 ## Dependency Inputs
 
 - Completed Packet 02 env/provider boundary.
-- Supabase PostgreSQL connection is available locally or an approved local fallback is documented.
-- Synthetic demo names and profile assumptions are approved.
+- Supabase development PostgreSQL is provisioned by Bernard and its connection values are available in untracked `web/.env`.
+- Synthetic demo names, profile assumptions, schema/API contract, UI data needs, and AI/OCR privacy behavior are approved by Bernard, Daniel, and Al.
 - Real provider values remain only in untracked env files.
+
+## Entry Readiness Evidence
+
+- Packet 02 is `Done` and its PR has been merged into `dev`.
+- Bernard confirmed the Supabase development project is provisioned.
+- Bernard approved the schema, API, Prisma mapping, and database constraints.
+- Daniel approved the Patient Profile fields, sparse states, seed labels, and UI suitability.
+- Al approved synthetic seed privacy, audit minimization, and sparse AI/OCR context handling.
+- `web/.env` exists locally, is ignored by Git, and was not inspected during readiness verification.
+- `web/prisma.config.ts` loads `web/.env` through `dotenv/config` and uses `DIRECT_URL` for Prisma CLI operations.
+- Fresh `db:generate` and `prisma validate` checks pass; `prisma migrate status` reaches the Supabase development database and reports the expected pre-Packet-03 state of no migrations.
 
 ## Hard Dependencies
 
@@ -58,6 +69,7 @@ Prisma can generate a typed client for core identity/profile data, preserve unkn
 ## Allowed Files / Areas
 
 - `web/prisma/`
+- `web/prisma.config.ts`
 - `web/src/lib/db/`
 - `web/src/lib/seed/`
 - `web/src/lib/audit/`
@@ -101,7 +113,7 @@ Prisma can generate a typed client for core identity/profile data, preserve unkn
 ## Manual QA
 
 - Inspect seed values for synthetic names, contacts, health notes, and access codes.
-- Confirm `.env.local` remains untracked.
+- Confirm `.env` remains untracked.
 - Confirm schema names use `PatientProfile` / `patientProfileId`, not legacy parent terminology.
 - Confirm Maya and Raka demonstrate both recorded and unknown fact states without using real data.
 - Confirm no empty array is labeled `NONE_REPORTED` unless explicitly seeded that way.

@@ -52,11 +52,16 @@ Installation details and official sources are in `docs/technical/dev-installatio
 | Environment | Location | Git status |
 |---|---|---|
 | Names and fake examples | `web/.env.example` | Committed after scaffold |
-| Local secret values | `web/.env.local` | Ignored |
+| Local secret values | `web/.env` | Ignored |
 | Test values | `web/.env.test.local` | Ignored |
 | Preview/production | Vercel project settings | Never stored in Git |
 
 `.gitignore` must cover `.env`, `.env.*`, and allow `.env.example` explicitly.
+
+The local development convention for this repository is `web/.env`. Next.js
+loads it for application commands, while `web/prisma.config.ts` loads it through
+`dotenv/config`. Prisma CLI operations use `DIRECT_URL`; application runtime
+database access uses `DATABASE_URL`.
 
 ## 4. Environment Contract
 
@@ -295,5 +300,6 @@ Any failed P0 item changes the deployment verdict to `Needs Fix` or `Fallback Re
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
+| 2026-07-16 | Mengunci `web/.env` sebagai file secret lokal dan `DIRECT_URL` untuk Prisma CLI | Menyamakan pemuatan env Next.js dan Prisma tanpa menyimpan credential di Git | Ozan | Bernard |
 | 2026-07-16 | Memperbarui env/deploy untuk Patient Profile, seed diabetes tipe 2, dan smoke test deactivation | Challenge pivot ke chronic illness | Bernard | Ozan |
 | 2026-07-15 | Mengunci Supabase, Azure, Vercel, env contract, deploy, OCR, dan SOS web | Human provider and scope verdict | Bernard | Ozan |

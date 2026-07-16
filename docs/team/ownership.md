@@ -93,7 +93,8 @@ Format change log:
 
 - Packet 01 scaffold, shell route, npm scripts, dan test harness sudah tersedia di `/web`.
 - Stack, provider, model data, kontrak API, OCR flow, serta SOS web sudah dikunci dalam dokumen teknis.
-- Ozan sudah mengunci keputusan produk progressive Patient Profile onboarding; Bernard, Daniel, dan Al tetap wajib memberi domain review pada schema/API, UX, dan AI context sebelum packet terkait diimplementasikan.
+- Ozan sudah mengunci keputusan produk progressive Patient Profile onboarding; Bernard, Daniel, dan Al sudah menyetujui schema/API, UX, seed/privacy, dan AI context yang diperlukan untuk memulai Packet 03.
+- Packet 03 berstatus `Ready`: Packet 02 sudah masuk `dev`, Supabase development sudah disiapkan Bernard, dan local secrets tersedia hanya di `web/.env` yang di-ignore Git.
 - Status setiap packet tetap diputuskan Ozan berdasarkan acceptance criteria dan bukti QA; keberadaan scaffold tidak otomatis menyelesaikan packet fitur berikutnya.
 - Packet 13 demo-readiness checklist tetap `Not Run` sampai seluruh flow MVP selesai dan diuji.
 
@@ -101,7 +102,7 @@ Format change log:
 
 | Tanggal | Dokumen | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|---|
-| 2026-07-16 | `docs/team/ownership.md` | Mencatat progressive Patient Profile contract sebagai keputusan lintas product, data, UX, dan AI | Menjaga review Bernard, Daniel, Al, dan QA Ozan eksplisit saat Packet 03/05/08/11 berjalan | Ozan | Pending: Bernard, Daniel, Al |
+| 2026-07-16 | `docs/team/ownership.md` | Mencatat progressive Patient Profile contract sebagai keputusan lintas product, data, UX, dan AI | Menjaga review Bernard, Daniel, Al, dan QA Ozan eksplisit saat Packet 03/05/08/11 berjalan | Ozan | Bernard, Daniel, Al |
 | 2026-07-16 | `docs/team/ownership.md` | Memperbarui status repo setelah scaffold Packet 01 tersedia | Menyelaraskan ownership guardrail dengan kondisi implementasi aktual | Ozan | Bernard |
 | 2026-07-16 | `docs/team/ownership.md` | Memecah ownership packet dari 9 menjadi 13 packet dan memakai hybrid role ownership per bidang | Menyesuaikan execution packet agar setiap packet layak dikerjakan dalam satu prompt implementasi | Ozan | Bernard |
 | 2026-07-16 | `docs/team/ownership.md` | Memecah ownership packet dari 7 menjadi 9 packet | Menyesuaikan execution packet agar OCR, daily care, SOS, dan QA lebih implementable dalam satu sesi | Ozan | Bernard |

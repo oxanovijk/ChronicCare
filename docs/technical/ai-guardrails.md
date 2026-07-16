@@ -535,5 +535,5 @@ Dokumen berikutnya yang terkait:
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
-| 2026-07-16 | Menambahkan sparse-profile context rules untuk `UNKNOWN`, `NONE_REPORTED`, dan `REPORTED` | Mencegah AI mengarang atau mengabsolutkan data Patient yang belum diketahui | Ozan | Pending: Al |
+| 2026-07-16 | Menambahkan sparse-profile context rules untuk `UNKNOWN`, `NONE_REPORTED`, dan `REPORTED` | Mencegah AI mengarang atau mengabsolutkan data Patient yang belum diketahui | Ozan | Al |
 | 2026-07-15 | Menambahkan OCR review gate, confirmed-only AI context, dan Azure provider lock | OCR masuk scope MVP | Al | Ozan |

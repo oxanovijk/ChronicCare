@@ -318,5 +318,5 @@ Not covered by this hackathon posture:
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
-| 2026-07-16 | Menambahkan progressive setup data minimization, explicit unknown semantics, dan last-four-only BPJS handling | Mengurangi forced disclosure dan mencegah caregiver mengarang data yang tidak diketahui | Ozan | Pending: Bernard, Daniel |
+| 2026-07-16 | Menambahkan progressive setup data minimization, explicit unknown semantics, dan last-four-only BPJS handling | Mengurangi forced disclosure dan mencegah caregiver mengarang data yang tidak diketahui | Ozan | Bernard, Daniel |
 | 2026-07-15 | Mengunci Supabase security boundary, OCR privacy, Patient session, dan browser-only SOS | Human stack and scope verdict | Bernard | Daniel |

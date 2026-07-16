@@ -28,7 +28,7 @@ Format evidence yang disarankan:
 | ID | Check | Owner | Evidence | Status |
 | --- | --- | --- | --- | --- |
 | ENV-01 | Node/npm sesuai versi yang dikunci | Bernard | Belum diisi | Not Run |
-| ENV-02 | `.env.local` tersedia lokal dan tidak terlacak Git | Bernard | Belum diisi | Not Run |
+| ENV-02 | `.env` tersedia lokal dan tidak terlacak Git | Bernard | Belum diisi | Not Run |
 | ENV-03 | Supabase schema, RLS, bucket privat, dan seed diterapkan | Bernard | Belum diisi | Not Run |
 | ENV-04 | Azure OpenAI dan Document Intelligence dapat dipanggil atau fallback dilabeli | Al | Belum diisi | Not Run |
 | ENV-05 | `npm run lint` berhasil | Bernard | Belum diisi | Not Run |
@@ -144,7 +144,7 @@ Format evidence yang disarankan:
 
 | ID | Check | Owner | Evidence | Status |
 | --- | --- | --- | --- | --- |
-| SEC-01 | Tidak ada secret atau `.env.local` dalam Git | Bernard | Belum diisi | Not Run |
+| SEC-01 | Tidak ada secret atau `.env` dalam Git | Bernard | Belum diisi | Not Run |
 | SEC-02 | Log/screenshot/video tidak berisi token atau data keluarga asli | Ozan | Belum diisi | Not Run |
 | SEC-03 | Semua seed dan file demo sintetis | Ozan | Belum diisi | Not Run |
 | SEC-04 | API error tidak membocorkan stack/SQL/provider secret | Bernard | Belum diisi | Not Run |

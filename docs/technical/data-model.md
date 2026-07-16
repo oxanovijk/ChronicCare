@@ -546,6 +546,6 @@ Minimum seed:
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
-| 2026-07-16 | Menambahkan progressive profile fact statuses, BPJS membership status, minimum profile creation, dan derived setup checklist contract | Mencegah data yang belum diketahui dianggap sebagai `tidak ada` atau dipaksa untuk ditebak | Ozan | Pending: Bernard |
+| 2026-07-16 | Menambahkan progressive profile fact statuses, BPJS membership status, minimum profile creation, dan derived setup checklist contract | Mencegah data yang belum diketahui dianggap sebagai `tidak ada` atau dipaksa untuk ditebak | Ozan | Bernard |
 | 2026-07-16 | Mengubah schema kontrak ke Patient Profile, demo diabetes tipe 2, dan deactivation non-destruktif | Challenge pivot ke chronic illness | Bernard | Ozan |
 | 2026-07-15 | Mengunci PostgreSQL, Prisma 7, Supabase Auth/Storage/Realtime, Patient session, OCR tables, dan SOS web | Human verdict untuk memulai scaffold | Bernard | Ozan |

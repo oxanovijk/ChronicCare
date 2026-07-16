@@ -362,7 +362,7 @@ Required progressive-profile tests:
 
 ## 12. Deployment
 
-Vercel builds `/web` with `npm run build`. Supabase hosts Auth, PostgreSQL, private Storage, and Realtime. Azure hosts OpenAI and Document Intelligence. Environment values live in Vercel project settings and local `.env.local`, never in Git.
+Vercel builds `/web` with `npm run build`. Supabase hosts Auth, PostgreSQL, private Storage, and Realtime. Azure hosts OpenAI and Document Intelligence. Environment values live in Vercel project settings and local `.env`, never in Git.
 
 Provider calls use Node.js runtime. Do not move Prisma, Azure, or secret-bearing handlers to Edge runtime without an approved architecture change.
 
@@ -370,6 +370,6 @@ Provider calls use Node.js runtime. Do not move Prisma, Azure, or secret-bearing
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
-| 2026-07-16 | Menambahkan progressive minimum profile architecture, explicit fact states, derived setup checklist, dan sparse-context behavior | Menjaga data tidak lengkap tetap jujur dan implementable dalam Packet 03 | Ozan | Pending: Bernard |
+| 2026-07-16 | Menambahkan progressive minimum profile architecture, explicit fact states, derived setup checklist, dan sparse-context behavior | Menjaga data tidak lengkap tetap jujur dan implementable dalam Packet 03 | Ozan | Bernard |
 | 2026-07-16 | Mengubah kontrak teknis ke Patient Profile, demo diabetes tipe 2, dan lifecycle deactivation | Challenge pivot ke chronic illness | Bernard | Ozan |
 | 2026-07-15 | Mengunci Next.js modular monolith, Supabase, Prisma, Azure OCR/AI, Vercel, dan SOS Realtime | Human stack and scope verdict | Bernard | Ozan |
