@@ -19,6 +19,7 @@ import {
 } from "@/lib/db/profile-facts";
 import type {
   CreatePatientProfileInput,
+  DeactivatePatientProfileInput,
   PatchPatientProfileInput,
 } from "@/lib/patient-profile/schemas";
 
@@ -335,5 +336,69 @@ export async function updatePatientProfile(
       },
     });
     return patientProfileDto(profile);
+  });
+}
+
+export async function deactivatePatientProfile(
+  context: CaregiverAuthContext,
+  patientProfileId: string,
+  input: DeactivatePatientProfileInput,
+  dependencies: { db?: PrismaClient; requestId?: string; now?: Date } = {},
+) {
+  requireOwner(context);
+  const db =
+    dependencies.db ?? (await import("@/lib/db/client")).prisma;
+  const deactivatedAt = dependencies.now ?? new Date();
+  const status =
+    input.reason === "PATIENT_DECEASED" ? "DECEASED" : "END_OF_CARE";
+
+  return db.$transaction(async (tx) => {
+    const updated = await tx.patientProfile.updateMany({
+      where: {
+        id: patientProfileId,
+        careCircleId: context.membership.careCircleId,
+        status: "ACTIVE",
+        deletedAt: null,
+      },
+      data: {
+        status,
+        deactivationReason: input.reason,
+        deactivationNote: input.note ?? null,
+        deactivatedByUserId: context.user.id,
+        deactivatedAt,
+        updatedByUserId: context.user.id,
+      },
+    });
+    if (updated.count !== 1) throw new PatientProfileError("NOT_FOUND");
+
+    await tx.patientAccessCode.updateMany({
+      where: { patientProfileId, status: "ACTIVE" },
+      data: { status: "REVOKED" },
+    });
+    await tx.patientSession.updateMany({
+      where: { patientProfileId, revokedAt: null },
+      data: { revokedAt: deactivatedAt },
+    });
+    await tx.auditEvent.create({
+      data: {
+        careCircleId: context.membership.careCircleId,
+        patientProfileId,
+        actorType: "CAREGIVER",
+        actorUserId: context.user.id,
+        actorRole: context.membership.role,
+        action: "PATIENT_PROFILE_DEACTIVATED",
+        targetType: "PATIENT_PROFILE",
+        targetId: patientProfileId,
+        summary: `PATIENT_PROFILE_DEACTIVATED ${input.reason}`,
+        requestId: dependencies.requestId,
+      },
+    });
+
+    return {
+      id: patientProfileId,
+      status,
+      reason: input.reason,
+      deactivatedAt: deactivatedAt.toISOString(),
+    };
   });
 }
