@@ -109,9 +109,11 @@ Do not install browser-only OpenAI clients. Azure credentials must remain server
 Run from `/web`:
 
 ```powershell
-npm install --save-dev prisma tsx @types/pg vitest @vitejs/plugin-react jsdom vite-tsconfig-paths @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event @playwright/test supabase
+npm install --save-dev prisma tsx @types/pg vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event @playwright/test supabase
 npx playwright install chromium
 ```
+
+Vite 8 resolves TypeScript path aliases through the native `resolve.tsconfigPaths` option. Do not install `vite-tsconfig-paths`; the plugin is redundant with the locked Vite/Vitest versions and emits a deprecation warning.
 
 `supabase` CLI is installed locally so the version is locked in `package-lock.json`. Docker is only required if the team chooses to run the full Supabase stack locally. The hackathon default uses a managed development project, so `npx supabase start` is optional.
 
@@ -284,3 +286,9 @@ Do not run migrations against a production database during development.
 ## 14. Update Rule
 
 Do not edit a command based on memory. Check the current official documentation and the installed package version first. Any changed dependency, command, env name, or provider must also update `README.md`, `AGENTS.md`, `docs/technical/env-and-deploy.md`, and the relevant packet.
+
+## 15. Change Log
+
+| Date | Change | Reason | DRI | Reviewer |
+| --- | --- | --- | --- | --- |
+| 2026-07-16 | Replaced `vite-tsconfig-paths` with Vite 8 native `resolve.tsconfigPaths` configuration | Remove a redundant deprecated plugin while preserving TypeScript alias resolution | Bernard | Ozan |

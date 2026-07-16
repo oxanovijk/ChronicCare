@@ -18,14 +18,16 @@ ChroniCare is a 30-hour hackathon MVP for chronic illness care coordination.
 
 Current state:
 
-- Documentation-first.
-- Pre-scaffold.
+- Packet 01 scaffold exists in `/web`.
+- Root, caregiver, and Patient login shell routes exist.
+- Baseline npm scripts and Vitest/Playwright harness are available.
+- Product features beyond the Packet 01 shell remain unimplemented until verified by their packets.
 - Stack and provider decisions are locked.
 - Product positioning has been refined to chronic illness patient care.
 - Human verdict on 2026-07-16: implementation terminology is `Patient Profile`, not legacy parent-care terminology.
 - Locked technical docs now use `Patient Profile`, `patientProfileId`, `patient_profiles`, Patient access code/session, and `/patient-profiles`.
-- `/web` and `package.json` do not exist yet.
-- Install, dev, lint, typecheck, test, seed, build, and deploy commands remain unavailable until Packet 01 creates them.
+- `/web/package.json` exists and exposes the locked Packet 01 command baseline.
+- Database, provider, and deployment commands may require later packet dependencies and credentials; command existence is not evidence that those features work.
 
 Do not claim an app feature exists because its document is complete. Do not scaffold or implement until the requested packet is explicitly selected and current docs are checked.
 
@@ -256,9 +258,9 @@ Human verdict already given for this refinement:
 
 ## 16. Commands
 
-Current status: unavailable until `/web/package.json` exists.
+Current status: Packet 01 commands are available from `/web`.
 
-Locked planned commands after Packet 01:
+Locked command baseline:
 
 ```powershell
 Set-Location web
@@ -274,7 +276,7 @@ npm run db:migrate
 npm run db:seed
 ```
 
-Do not invent a command or report it as available before checking `web/package.json`. Installation source is `docs/technical/dev-installations.md`.
+Do not report a command or feature as passing before running the relevant verification. Database commands remain dependent on Packet 03 setup. Installation source is `docs/technical/dev-installations.md`.
 
 ## 17. Verification
 
@@ -313,5 +315,6 @@ Before saying done, fixed, working, passing, ready, implemented, or deployed:
 
 | Date | Change | Reason | DRI | Reviewer |
 | --- | --- | --- | --- | --- |
+| 2026-07-16 | Updated project state and command availability after Packet 01 scaffold | Keep guardrail aligned with verified repository state | Ozan | Bernard |
 | 2026-07-16 | Finalized Patient terminology as current implementation truth across guardrails | Step 6/7 consistency pass | Ozan | Bernard |
 | 2026-07-16 | Updated guardrail positioning to chronic illness Patient care; recorded diabetes tipe 2 demo condition, Patient terminology, and deactivation verdict | Human challenge update and scope verdict | Ozan | Bernard |
