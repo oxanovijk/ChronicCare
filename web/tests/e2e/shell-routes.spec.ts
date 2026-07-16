@@ -30,15 +30,15 @@ test.describe("shell routes", () => {
     ).toBeVisible();
   });
 
-  test("patient login shell renders inactive form", async ({ page }) => {
+  test("patient login renders active form", async ({ page }) => {
     await page.goto("/patient/login");
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Masuk sebagai Patient" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Kode akses Patient")).toBeDisabled();
+    await expect(page.getByLabel("Kode akses Patient")).toBeEnabled();
     await expect(
-      page.getByRole("button", { name: "Masuk (belum aktif)" }),
-    ).toBeDisabled();
+      page.getByRole("button", { name: "Masuk" }),
+    ).toBeEnabled();
   });
 });

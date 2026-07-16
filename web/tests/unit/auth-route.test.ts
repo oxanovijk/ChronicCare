@@ -1,29 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { resolveCaregiverAuthContext } = vi.hoisted(() => ({
-  resolveCaregiverAuthContext: vi.fn(),
+const { resolveAuthContext } = vi.hoisted(() => ({
+  resolveAuthContext: vi.fn(),
 }));
 
-vi.mock("@/lib/auth/caregiver", async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import("@/lib/auth/caregiver")>();
+vi.mock("@/lib/auth/patient", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/patient")>();
 
   return {
     ...actual,
-    resolveCaregiverAuthContext,
+    resolveAuthContext,
   };
 });
 
 import { GET } from "@/app/api/v1/auth/me/route";
-import { CaregiverAuthError } from "@/lib/auth/caregiver";
+import { PatientAuthError } from "@/lib/auth/patient";
 
 describe("GET /api/v1/auth/me", () => {
   beforeEach(() => {
-    resolveCaregiverAuthContext.mockReset();
+    resolveAuthContext.mockReset();
   });
 
   it("returns verified context with no-store caching", async () => {
-    resolveCaregiverAuthContext.mockResolvedValue({
+    resolveAuthContext.mockResolvedValue({
       actorType: "CAREGIVER",
       user: { id: "owner-id", displayName: "Dimas Pratama" },
       membership: { careCircleId: "circle-id", role: "OWNER" },
@@ -40,8 +39,8 @@ describe("GET /api/v1/auth/me", () => {
   });
 
   it("returns a generic unauthenticated error", async () => {
-    resolveCaregiverAuthContext.mockRejectedValue(
-      new CaregiverAuthError("UNAUTHENTICATED"),
+    resolveAuthContext.mockRejectedValue(
+      new PatientAuthError("UNAUTHENTICATED"),
     );
 
     const response = await GET();
@@ -56,5 +55,25 @@ describe("GET /api/v1/auth/me", () => {
     );
     expect(JSON.stringify(body)).not.toContain("token");
     expect(JSON.stringify(body)).not.toContain("session");
+  });
+
+  it("returns Patient identity without caregiver membership", async () => {
+    resolveAuthContext.mockResolvedValue({
+      actorType: "PATIENT",
+      patientProfile: {
+        id: "maya-id",
+        displayName: "Maya Pratama",
+        relationshipLabel: "Maya",
+      },
+    });
+
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data.actorType).toBe("PATIENT");
+    expect(body.data.patientProfile.displayName).toBe("Maya Pratama");
+    expect(body.data).not.toHaveProperty("membership");
+    expect(body.data).not.toHaveProperty("session");
   });
 });

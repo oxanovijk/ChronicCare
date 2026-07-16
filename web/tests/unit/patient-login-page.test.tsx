@@ -12,16 +12,14 @@ describe("patient login shell page", () => {
     ).toBeInTheDocument();
   });
 
-  it("keeps the access-code form visibly inactive", () => {
+  it("renders the active access-code form", () => {
     render(<PatientLoginShellPage />);
 
-    expect(screen.getByLabelText("Kode akses Patient")).toBeDisabled();
+    expect(screen.getByLabelText("Kode akses Patient")).toBeEnabled();
     expect(
-      screen.getByRole("button", { name: "Masuk (belum aktif)" }),
-    ).toBeDisabled();
-    expect(
-      screen.getByText("Shell awal — login belum aktif"),
-    ).toBeInTheDocument();
+      screen.getByRole("button", { name: "Masuk" }),
+    ).toBeEnabled();
+    expect(screen.getByText("Akses Patient")).toBeInTheDocument();
   });
 
   it("links back to the home page", () => {

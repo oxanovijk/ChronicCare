@@ -1,34 +1,14 @@
 import { randomUUID } from "node:crypto";
 
-import {
-  CaregiverAuthError,
-  resolveCaregiverAuthContext,
-} from "@/lib/auth/caregiver";
+import { apiErrorResponse, apiSuccess } from "@/lib/auth/api-response";
+import { resolveAuthContext } from "@/lib/auth/patient";
 
 export async function GET() {
   const requestId = `req_${randomUUID()}`;
-  const headers = { "Cache-Control": "private, no-store" };
 
   try {
-    return Response.json(
-      { data: await resolveCaregiverAuthContext(), meta: { requestId } },
-      { headers },
-    );
+    return apiSuccess(await resolveAuthContext(), requestId);
   } catch (error) {
-    const code =
-      error instanceof CaregiverAuthError ? error.code : "INTERNAL_ERROR";
-    const status =
-      code === "UNAUTHENTICATED" ? 401 : code === "FORBIDDEN" ? 403 : 500;
-    const message =
-      code === "UNAUTHENTICATED"
-        ? "Silakan masuk untuk melanjutkan."
-        : code === "FORBIDDEN"
-          ? "Anda tidak memiliki akses."
-          : "Terjadi kesalahan. Coba lagi.";
-
-    return Response.json(
-      { error: { code, message, requestId } },
-      { status, headers },
-    );
+    return apiErrorResponse(error, requestId);
   }
 }

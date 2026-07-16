@@ -1,6 +1,6 @@
 # Packet 05: Patient Access Code and Profile Isolation
 
-Status: Ready
+Status: Done
 
 Driver / DRI: Bernard
 
@@ -78,11 +78,13 @@ Owner can create a profile without guessing optional data, caregivers can comple
 
 - `web/src/lib/auth/`
 - `web/src/lib/patient-profile/`
-- `web/src/app/api/v1/auth/patient-code/`
+- `web/src/app/api/v1/auth/patient/`
 - `web/src/app/api/v1/patient-profiles/`
-- `web/src/app/(patient)/`
-- `web/src/app/(caregiver)/`
+- `web/src/app/patient/`
+- `web/src/app/caregiver/`
+- `web/src/components/auth/`
 - `web/src/components/profile/`
+- `web/playwright.config.ts`
 - `web/tests/**/patient-session*`
 - `web/tests/**/profile-isolation*`
 - `web/tests/**/patient-profile*`
@@ -135,6 +137,103 @@ Owner can create a profile without guessing optional data, caregivers can comple
 - Try wrong, expired, or revoked Patient code and confirm generic copy.
 - Confirm Patient UI is simpler than caregiver UI and has no admin/document/member access.
 
+## Exit Review Evidence
+
+Review completed by Daniel, Al, and Ozan on 2026-07-17 against commit
+`a2bf438` plus the current P5 QA corrections.
+
+### Daniel - UI/UX Review
+
+- Patient login and Patient homepage were inspected at `390x844` and
+  `1440x900`; both rendered without horizontal overflow or console errors.
+- Keyboard order on Patient login reached the code field, `Masuk`, and the
+  return link. Patient mode contains no caregiver administration, document, or
+  membership controls.
+- Caregiver profile selector/editor was exercised as Owner and Family Member.
+  Loading, empty, error, forbidden, create-success, and update-success states
+  use distinct copy.
+- A delayed Maya/Raka switch confirmed that the previous profile detail is
+  removed immediately and replaced by a loading state before the next profile
+  appears.
+- Minimum profile creation explains that optional data may remain `Belum
+  diketahui`; the UI does not encourage guessing.
+
+### Al - Privacy and Context Review
+
+- `patientProfileDto` uses an explicit allowlist and excludes `careCircleId`,
+  access-code hashes, session values, and future internal/unconfirmed context.
+- Patient `/api/v1/auth/me` returns only the bound Patient identity/profile and
+  does not expose caregiver membership or session material.
+- Patient-bound reads require an explicit route `patientProfileId` and authorize
+  it against the server-resolved Patient or caregiver context. Maya-to-Raka and
+  Raka-to-Maya reads return `403` without returning the other profile name.
+- P5 does not feed data to AI/OCR. Future AI/OCR callers must reuse the same
+  authorized profile boundary and may not add hidden or unconfirmed extraction
+  fields to this DTO.
+- A tracked-file scan found no local database URL, Patient session secret,
+  caregiver password, or usable Patient code.
+
+### Ozan - Acceptance Criteria Verdict
+
+| # | Verdict | Evidence |
+| --- | --- | --- |
+| 1 | Pass | Wrong, expired, and revoked codes return the same generic authentication failure; valid codes are checked against Argon2id hashes. |
+| 2 | Pass | Owner created a temporary profile through the UI with only `displayName` and `relationshipLabel`; API returned `201`. |
+| 3 | Pass | Family Member updated an allowed optional field through the UI/API; Owner and Family paths returned success. |
+| 4 | Pass | Minimum-create evidence retained optional fact states as `UNKNOWN` with empty arrays. |
+| 5 | Pass | Unit coverage rejects full BPJS numbers and enforces the four-digit suffix/status contract. |
+| 6 | Pass | Unit coverage rejects client-supplied `currentMedicationsStatus = REPORTED`. |
+| 7 | Pass | Profile DTO includes derived `setupChecklist`; no completion percentage is stored or returned. |
+| 8 | Pass | Maya and Raka logins each resolve a session bound to exactly one `patientProfileId`. |
+| 9 | Pass | Patient access to the other profile returns `403`; caregiver API access returns `401`; `/caregiver` redirects to `/patient`. |
+| 10 | Pass | Delayed Maya/Raka/Maya switching showed no stale detail during loading. |
+| 11 | Pass | Profile detail routes require explicit `patientProfileId` and authorize it server-side. |
+| 12 | Pass | Client role/circle/profile spoofing is ignored or denied by server-resolved context tests. |
+| 13 | Pass | Unit and E2E coverage includes wrong/expired/revoked code, both cross-profile directions, caregiver switching, and Patient caregiver-route denial. |
+| 14 | Pass | Responsive browser sessions emitted zero fresh console errors; API and tracked-secret scans found no code validity detail or hidden profile data. |
+
+### Automated Check Results
+
+| Command | Exit | Result |
+| --- | --- | --- |
+| `npm run lint` | 0 | ESLint completed without errors. |
+| `npm run typecheck` | 0 | TypeScript completed without errors. |
+| `npm test` | 0 | 72 tests in 17 files passed. |
+| `npm test -- patient-session` | 0 | 13 tests in 3 files passed. |
+| `npm test -- profile-isolation` | 0 | 4 tests in 2 files passed. |
+| `npm test -- patient-profile` | 0 | 8 tests in 1 file passed. |
+| `npm run build` | 0 | Next.js production build passed; Patient auth/profile routes and caregiver/Patient pages were generated. |
+| `npm run test:e2e` | 0 | 14 Playwright tests passed with no skip or not-run result. |
+
+### Manual QA Matrix
+
+| Actor / route | Viewport | Result |
+| --- | --- | --- |
+| Patient login `/patient/login` | `390x844`, `1440x900` | Pass: keyboard reachable, generic wrong-code state, no overflow, no fresh console error. |
+| Maya `/patient` | `390x844` | Pass: own profile `200`, Raka `403`, caregiver list `401`, caregiver route redirected, logout revoked session. |
+| Raka `/patient` | `1440x900` | Pass: own profile `200`, Maya `403`, no hidden DTO fields, no overflow or console error. |
+| Owner `/caregiver` | `1440x900` | Pass: Maya/Raka/Maya switch cleared stale state; minimum create returned `201` and qualified success copy. |
+| Family Member `/caregiver` | `390x844` | Pass: create denied `403`, allowed profile update returned `200`, success state visible. |
+
+Wrong, expired, and revoked code checks all returned `401 UNAUTHENTICATED`
+with `Kode tidak valid atau sudah tidak berlaku.` and no Patient identity leak.
+Temporary QA data and audit artifacts were removed. Maya and Raka are active,
+not deleted, and each has one active, non-expired, non-locked, hash-only code.
+
+### Corrected Review Findings
+
+- Replaced broad profile object spreading with an explicit response DTO
+  allowlist.
+- Kept the Patient on the current page and showed a retryable error when logout
+  revocation fails instead of always redirecting.
+- Separated profile-create success/error messaging from profile-list load
+  errors.
+- Configured Playwright to use one worker because live Supabase caregiver and
+  Patient suites share mutable demo fixtures; this removed provider-concurrency
+  flakiness while retaining all 14 scenarios.
+- Corrected this packet's stale planned paths to the implemented App Router
+  paths. No locked API, role, data, or privacy contract changed.
+
 ## Documentation Update Rules
 
 - Do not change role/access docs unless a locked permission changes and human allows it.
@@ -150,4 +249,20 @@ Owner can create a profile without guessing optional data, caregivers can comple
 
 ## Handoff Notes
 
-Provide profile create/update service names, setup checklist selector, active profile type, Patient session helper names, route paths, cookie/session behavior, test evidence, and Maya/Raka isolation proof. Packet 06 and daily-care packets must reuse these helpers.
+- Profile services: `createPatientProfile`, `updatePatientProfile`,
+  `listPatientProfiles`, and `getAuthorizedPatientProfile`.
+- Derived selector and DTO: `deriveSetupChecklist` and `patientProfileDto`.
+- Patient auth helpers: `authenticatePatientCode`,
+  `resolvePatientAuthContext`, `requireBoundPatientProfile`, and
+  `revokePatientSession`; shared `/auth/me` resolution uses
+  `resolveAuthContext`.
+- Routes: `/api/v1/auth/patient/login`,
+  `/api/v1/auth/patient/logout`, `/api/v1/patient-profiles`, and
+  `/api/v1/patient-profiles/[patientProfileId]`; UI routes are
+  `/patient/login`, `/patient`, and `/caregiver`.
+- Cookie: opaque, HTTP-only `chronicare_patient_session`, with the locked
+  eight-hour server-side session lifetime.
+- Packet 06 must reuse the Owner guard, profile authorization, access-code
+  records, and Patient session records. Profile-wide atomic code/session
+  revocation is Packet 06 implementation scope.
+- P5 has no remaining blocker or unresolved review finding.

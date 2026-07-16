@@ -96,7 +96,8 @@ Format change log:
 - Ozan sudah mengunci keputusan produk progressive Patient Profile onboarding; Bernard, Daniel, dan Al sudah menyetujui schema/API, UX, seed/privacy, dan AI context yang diperlukan untuk memulai Packet 03.
 - Packet 03 berstatus `Done`: implementasi commit `9c5daf3`, migration/seed, seluruh acceptance criteria, review Daniel/Al, dan QA Ozan sudah lulus.
 - Packet 04 berstatus `Done`: caregiver login UI, verified server auth context, active membership resolution, Owner guard, generic error handling, role-spoof denial, privacy scan, responsive manual QA, 45 unit tests, dan 7 E2E sudah lulus review Daniel, Al, dan Ozan.
-- Packet 05 berstatus `Ready`: helper Packet 04 dapat dipakai ulang, Maya/Raka dan hash-only access-code fixture tersedia dari Packet 03, `PATIENT_SESSION_SECRET` tersedia secara lokal, dan usable synthetic Patient codes tetap menjadi scope implementasi Packet 05.
+- Packet 05 berstatus `Done`: minimum profile API/UI, Patient code login, profile-bound session, progressive setup state, bidirectional Maya/Raka isolation, responsive QA, DTO privacy review, 72 unit tests, dan 14 E2E tanpa skip sudah lulus review Daniel, Al, dan Ozan.
+- Packet 06 berstatus `Ready`: schema lifecycle/code/session dari Packet 03, Owner guard dari Packet 04, helper profile-bound Patient dari Packet 05, ignored local env, dan resettable synthetic fixture tersedia. Profile-wide atomic code/session revocation tetap scope implementasi Packet 06.
 - Status setiap packet tetap diputuskan Ozan berdasarkan acceptance criteria dan bukti QA; keberadaan scaffold tidak otomatis menyelesaikan packet fitur berikutnya.
 - Packet 13 demo-readiness checklist tetap `Not Run` sampai seluruh flow MVP selesai dan diuji.
 

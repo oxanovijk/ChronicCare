@@ -88,7 +88,7 @@ describe("caregiver auth panel", () => {
     expect(await screen.findByText("Dimas Pratama")).toBeInTheDocument();
     expect(screen.getByText("Owner")).toBeInTheDocument();
     expect(screen.queryByText("Family Member")).not.toBeInTheDocument();
-    expect(fetch).toHaveBeenLastCalledWith(
+    expect(fetch).toHaveBeenCalledWith(
       "/api/v1/auth/me",
       expect.objectContaining({ cache: "no-store" }),
     );
