@@ -28,7 +28,10 @@ describe("caregiver auth context", () => {
           data: {
             user: {
               id: "verified-user",
-              user_metadata: { role: "OWNER" },
+              user_metadata: {
+                role: "OWNER",
+                careCircleId: "client-circle",
+              },
             },
           },
           error: null,
@@ -64,5 +67,6 @@ describe("caregiver auth context", () => {
     });
     expect(context).not.toHaveProperty("token");
     expect(context).not.toHaveProperty("session");
+    expect(context.membership.careCircleId).not.toBe("client-circle");
   });
 });

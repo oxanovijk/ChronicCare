@@ -10,9 +10,7 @@ describe("root page", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "ChroniCare" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/bukan alat\s+diagnosis/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/bukan alat\s+diagnosis/i)).toBeInTheDocument();
   });
 
   it("links to the caregiver and patient login shells", () => {
@@ -26,11 +24,12 @@ describe("root page", () => {
     ).toHaveAttribute("href", "/patient/login");
   });
 
-  it("labels the app as pre-release without live feature claims", () => {
+  it("states that the caregiver auth foundation is active", () => {
     render(<Home />);
 
     expect(
-      screen.getByText("Pra-rilis — fitur belum aktif"),
+      screen.getByText("Pra-rilis - autentikasi caregiver aktif"),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/fitur belum aktif/i)).not.toBeInTheDocument();
   });
 });

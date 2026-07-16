@@ -2,7 +2,7 @@
 
 Produk: ChroniCare
 
-Status: Locked packet structure for MVP v1; Packets 01 through 03 are `Done`, Packet 04 is `Ready`, and each remaining packet status remains evidence-driven
+Status: Locked packet structure for MVP v1; Packets 01 through 04 are `Done`, Packet 05 is `Ready`, and each remaining packet status remains evidence-driven
 
 DRI: Ozan
 
@@ -21,8 +21,8 @@ This index keeps execution packets small enough for one focused Codex session. I
 | 01 | [Scaffold and Tooling Baseline](packets/01-scaffold-and-tooling-baseline.md) | Bernard | Done | Runnable `/web`, scripts, shell routes, baseline tests |
 | 02 | [Env and Provider Boundary](packets/02-env-and-provider-boundary.md) | Bernard | Done | Typed env validation, server-only Supabase/Azure boundaries, safe fallback flags |
 | 03 | [Data Schema, Prisma, and Seed Base](packets/03-data-schema-prisma-and-seed-base.md) | Bernard | Done | Minimum identity/profile schema, explicit fact states, audit helper, synthetic seed base |
-| 04 | [Caregiver Auth and Membership Authorization](packets/04-caregiver-auth-and-membership-authorization.md) | Bernard | Ready | Caregiver session resolution, Owner/Family Member authorization, role tests |
-| 05 | [Patient Access Code and Profile Isolation](packets/05-patient-access-code-and-profile-isolation.md) | Bernard | Draft | Minimum profile API, Patient code login, Patient Profile binding, Maya/Raka isolation |
+| 04 | [Caregiver Auth and Membership Authorization](packets/04-caregiver-auth-and-membership-authorization.md) | Bernard | Done | Caregiver session resolution, Owner/Family Member authorization, role tests |
+| 05 | [Patient Access Code and Profile Isolation](packets/05-patient-access-code-and-profile-isolation.md) | Bernard | Ready | Minimum profile API, Patient code login, Patient Profile binding, Maya/Raka isolation |
 | 06 | [Patient Profile Lifecycle Deactivation](packets/06-patient-profile-lifecycle-deactivation.md) | Bernard | Draft | Owner-only non-destructive profile deactivation and Patient access revocation |
 | 07 | [Patient Homepage and Check-In](packets/07-patient-homepage-and-check-in.md) | Daniel | Draft | Cheerful Patient homepage and profile-bound check-in flow |
 | 08 | [Caregiver Dashboard, Medication, and Reminder](packets/08-caregiver-dashboard-medication-and-reminder.md) | Daniel | Draft | Informative caregiver dashboard with medication/reminder basics |
@@ -133,6 +133,9 @@ Run `npm run test:e2e` when the packet adds or changes a user journey.
 
 | Packet | From | To | Timestamp | Evidence | Approved by |
 | --- | --- | --- | --- | --- | --- |
+| 05 | Draft | Ready | 2026-07-17 02:25 +07:00 | P4 auth/membership boundary is Done; P3 Maya/Raka profiles and hash-only code fixtures exist; ignored local Patient session secret and database inputs are present; usable synthetic Patient codes remain explicit P5 scope | Ozan |
+| 04 | Review | Done | 2026-07-17 02:25 +07:00 | All 8 acceptance criteria passed; Daniel/Al/Ozan reviews, 45 unit tests, 7 live E2E/responsive checks, build, role-spoof/denial tests, Auth-user audit, logout verification, and secret/artifact scans passed | Ozan |
+| 04 | Ready | Review | 2026-07-17 02:25 +07:00 | Commit `1a3c89c` plus current P4 QA corrections provide server auth context, membership/Owner guards, caregiver login UI, generic states, and reviewable automated/manual evidence | Ozan |
 | 04 | Draft | Ready | 2026-07-17 01:26 +07:00 | P3 migration/seed verified and Done; Supabase Auth identities and ignored local env are available; typed core env validation passes; caregiver demo-password establishment remains in P4 scope | Ozan |
 | 03 | Review | Done | 2026-07-17 01:26 +07:00 | All 12 acceptance criteria passed; migration current; seed passed twice; database constraints, 33 tests, lint, typecheck, build, e2e regression, privacy scan, and Daniel/Al/Ozan reviews passed | Ozan |
 | 03 | Ready | Review | 2026-07-17 01:18 +07:00 | Commit `9c5daf3` provides schema, migration, seed, DB/fact helpers, audit helper, and tests; independent domain and QA review started | Ozan |

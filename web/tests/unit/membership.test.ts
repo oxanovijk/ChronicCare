@@ -15,6 +15,12 @@ function context(role: "OWNER" | "FAMILY_MEMBER"): CaregiverAuthContext {
 }
 
 describe("caregiver membership guards", () => {
+  it("rejects unauthenticated callers from Owner-only actions", () => {
+    expect(() => requireOwner(null)).toThrow(
+      new CaregiverAuthError("UNAUTHENTICATED"),
+    );
+  });
+
   it("allows Owner and keeps the server-resolved context", () => {
     const owner = context("OWNER");
     expect(requireOwner(owner)).toBe(owner);

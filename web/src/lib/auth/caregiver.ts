@@ -60,7 +60,11 @@ export async function resolveCaregiverAuthContext(
   };
 }
 
-export function requireOwner(context: CaregiverAuthContext) {
+export function requireOwner(context: CaregiverAuthContext | null | undefined) {
+  if (!context) {
+    throw new CaregiverAuthError("UNAUTHENTICATED");
+  }
+
   if (context.membership.role !== "OWNER") {
     throw new CaregiverAuthError("FORBIDDEN");
   }
