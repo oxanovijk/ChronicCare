@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { LoaderCircle, Plus, Save } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -97,6 +97,11 @@ function DeactivateProfileDialog({
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
+  const errorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
 
   async function deactivate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -174,7 +179,12 @@ function DeactivateProfileDialog({
             />
           </div>
           {error ? (
-            <Alert variant="destructive" aria-live="assertive">
+            <Alert
+              ref={errorRef}
+              variant="destructive"
+              tabIndex={-1}
+              aria-live="assertive"
+            >
               <AlertTitle>Profil belum dinonaktifkan</AlertTitle>
               <AlertDescription>
                 Muat ulang data profil, lalu coba lagi.
@@ -496,6 +506,11 @@ export function CaregiverProfilePanel({
     "created" | "error" | null
   >(null);
   const [lifecycleNotice, setLifecycleNotice] = useState(false);
+  const lifecycleNoticeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (lifecycleNotice) lifecycleNoticeRef.current?.focus();
+  }, [lifecycleNotice]);
 
   useEffect(() => {
     let active = true;
@@ -624,7 +639,12 @@ export function CaregiverProfilePanel({
         </Alert>
       ) : null}
       {lifecycleNotice ? (
-        <Alert aria-live="polite">
+        <Alert
+          ref={lifecycleNoticeRef}
+          role="status"
+          tabIndex={-1}
+          aria-live="polite"
+        >
           <AlertTitle>Patient Profile dinonaktifkan</AlertTitle>
           <AlertDescription>
             Profil sudah keluar dari alur aktif. Riwayat tetap tersimpan dan

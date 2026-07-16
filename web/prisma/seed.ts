@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 import assert from "node:assert/strict";
-import { randomBytes } from "node:crypto";
+import * as crypto from "node:crypto";
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { createClient } from "@supabase/supabase-js";
@@ -33,12 +33,53 @@ const demoUsers = [
 ] as const;
 
 // Argon2id fixture hashes only. No reusable Patient code is committed or logged.
-const codeHashes = {
+const fixtureCodeHashes = {
   maya:
     "$argon2id$v=19$m=65536,t=3,p=1$wjma+KnjtTOi3Xe4RwAuGg$8Kci3tpRr9Q7kQT2MjUxhXUe5E/A3b57FuDkqR+/m7E",
   raka:
     "$argon2id$v=19$m=65536,t=3,p=1$3HZppNYH2Oe8AlK9I0AL0Q$Pfn+9RV1xTi/vzIfks6ZKaR403JsVdSBKD2F8WQK8Vg",
 } as const;
+
+type NativeArgon2 = (
+  algorithm: "argon2id",
+  parameters: {
+    message: Buffer;
+    nonce: Buffer;
+    parallelism: number;
+    tagLength: number;
+    memory: number;
+    passes: number;
+  },
+  callback: (error: Error | null | undefined, result?: Buffer) => void,
+) => void;
+
+const argon2 = (crypto as unknown as { argon2: NativeArgon2 }).argon2;
+
+async function hashPatientCode(code: string) {
+  const memory = 65_536;
+  const passes = 3;
+  const parallelism = 1;
+  const nonce = crypto.randomBytes(16);
+  const hash = await new Promise<Buffer>((resolve, reject) => {
+    argon2(
+      "argon2id",
+      {
+        message: Buffer.from(code),
+        nonce,
+        parallelism,
+        tagLength: 32,
+        memory,
+        passes,
+      },
+      (error, result) => {
+        if (error || !result) reject(error ?? new Error("Argon2 failed"));
+        else resolve(result);
+      },
+    );
+  });
+
+  return `$argon2id$v=19$m=${memory},t=${passes},p=${parallelism}$${nonce.toString("base64")}$${hash.toString("base64")}`;
+}
 
 async function main() {
   let stage = "configuration";
@@ -53,6 +94,18 @@ async function main() {
     "Supabase admin",
     inspectSupabaseAdminEnv(process.env),
   );
+  const configuredCodeHashes = {
+    maya: process.env["PATIENT_DEMO_MAYA_CODE"]
+      ? await hashPatientCode(process.env["PATIENT_DEMO_MAYA_CODE"])
+      : null,
+    raka: process.env["PATIENT_DEMO_RAKA_CODE"]
+      ? await hashPatientCode(process.env["PATIENT_DEMO_RAKA_CODE"])
+      : null,
+  };
+  const codeHashes = {
+    maya: configuredCodeHashes.maya ?? fixtureCodeHashes.maya,
+    raka: configuredCodeHashes.raka ?? fixtureCodeHashes.raka,
+  };
   const prisma = new PrismaClient({
     adapter: new PrismaPg({ connectionString: directUrl }),
   });
@@ -77,7 +130,7 @@ async function main() {
       stage = "auth-user creation";
       const created = await supabase.auth.admin.createUser({
         email: user.email,
-        password: `${randomBytes(32).toString("base64url")}Aa1!`,
+        password: `${crypto.randomBytes(32).toString("base64url")}Aa1!`,
         email_confirm: true,
         user_metadata: { display_name: user.displayName },
       });
@@ -197,6 +250,10 @@ async function main() {
           updatedByUserId: ownerId,
           deletedAt: null,
           status: "ACTIVE",
+          deactivationReason: null,
+          deactivationNote: null,
+          deactivatedByUserId: null,
+          deactivatedAt: null,
           ...mayaFacts,
         },
       });
@@ -218,6 +275,10 @@ async function main() {
           updatedByUserId: ownerId,
           deletedAt: null,
           status: "ACTIVE",
+          deactivationReason: null,
+          deactivationNote: null,
+          deactivatedByUserId: null,
+          deactivatedAt: null,
           ...rakaFacts,
         },
       });
@@ -238,7 +299,16 @@ async function main() {
           codeHash: codeHashes.maya,
           createdByUserId: ownerId,
         },
-        update: { codeHash: codeHashes.maya, status: "ACTIVE" },
+        update: {
+          ...(configuredCodeHashes.maya
+            ? { codeHash: configuredCodeHashes.maya }
+            : {}),
+          status: "ACTIVE",
+          failedAttemptCount: 0,
+          lockedUntil: null,
+          lastUsedAt: null,
+          expiresAt: null,
+        },
       });
       await tx.patientAccessCode.upsert({
         where: { id: ids.rakaCode },
@@ -248,7 +318,16 @@ async function main() {
           codeHash: codeHashes.raka,
           createdByUserId: ownerId,
         },
-        update: { codeHash: codeHashes.raka, status: "ACTIVE" },
+        update: {
+          ...(configuredCodeHashes.raka
+            ? { codeHash: configuredCodeHashes.raka }
+            : {}),
+          status: "ACTIVE",
+          failedAttemptCount: 0,
+          lockedUntil: null,
+          lastUsedAt: null,
+          expiresAt: null,
+        },
       });
     });
 
@@ -263,7 +342,24 @@ async function main() {
     assert.equal(seeded.members.length, 2);
     assert.equal(seeded.patientProfiles.length, 2);
     assert(
-      seeded.patientProfiles.every((profile) => profile.accessCodes.length === 1),
+      seeded.patientProfiles.every(
+        (profile) =>
+          profile.status === "ACTIVE" &&
+          profile.deactivationReason === null &&
+          profile.deactivationNote === null &&
+          profile.deactivatedByUserId === null &&
+          profile.deactivatedAt === null,
+      ),
+    );
+    assert(
+      seeded.patientProfiles.every(
+        (profile) =>
+          profile.accessCodes.length === 1 &&
+          profile.accessCodes[0]?.status === "ACTIVE" &&
+          profile.accessCodes[0]?.failedAttemptCount === 0 &&
+          profile.accessCodes[0]?.lockedUntil === null &&
+          profile.accessCodes[0]?.expiresAt === null,
+      ),
     );
     console.info("Synthetic Packet 03 seed applied and verified.");
   } catch {

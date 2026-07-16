@@ -82,6 +82,7 @@ describe("caregiver Patient Profile lifecycle UI", () => {
     expect(
       await screen.findByText("Patient Profile dinonaktifkan"),
     ).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveFocus();
     expect(
       await screen.findByRole("heading", { level: 3, name: "Raka Pratama" }),
     ).toBeInTheDocument();
@@ -117,5 +118,42 @@ describe("caregiver Patient Profile lifecycle UI", () => {
     expect(
       screen.queryByRole("button", { name: "Nonaktifkan profil" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("moves focus to the retryable error without closing the dialog", async () => {
+    const maya = profile("maya-id", "Maya Pratama", "Maya");
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+      const url = String(input);
+      if (url === "/api/v1/patient-profiles" && !init?.method) {
+        return Response.json({ data: [maya] });
+      }
+      if (url.endsWith("maya-id") && !url.endsWith("/deactivate")) {
+        return Response.json({ data: maya });
+      }
+      if (url.endsWith("maya-id/deactivate") && init?.method === "POST") {
+        return Response.json(
+          { error: { code: "INTERNAL_ERROR", message: "generic" } },
+          { status: 500 },
+        );
+      }
+      return new Response(null, { status: 404 });
+    });
+
+    const user = userEvent.setup();
+    render(<CaregiverProfilePanel role="OWNER" />);
+    await screen.findByRole("heading", { level: 3, name: "Maya Pratama" });
+    await user.click(
+      screen.getByRole("button", { name: "Nonaktifkan profil" }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Akhiri perawatan profil" }),
+    );
+
+    expect(await screen.findByText("Profil belum dinonaktifkan")).toBeVisible();
+    expect(screen.getByRole("alert")).toHaveFocus();
+    expect(screen.getByRole("dialog")).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Akhiri perawatan profil" }),
+    ).toBeEnabled();
   });
 });
