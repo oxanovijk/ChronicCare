@@ -9,6 +9,10 @@ export const nonEmpty = z.string().trim().min(1);
 
 export function webUrl(runtime: RuntimeEnvironment) {
   return z.url().refine((value) => {
+    if (!URL.canParse(value)) {
+      return false;
+    }
+
     const protocol = new URL(value).protocol;
 
     return (

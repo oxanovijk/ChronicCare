@@ -86,6 +86,7 @@ describe("environment validation", () => {
   it("ships an .env.example whose locked defaults parse as written", () => {
     const example = parse(readFileSync(".env.example", "utf8"));
 
+    expect(example.NEXT_PUBLIC_APP_URL).toBe("http://localhost:3000");
     expect(parseProviderFlags(example)).toEqual({
       OCR_FALLBACK_MODE: "disabled",
       OCR_MAX_FILE_BYTES: 5_242_880,

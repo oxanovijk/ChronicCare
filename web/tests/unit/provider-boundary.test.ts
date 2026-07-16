@@ -1,11 +1,18 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { createAzureOpenAIClient } from "@/lib/azure/openai";
+import { createDocumentIntelligenceProvider } from "@/lib/azure/document-intelligence";
 import {
   DEMO_FALLBACK_LABEL,
   ProviderConfigurationError,
   requireProviderConfig,
   resolveOcrProviderConfig,
 } from "@/lib/config/provider-policy";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe("provider boundary policy", () => {
   it("returns live configuration when credentials are valid", () => {
@@ -58,5 +65,33 @@ describe("provider boundary policy", () => {
         "disabled",
       ),
     ).toThrow(ProviderConfigurationError);
+  });
+
+  it("keeps real provider factories credential-free until explicitly called", () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "");
+    vi.stubEnv("AZURE_OPENAI_ENDPOINT", "");
+    vi.stubEnv("AZURE_OPENAI_API_KEY", "");
+    vi.stubEnv("AZURE_OPENAI_API_VERSION", "");
+    vi.stubEnv("AZURE_OPENAI_DEPLOYMENT", "");
+
+    expect(() => createSupabaseAdminClient()).toThrow(
+      ProviderConfigurationError,
+    );
+    expect(() => createAzureOpenAIClient()).toThrow(
+      ProviderConfigurationError,
+    );
+  });
+
+  it("returns the labeled fallback from the real OCR provider boundary", () => {
+    vi.stubEnv("OCR_FALLBACK_MODE", "synthetic-demo");
+    vi.stubEnv("AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT", "");
+    vi.stubEnv("AZURE_DOCUMENT_INTELLIGENCE_KEY", "");
+    vi.stubEnv("AZURE_DOCUMENT_INTELLIGENCE_MODEL", "");
+
+    expect(createDocumentIntelligenceProvider()).toEqual({
+      mode: "demo-fallback",
+      label: DEMO_FALLBACK_LABEL,
+    });
   });
 });
