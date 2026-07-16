@@ -48,6 +48,7 @@ Patient receives short safe answers; caregiver receives concise preparation/navi
 
 - Packet 02 provider boundary must exist.
 - Packet 05 profile isolation must exist.
+- Packet 06 lifecycle exclusion must exist.
 - Packet 08 daily-care selector must exist.
 - Packet 09 confirmed OCR selector must exist.
 
@@ -83,6 +84,7 @@ Patient receives short safe answers; caregiver receives concise preparation/navi
 
 - Persona is inferred from actor session, not request body.
 - Context uses one explicit authorized `patientProfileId`.
+- Context builders and chat routes reject deactivated Patient Profiles and never include their profile, daily-care, or confirmed OCR context in a new AI request.
 - Only latest check-in, medication/reminder basics, relevant profile fields, and confirmed OCR summaries enter context.
 - Profile facts with status `UNKNOWN` are excluded and never converted to negative claims.
 - `NONE_REPORTED` facts retain caregiver-reported qualification in context and response.
@@ -124,6 +126,10 @@ Caregiver:
 - With a synthetic `NONE_REPORTED` fact: ask the equivalent question and verify qualified wording.
 
 Repeat a caregiver prompt after switching to Raka. Response must not mention Maya data.
+
+Repeat context selection against a deactivated resettable profile. The request
+must be denied before the provider call, and no retained profile/history/OCR
+data may enter hidden context.
 
 ## Documentation Update Rules
 

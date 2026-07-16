@@ -1,6 +1,6 @@
 # Packet 07: Patient Homepage and Check-In
 
-Status: Draft
+Status: Ready
 
 Driver / DRI: Daniel
 
@@ -45,10 +45,25 @@ Patient sees a warm, cheerful homepage and can submit a simple check-in that bel
 - Check-in fields are limited to locked MVP needs.
 - Diabetes tipe 2 is demo context only.
 
+## Entry Readiness Evidence
+
+- Packet 06 is `Done`; deactivated profiles are excluded from active profile
+  reads, Patient auth, and active caregiver selection.
+- Packet 03 already provides the `CheckIn` model and profile relation required
+  for P7; no unresolved schema/provider decision blocks implementation.
+- Packet 05 provides profile-bound Patient login/session helpers and explicit
+  wrong-profile denial that P7 must reuse.
+- Ignored local Patient/caregiver demo inputs and the development database are
+  available; Maya and Raka are active, clean, and resettable through seed.
+- P7 must add the locked check-in API/UI and deactivated-profile write denial;
+  these are normal implementation scope, not entry blockers.
+- No hard blocker or unresolved soft dependency remains.
+
 ## Hard Dependencies
 
 - Packet 03 schema/seed base must exist.
 - Packet 05 Patient access/session helpers must exist.
+- Packet 06 lifecycle exclusion must exist.
 
 ## Soft Dependencies / Parallel Prep
 
@@ -58,7 +73,7 @@ Patient sees a warm, cheerful homepage and can submit a simple check-in that bel
 
 ## Allowed Files / Areas
 
-- `web/src/app/(patient)/`
+- `web/src/app/patient/`
 - `web/src/app/api/v1/patient-profiles/[patientProfileId]/check-ins/`
 - `web/src/components/patient/`
 - `web/src/components/daily-care/`
@@ -120,4 +135,3 @@ Patient sees a warm, cheerful homepage and can submit a simple check-in that bel
 ## Handoff Notes
 
 Report Patient route paths, check-in API names, fields saved, tests run, mobile QA evidence, and safe-copy notes. Packet 08 consumes check-in data for caregiver dashboard.
-

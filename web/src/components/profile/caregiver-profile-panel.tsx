@@ -1,10 +1,20 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { LoaderCircle, Plus, Save } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -12,6 +22,10 @@ import { Textarea } from "@/components/ui/textarea";
 
 type FactStatus = "UNKNOWN" | "NONE_REPORTED" | "REPORTED";
 type BpjsStatus = "UNKNOWN" | "NOT_REGISTERED" | "REGISTERED";
+type DeactivationReason =
+  | "NO_LONGER_CARED"
+  | "PATIENT_DECEASED"
+  | "OTHER";
 
 type PatientProfile = {
   id: string;
@@ -67,6 +81,134 @@ function FactStatusSelect({
       <option value="NONE_REPORTED">Tidak ada yang dilaporkan</option>
       <option value="REPORTED">Sudah tercatat</option>
     </select>
+  );
+}
+
+function DeactivateProfileDialog({
+  profile,
+  onDeactivated,
+}: {
+  profile: PatientProfile;
+  onDeactivated: (patientProfileId: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] =
+    useState<DeactivationReason>("NO_LONGER_CARED");
+  const [note, setNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(false);
+  const errorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
+
+  async function deactivate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(false);
+    try {
+      const response = await fetch(
+        `/api/v1/patient-profiles/${profile.id}/deactivate`,
+        {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason, note: valueOrNull(note) }),
+        },
+      );
+      if (!response.ok) {
+        setError(true);
+        return;
+      }
+      setOpen(false);
+      onDeactivated(profile.id);
+    } catch {
+      setError(true);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (nextOpen) setError(false);
+      }}
+    >
+      <DialogTrigger render={<Button type="button" variant="destructive" />}>
+        Nonaktifkan profil
+      </DialogTrigger>
+      <DialogContent showCloseButton={!submitting}>
+        <DialogHeader>
+          <DialogTitle>Akhiri perawatan profil</DialogTitle>
+          <DialogDescription>
+            {profile.displayName} akan dikeluarkan dari alur perawatan aktif.
+            Riwayat tetap tersimpan, sedangkan kode dan sesi Patient dicabut.
+            Ini bukan pembatalan langganan atau pembayaran.
+          </DialogDescription>
+        </DialogHeader>
+        <form className="space-y-4" onSubmit={deactivate}>
+          <div className="space-y-2">
+            <Label htmlFor={`deactivation-reason-${profile.id}`}>Alasan</Label>
+            <select
+              id={`deactivation-reason-${profile.id}`}
+              value={reason}
+              onChange={(event) =>
+                setReason(event.target.value as DeactivationReason)
+              }
+              className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+            >
+              <option value="NO_LONGER_CARED">Perawatan berakhir</option>
+              <option value="OTHER">Pasien berpindah perawatan</option>
+              <option value="PATIENT_DECEASED">Pasien meninggal dunia</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor={`deactivation-note-${profile.id}`}>
+              Catatan singkat (opsional)
+            </Label>
+            <Textarea
+              id={`deactivation-note-${profile.id}`}
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              maxLength={500}
+              placeholder="Hindari detail medis atau data sensitif."
+            />
+          </div>
+          {error ? (
+            <Alert
+              ref={errorRef}
+              variant="destructive"
+              tabIndex={-1}
+              aria-live="assertive"
+            >
+              <AlertTitle>Profil belum dinonaktifkan</AlertTitle>
+              <AlertDescription>
+                Muat ulang data profil, lalu coba lagi.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          <DialogFooter>
+            <DialogClose
+              render={
+                <Button type="button" variant="outline" disabled={submitting} />
+              }
+            >
+              Batal
+            </DialogClose>
+            <Button type="submit" variant="destructive" disabled={submitting}>
+              {submitting ? (
+                <LoaderCircle className="animate-spin" aria-hidden="true" />
+              ) : null}
+              Akhiri perawatan profil
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -363,6 +505,12 @@ export function CaregiverProfilePanel({
   const [createNotice, setCreateNotice] = useState<
     "created" | "error" | null
   >(null);
+  const [lifecycleNotice, setLifecycleNotice] = useState(false);
+  const lifecycleNoticeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (lifecycleNotice) lifecycleNoticeRef.current?.focus();
+  }, [lifecycleNotice]);
 
   useEffect(() => {
     let active = true;
@@ -420,6 +568,15 @@ export function CaregiverProfilePanel({
     setProfiles((current) =>
       current?.map((item) => (item.id === saved.id ? saved : item)) ?? null,
     );
+  }
+
+  function removeDeactivatedProfile(patientProfileId: string) {
+    const remaining =
+      profiles?.filter((item) => item.id !== patientProfileId) ?? [];
+    setProfiles(remaining);
+    setProfile(null);
+    setSelectedId(remaining[0]?.id ?? null);
+    setLifecycleNotice(true);
   }
 
   async function createProfile(event: FormEvent<HTMLFormElement>) {
@@ -481,6 +638,20 @@ export function CaregiverProfilePanel({
           </AlertDescription>
         </Alert>
       ) : null}
+      {lifecycleNotice ? (
+        <Alert
+          ref={lifecycleNoticeRef}
+          role="status"
+          tabIndex={-1}
+          aria-live="polite"
+        >
+          <AlertTitle>Patient Profile dinonaktifkan</AlertTitle>
+          <AlertDescription>
+            Profil sudah keluar dari alur aktif. Riwayat tetap tersimpan dan
+            akses Patient telah dicabut.
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
       {profiles?.length ? (
         <div className="space-y-2">
@@ -511,7 +682,29 @@ export function CaregiverProfilePanel({
         </div>
       ) : null}
       {profile ? (
-        <ProfileEditor key={profile.id} profile={profile} onSaved={saveProfile} />
+        <>
+          <ProfileEditor
+            key={profile.id}
+            profile={profile}
+            onSaved={saveProfile}
+          />
+          {role === "OWNER" ? (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <h3 className="font-medium">Akhiri perawatan profil</h3>
+                <p className="text-sm text-muted-foreground">
+                  Gunakan hanya saat profil tidak lagi menjadi bagian dari
+                  perawatan aktif.
+                </p>
+                <DeactivateProfileDialog
+                  profile={profile}
+                  onDeactivated={removeDeactivatedProfile}
+                />
+              </div>
+            </>
+          ) : null}
+        </>
       ) : null}
 
       {role === "OWNER" && (profiles?.length ?? 0) < 2 ? (

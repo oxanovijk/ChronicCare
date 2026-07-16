@@ -5,6 +5,13 @@ const nullableText = (max: number) =>
 
 export const patientProfileIdSchema = z.uuid();
 
+export const deactivatePatientProfileSchema = z
+  .object({
+    reason: z.enum(["NO_LONGER_CARED", "PATIENT_DECEASED", "OTHER"]),
+    note: nullableText(500).optional(),
+  })
+  .strict();
+
 export const createPatientProfileSchema = z
   .object({
     displayName: z.string().trim().min(1).max(120),
@@ -46,6 +53,9 @@ export const patchPatientProfileSchema = z
 
 export type CreatePatientProfileInput = z.infer<
   typeof createPatientProfileSchema
+>;
+export type DeactivatePatientProfileInput = z.infer<
+  typeof deactivatePatientProfileSchema
 >;
 export type PatchPatientProfileInput = z.infer<
   typeof patchPatientProfileSchema
