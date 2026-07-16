@@ -2,7 +2,7 @@
 
 Produk: ChroniCare
 
-Status: Locked packet structure for MVP v1; all packets remain `Draft` until scaffold/dependencies exist
+Status: Locked packet structure for MVP v1; Packet 01 is `Done`, and each remaining packet status remains evidence-driven
 
 DRI: Ozan
 
@@ -18,7 +18,7 @@ This index keeps execution packets small enough for one focused Codex session. I
 
 | Order | Packet | Driver / DRI | Current status | Exit result |
 | --- | --- | --- | --- | --- |
-| 01 | [Scaffold and Tooling Baseline](packets/01-scaffold-and-tooling-baseline.md) | Bernard | Draft | Runnable `/web`, scripts, shell routes, baseline tests |
+| 01 | [Scaffold and Tooling Baseline](packets/01-scaffold-and-tooling-baseline.md) | Bernard | Done | Runnable `/web`, scripts, shell routes, baseline tests |
 | 02 | [Env and Provider Boundary](packets/02-env-and-provider-boundary.md) | Bernard | Draft | Typed env validation, server-only Supabase/Azure boundaries, safe fallback flags |
 | 03 | [Data Schema, Prisma, and Seed Base](packets/03-data-schema-prisma-and-seed-base.md) | Bernard | Draft | Minimum identity/profile schema, audit helper, synthetic seed base |
 | 04 | [Caregiver Auth and Membership Authorization](packets/04-caregiver-auth-and-membership-authorization.md) | Bernard | Draft | Caregiver session resolution, Owner/Family Member authorization, role tests |
@@ -133,7 +133,8 @@ Run `npm run test:e2e` when the packet adds or changes a user journey.
 
 | Packet | From | To | Timestamp | Evidence | Approved by |
 | --- | --- | --- | --- | --- | --- |
-| All | Draft | Draft | 2026-07-16 | Refined execution plan from 9 broad packets into 13 one-prompt-sized packets; app still does not exist | Human request |
+| 01 | Draft | Done | 2026-07-16 21:26 +07:00 | Latest P1 baseline verified: `/web` scaffold, locked scripts, shell routes, install/lint/typecheck/test/build/e2e, manual responsive QA, and secret scan passed | Ozan |
+| All | Draft | Draft | 2026-07-16 | At the time of packet restructuring, the app did not yet exist; 13 one-prompt-sized packets were prepared | Human request |
 
 ## Change Log
 

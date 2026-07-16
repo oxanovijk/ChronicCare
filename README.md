@@ -2,7 +2,7 @@
 
 Care Circle berbasis web untuk membantu pasien chronic illness dan caregiver menjaga rutinitas perawatan jangka panjang. Patient mendapat antarmuka yang cheerful, sederhana, dan suportif untuk check-in, reminder, chatbot, dan SOS. Caregiver mendapat dashboard yang lebih informatif untuk melihat konteks Patient aktif, meninjau dokumen hasil OCR, menangani SOS, serta mencari faskes/BPJS di Tangerang.
 
-Status repo: documentation-first, pre-scaffold. Stack dan kontrak sudah dikunci, tetapi aplikasi dan command belum tersedia sampai Packet 01 membuat `/web`.
+Status repo: Packet 01 scaffold tersedia di `/web`. Shell route dan command baseline sudah dapat dijalankan; fitur produk setelah scaffold tetap harus diverifikasi per packet dan tidak boleh dianggap live hanya karena tercantum di dokumentasi.
 
 Refinement status: positioning sudah berubah menjadi chronic illness care. Istilah internal untuk MVP memakai `Patient Profile`, `patientProfileId`, dan route `patient-profiles` pada technical docs dan execution packets.
 
@@ -79,14 +79,24 @@ Satu Care Circle memiliki tepat satu Owner aktif dan maksimal dua Patient Profil
 
 ## Local Development
 
-Commands are unavailable today because `/web/package.json` does not exist. Packet 01 will scaffold the app using the verified steps in [Development Installations](docs/technical/dev-installations.md).
-
-Planned workflow after scaffold:
+Gunakan Node.js 24.x dan npm. Packet 01 tidak membutuhkan `.env` atau kredensial provider.
 
 ```powershell
 Set-Location web
 npm install
+npx playwright install chromium
 npm run dev
+```
+
+Buka:
+
+- `http://localhost:3000`
+- `http://localhost:3000/caregiver`
+- `http://localhost:3000/patient/login`
+
+Command verifikasi scaffold:
+
+```powershell
 npm run lint
 npm run typecheck
 npm test
@@ -94,7 +104,7 @@ npm run test:e2e
 npm run build
 ```
 
-Do not report these commands as passing until the files exist and each command runs successfully.
+Command database tersedia sebagai baseline tooling, tetapi `db:migrate`, `db:seed`, dan `db:studio` tidak dijalankan sampai database Packet 03 tersedia. Detail instalasi tetap mengikuti [Development Installations](docs/technical/dev-installations.md).
 
 ## Environment Names
 
@@ -181,8 +191,8 @@ Use fictional data only. Demo story uses a synthetic diabetes tipe 2 scenario, s
 
 ## Known MVP Limitations
 
-- The application is not scaffolded yet.
-- Documentation has been refined to Patient terminology, but the application is still pre-scaffold.
+- Packet 01 baru menyediakan scaffold, shell route, dan test harness; auth, daily care, OCR, chatbot, SOS, provider integration, database, dan deployment belum boleh diklaim live.
+- Patient login shell sengaja nonaktif sampai packet akses Patient mengimplementasikan session dan access code.
 - Demo condition is diabetes tipe 2, but ChroniCare is not a diabetes diagnosis or treatment app.
 - OCR accepts one PDF/JPEG/PNG up to 5 MB and three pages; a labeled synthetic fallback may be used.
 - OCR output needs caregiver confirmation and is not medical truth.
@@ -191,5 +201,5 @@ Use fictional data only. Demo story uses a synthetic diabetes tipe 2 scenario, s
 - Faskes data is static and must be confirmed directly with the facility/BPJS.
 - Chatbot is non-diagnostic and may return a safe fallback.
 - Food/menu guidance is out of MVP and must not be framed as personal clinical advice.
-- QA checklist remains `Not Run` until implementation exists and tests run.
+- Packet 13 demo-readiness checklist tetap `Not Run` sampai seluruh flow MVP selesai dan bukti QA final dijalankan.
 - Commit and push are not part of documentation preparation unless explicitly requested.

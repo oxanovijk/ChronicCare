@@ -91,15 +91,16 @@ Format change log:
 
 ## 7. Status Saat Ini
 
-- Repo masih documentation-first dan belum memiliki scaffold aplikasi.
+- Packet 01 scaffold, shell route, npm scripts, dan test harness sudah tersedia di `/web`.
 - Stack, provider, model data, kontrak API, OCR flow, serta SOS web sudah dikunci dalam dokumen teknis.
-- Status packet tetap `Draft` sampai file aplikasi, command, credential demo, dan dependency packet benar-benar tersedia.
-- QA checklist tetap `Not Run` sampai ada implementasi yang diuji.
+- Status setiap packet tetap diputuskan Ozan berdasarkan acceptance criteria dan bukti QA; keberadaan scaffold tidak otomatis menyelesaikan packet fitur berikutnya.
+- Packet 13 demo-readiness checklist tetap `Not Run` sampai seluruh flow MVP selesai dan diuji.
 
 ## 8. Change Log
 
 | Tanggal | Dokumen | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|---|
+| 2026-07-16 | `docs/team/ownership.md` | Memperbarui status repo setelah scaffold Packet 01 tersedia | Menyelaraskan ownership guardrail dengan kondisi implementasi aktual | Ozan | Bernard |
 | 2026-07-16 | `docs/team/ownership.md` | Memecah ownership packet dari 9 menjadi 13 packet dan memakai hybrid role ownership per bidang | Menyesuaikan execution packet agar setiap packet layak dikerjakan dalam satu prompt implementasi | Ozan | Bernard |
 | 2026-07-16 | `docs/team/ownership.md` | Memecah ownership packet dari 7 menjadi 9 packet | Menyesuaikan execution packet agar OCR, daily care, SOS, dan QA lebih implementable dalam satu sesi | Ozan | Bernard |
 | 2026-07-16 | `docs/team/ownership.md` | Mengubah packet ownership ke Patient terminology | Menyelaraskan execution docs dengan chronic illness Patient positioning | Ozan | Bernard |

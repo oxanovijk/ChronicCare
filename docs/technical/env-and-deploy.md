@@ -27,9 +27,9 @@ No WhatsApp, SMS, Push API, service worker, or OS notification provider is part 
 
 ## 2. Current Command Status
 
-The repository is still pre-scaffold. No app command is executable until Packet 01 creates `/web/package.json`.
+Packet 01 has created `/web/package.json`, so the application and verification commands are executable. Provider, database, seed, and deployment behavior still depends on later packets and must not be inferred from script availability.
 
-Planned commands after scaffold:
+Current command baseline:
 
 ```powershell
 Set-Location web

@@ -1,6 +1,6 @@
 # Packet 01: Scaffold and Tooling Baseline
 
-Status: Draft
+Status: Done
 
 Driver / DRI: Bernard
 
@@ -120,3 +120,5 @@ The repo has a runnable `/web` app with root, caregiver shell, Patient login she
 ## Handoff Notes
 
 Report changed paths, exact commands run, script availability, local URL if dev server was started, and any unavailable dependency. Packet 02 starts only after `/web` and package scripts exist.
+
+QA must use the latest `origin/P1` HEAD as the Packet 01 baseline and record the resolved SHA at the start of the session. Earlier SHAs in pre-final handoff messages are historical references, not the verification baseline.
