@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CaregiverProfilePanel } from "@/components/profile/caregiver-profile-panel";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type CaregiverContext = {
@@ -166,7 +167,7 @@ export function CaregiverAuthPanel() {
             <Badge variant="secondary">{roleLabel}</Badge>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-5">
           {formError ? (
             <Alert
               variant="destructive"
@@ -181,10 +182,11 @@ export function CaregiverAuthPanel() {
             <ShieldCheck aria-hidden="true" />
             <AlertTitle>Sesi caregiver aktif</AlertTitle>
             <AlertDescription>
-              Dashboard Patient belum tersedia pada Packet 04. Akses berikutnya
-              tetap akan mengikuti Care Circle dan peran yang tersimpan di server.
+              Patient Profile hanya dimuat setelah server memverifikasi Care
+              Circle dan peran akun ini.
             </AlertDescription>
           </Alert>
+          <CaregiverProfilePanel role={state.context.membership.role} />
         </CardContent>
         <CardFooter>
           <Button
