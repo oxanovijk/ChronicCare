@@ -66,6 +66,29 @@ Acceptance:
 
 Owner: Bernard dan Daniel. QA: Ozan.
 
+### 2.4 Progressive Patient Profile setup
+
+Outcome:
+
+- Owner dapat membuat Patient Profile dengan `displayName` dan `relationshipLabel` saja.
+- Informasi demografis, kesehatan, BPJS, fasilitas, kontak darurat, dan dokumen dapat dilengkapi kemudian.
+- Kondisi, alergi, obat aktif, dan kontak darurat membedakan `UNKNOWN`, `NONE_REPORTED`, dan `REPORTED`.
+- Status BPJS membedakan `UNKNOWN`, `NOT_REGISTERED`, dan `REGISTERED`.
+- Nomor BPJS lengkap tidak diterima atau disimpan dalam Patient Profile; empat digit terakhir bersifat opsional untuk pengenalan.
+
+Acceptance:
+
+- Tidak ada optional health field yang memblokir penyelesaian onboarding.
+- UI menyediakan `Belum tahu, isi nanti` tanpa mendorong caregiver menebak.
+- Empty array atau tidak adanya row tidak ditampilkan sebagai klaim `tidak ada`.
+- API menolak nomor BPJS lengkap dan memvalidasi suffix empat digit hanya untuk status `REGISTERED`.
+- Status obat `REPORTED` hanya berasal dari Medication aktif; profile form tidak boleh menandainya tanpa membuat catatan obat.
+- Dashboard menampilkan setup checklist yang dihitung dari data aktual, bukan persentase tersimpan.
+- Patient access code, daily care, document upload, chatbot, dan SOS tetap tersedia untuk profile minimum.
+- Chatbot tidak mengarang context untuk fact berstatus `UNKNOWN`.
+
+Owner product/QA: Ozan. API/data: Bernard. UX: Daniel. AI context: Al.
+
 ## 3. P0: Patient Experience
 
 ### 3.1 Patient homepage
@@ -224,7 +247,7 @@ P1 tidak boleh menggeser waktu verifikasi P0.
 ## 7. P2 / Parking Lot
 
 - Food/menu/pantangan guidance.
-- Onboarding chronic condition yang lebih personal.
+- Onboarding chronic condition yang lebih personal di luar progressive minimum setup, seperti pertanyaan dinamis per kondisi atau rekomendasi berbasis jawaban.
 - Edit profil caregiver.
 - Notification preferences di dalam aplikasi.
 - Insight card non-klinis berbasis seed.
@@ -283,3 +306,4 @@ Technical docs dan execution packets sekarang memakai Patient terminology sebaga
 - 15 Juli 2026: OCR dengan caregiver review menjadi P0; SOS dikunci sebagai alert web Realtime dengan bunyi opt-in.
 - 16 Juli 2026: Step 2 refinement, mengganti feature scope dari Parent/elderly care ke chronic illness Patient care, menambahkan diabetes tipe 2 sebagai demo condition, dan memasukkan end-of-care/deactivate Patient Profile sebagai MVP lifecycle flow.
 - 16 Juli 2026: Step 6/7 consistency pass, menghapus catatan rename teknis yang sudah selesai dan mengunci `patientProfileId` sebagai implementation truth.
+- 16 Juli 2026: Menambahkan progressive minimum Patient Profile setup sebagai P0 identity behavior dan mengunci semantik `UNKNOWN`, `NONE_REPORTED`, serta `REPORTED`.

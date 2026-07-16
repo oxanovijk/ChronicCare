@@ -76,6 +76,7 @@ Caregiver uploads a synthetic document, sees extraction as draft, edits one fiel
 - Clinical interpretation, lab safety interpretation, or diagnosis.
 - Diabetes lab interpretation, target recommendation, or food/pantangan advice.
 - Background OCR queue.
+- Automatic content classification for KTP or other identity documents.
 
 ## Acceptance Criteria
 
@@ -88,6 +89,7 @@ Caregiver uploads a synthetic document, sees extraction as draft, edits one fiel
 - Confirmed-summary selector returns only confirmed extraction for one authorized `patientProfileId`.
 - Pending/rejected/failed extraction never enters chatbot context.
 - Raw OCR text, file bytes, BPJS number, and provider errors are not logged.
+- Upload UI lists supported health-document categories and tells users not to upload KTP or other identity documents.
 
 ## Automated Checks
 
@@ -107,6 +109,7 @@ Caregiver uploads a synthetic document, sees extraction as draft, edits one fiel
 - Try invalid type, oversize file, and unreadable file.
 - Switch to Raka and confirm Maya document does not appear.
 - Confirm `DEMO_FALLBACK` is visible when fixture mode is used.
+- Confirm upload copy does not request KTP and warns against uploading identity documents.
 
 ## Documentation Update Rules
 
@@ -124,4 +127,3 @@ Caregiver uploads a synthetic document, sees extraction as draft, edits one fiel
 ## Handoff Notes
 
 Provide confirmed OCR summary selector, provider mode, fallback trigger, review-state evidence, private storage evidence, and cross-profile document isolation evidence. Packet 11 must use only the confirmed selector.
-

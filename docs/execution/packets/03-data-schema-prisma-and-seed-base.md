@@ -14,18 +14,18 @@ Timebox: hours 5 to 7
 
 ## Role Work
 
-- Role A - Schema/data, DRI: Bernard: implement minimum Prisma schema, database helpers, and constraints needed for identity, Care Circle, Patient Profile, sessions, and audit.
+- Role A - Schema/data, DRI: Bernard: implement minimum Prisma schema, progressive profile fact statuses, database helpers, and constraints needed for identity, Care Circle, Patient Profile, sessions, and audit.
 - Role B - Seed/demo data, DRI: Ozan: define synthetic Owner, Family Member, Maya, and Raka seed records with diabetes tipe 2 as demo scenario only.
 - Role C - UI data needs, DRI: Daniel: confirm seed labels and profile fields are enough for Patient/caregiver UI without adding future features.
 - Role D - Privacy review, DRI: Al: review that seed data and audit fields do not include real sensitive data.
 
 ## Goal
 
-Implement the minimum database schema and synthetic seed foundation needed before auth, Patient access, and feature packets.
+Implement the minimum database schema, explicit unknown/none/reported semantics, and synthetic seed foundation needed before auth, Patient access, and feature packets.
 
 ## Technical-Visible Outcome
 
-Prisma can generate a typed client for core identity/profile data, and seed helpers can create synthetic demo records without real family or credential data.
+Prisma can generate a typed client for core identity/profile data, preserve unknown facts without false defaults, and create synthetic demo records without real family or credential data.
 
 ## Covered Canonical Sources
 
@@ -63,6 +63,7 @@ Prisma can generate a typed client for core identity/profile data, and seed help
 - `web/src/lib/audit/`
 - `web/tests/**/db*`
 - `web/tests/**/seed*`
+- `web/tests/**/profile-fact*`
 
 ## Out of Scope
 
@@ -75,9 +76,13 @@ Prisma can generate a typed client for core identity/profile data, and seed help
 ## Acceptance Criteria
 
 - Prisma models cover core users, Care Circles, memberships, Patient Profiles, Patient access codes/sessions, and audit events.
+- `profile_fact_status` and `bpjs_membership_status` match the locked data model.
+- Patient Profile can be created with minimum identity while all optional fact statuses default to `UNKNOWN`.
+- Database checks reject contradictory condition, allergy, emergency-contact, and BPJS status/value combinations.
+- Patient Profile stores only optional `bpjs_number_last4`; full BPJS number is not modeled.
 - Patient Profile status and deactivation fields match the locked data model.
 - Constraints or server helpers prevent second active Owner and third active Patient Profile for the MVP Care Circle.
-- Seed creates synthetic Owner, Family Member, Maya Pratama with diabetes tipe 2 context, and Raka Pratama with distinct chronic-care context.
+- Seed creates synthetic Owner, Family Member, Maya Pratama with diabetes tipe 2 context, and Raka Pratama with distinct chronic-care context including at least one `UNKNOWN` optional fact.
 - Patient access code fixtures are stored as hashes, not raw reusable secrets.
 - Audit helper records actor/action/target without sensitive payload values.
 - `db:generate` works or a database blocker is documented with exact reason.
@@ -91,12 +96,15 @@ Prisma can generate a typed client for core identity/profile data, and seed help
 | `npm run lint` from `/web` | Schema helpers and seed scripts lint cleanly. |
 | `npm run typecheck` from `/web` | Prisma types and seed helpers compile. |
 | `npm test -- seed` from `/web` if supported | Seed helpers create expected synthetic records and constraints. |
+| `npm test -- profile-facts` from `/web` if supported | Minimum-create defaults, contradictory fact states, and BPJS last-four validation behave as locked. |
 
 ## Manual QA
 
 - Inspect seed values for synthetic names, contacts, health notes, and access codes.
 - Confirm `.env.local` remains untracked.
 - Confirm schema names use `PatientProfile` / `patientProfileId`, not legacy parent terminology.
+- Confirm Maya and Raka demonstrate both recorded and unknown fact states without using real data.
+- Confirm no empty array is labeled `NONE_REPORTED` unless explicitly seeded that way.
 - Confirm audit helper does not duplicate sensitive document, prompt, token, or health content.
 
 ## Documentation Update Rules
@@ -110,9 +118,9 @@ Prisma can generate a typed client for core identity/profile data, and seed help
 - Supabase/local database connection is unavailable and Prisma generation cannot be verified.
 - Locked data model contains unresolved `Parent Profile` terminology that blocks safe implementation.
 - A schema decision would change role permissions, retention, profile limits, or provider assumptions.
+- Fact status/value consistency cannot be enforced without silently deleting or inventing data.
 - Seed requires real personal/family/health data.
 
 ## Handoff Notes
 
-Report migration/generation status, core model names, seed command/result, synthetic account lookup strategy, audit helper names, and blockers. Packet 04 must use these helpers instead of duplicating identity/profile logic.
-
+Report migration/generation status, core model names, fact/BPJS enum names, constraint tests, seed command/result, synthetic account lookup strategy, audit helper names, and blockers. Packet 04 and Packet 05 must use these helpers instead of duplicating identity/profile logic; Packet 05 builds the derived setup checklist.

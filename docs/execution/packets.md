@@ -2,7 +2,7 @@
 
 Produk: ChroniCare
 
-Status: Locked packet structure for MVP v1; Packet 01 is `Done`, and each remaining packet status remains evidence-driven
+Status: Locked packet structure for MVP v1; Packets 01 and 02 are `Done`, and each remaining packet status remains evidence-driven
 
 DRI: Ozan
 
@@ -19,10 +19,10 @@ This index keeps execution packets small enough for one focused Codex session. I
 | Order | Packet | Driver / DRI | Current status | Exit result |
 | --- | --- | --- | --- | --- |
 | 01 | [Scaffold and Tooling Baseline](packets/01-scaffold-and-tooling-baseline.md) | Bernard | Done | Runnable `/web`, scripts, shell routes, baseline tests |
-| 02 | [Env and Provider Boundary](packets/02-env-and-provider-boundary.md) | Bernard | Draft | Typed env validation, server-only Supabase/Azure boundaries, safe fallback flags |
-| 03 | [Data Schema, Prisma, and Seed Base](packets/03-data-schema-prisma-and-seed-base.md) | Bernard | Draft | Minimum identity/profile schema, audit helper, synthetic seed base |
+| 02 | [Env and Provider Boundary](packets/02-env-and-provider-boundary.md) | Bernard | Done | Typed env validation, server-only Supabase/Azure boundaries, safe fallback flags |
+| 03 | [Data Schema, Prisma, and Seed Base](packets/03-data-schema-prisma-and-seed-base.md) | Bernard | Draft | Minimum identity/profile schema, explicit fact states, audit helper, synthetic seed base |
 | 04 | [Caregiver Auth and Membership Authorization](packets/04-caregiver-auth-and-membership-authorization.md) | Bernard | Draft | Caregiver session resolution, Owner/Family Member authorization, role tests |
-| 05 | [Patient Access Code and Profile Isolation](packets/05-patient-access-code-and-profile-isolation.md) | Bernard | Draft | Patient code login, Patient Profile binding, Maya/Raka isolation |
+| 05 | [Patient Access Code and Profile Isolation](packets/05-patient-access-code-and-profile-isolation.md) | Bernard | Draft | Minimum profile API, Patient code login, Patient Profile binding, Maya/Raka isolation |
 | 06 | [Patient Profile Lifecycle Deactivation](packets/06-patient-profile-lifecycle-deactivation.md) | Bernard | Draft | Owner-only non-destructive profile deactivation and Patient access revocation |
 | 07 | [Patient Homepage and Check-In](packets/07-patient-homepage-and-check-in.md) | Daniel | Draft | Cheerful Patient homepage and profile-bound check-in flow |
 | 08 | [Caregiver Dashboard, Medication, and Reminder](packets/08-caregiver-dashboard-medication-and-reminder.md) | Daniel | Draft | Informative caregiver dashboard with medication/reminder basics |
@@ -133,6 +133,8 @@ Run `npm run test:e2e` when the packet adds or changes a user journey.
 
 | Packet | From | To | Timestamp | Evidence | Approved by |
 | --- | --- | --- | --- | --- | --- |
+| 02 | Draft | Done | 2026-07-16 23:22 +07:00 | Typed public/server env parsing, real server-only Supabase/Azure factories, labeled OCR fallback, 23 unit tests, client-import rejection, lint/typecheck/build/e2e, responsive shell QA, and secret scan passed without credentials | Ozan |
+| 01 | Done | Done | 2026-07-16 23:22 +07:00 | Regressed successfully after Packet 02 and progressive-profile documentation: install, lint, typecheck, 23 unit tests, 3 e2e tests, build, six responsive route checks, and secret scan passed | Ozan |
 | 01 | Draft | Done | 2026-07-16 21:26 +07:00 | Latest P1 baseline verified: `/web` scaffold, locked scripts, shell routes, install/lint/typecheck/test/build/e2e, manual responsive QA, and secret scan passed | Ozan |
 | All | Draft | Draft | 2026-07-16 | At the time of packet restructuring, the app did not yet exist; 13 one-prompt-sized packets were prepared | Human request |
 
@@ -140,5 +142,6 @@ Run `npm run test:e2e` when the packet adds or changes a user journey.
 
 | Date | Change | Reason | DRI | Reviewer |
 | --- | --- | --- | --- | --- |
+| 2026-07-16 | Added progressive Patient Profile data semantics to Packets 03, 05, 08, 09, and 11 | Carry the approved unknown/none/reported contract through schema, profile API, dashboard, document privacy copy, and AI context | Ozan | Pending: Bernard |
 | 2026-07-16 | Refined execution packet structure from 9 to 13 packets and added role work, dependency inputs, automated checks, documentation rules, blockers, and covered canonical sources | Make each packet good for one focused implementation prompt while preserving the 30-hour demo path | Ozan | Bernard |
 | 2026-07-16 | Updated packet index for Patient Profile, diabetes tipe 2 demo context, and profile deactivation scope | Challenge update and human scope verdict | Ozan | Bernard |

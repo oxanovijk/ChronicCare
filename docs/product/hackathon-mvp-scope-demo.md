@@ -25,6 +25,7 @@ Demo memakai diabetes tipe 2 sebagai skenario konkret. ChroniCare tetap bukan ap
 - Demo-first dan patient-bound.
 - Satu alur end-to-end sebelum polish.
 - Maksimal dua Patient Profile untuk MVP hackathon.
+- Patient Profile dapat dibuat dari identitas minimum; optional health data boleh tetap `UNKNOWN` dan dilengkapi bertahap.
 - Fitur eksternal harus punya fallback yang jujur.
 - Hasil OCR adalah draft sampai dikonfirmasi caregiver.
 - AI membantu navigasi, persiapan kontrol, dan rutinitas umum; bukan keputusan klinis.
@@ -69,6 +70,7 @@ Jika rehearsal melebihi dua menit, potong Patient chatbot terlebih dahulu. Janga
 - Supabase Auth untuk caregiver.
 - Session kode khusus Patient yang terikat ke satu Patient Profile.
 - Care Circle, membership, dan Patient Profile switching.
+- Progressive Patient Profile setup dengan status `UNKNOWN`, `NONE_REPORTED`, dan `REPORTED` yang tidak memblokir main flow.
 - Check-in dan ringkasan daily care.
 - Medication/reminder dasar yang dapat dibaca.
 - Upload dokumen privat dan metadata patient-bound.
@@ -104,7 +106,7 @@ P1 hanya dikerjakan setelah P0 happy path stabil:
 ## 8. P2 / Parking Lot
 
 - Food/menu/pantangan guidance.
-- Onboarding chronic condition yang lebih personal.
+- Pertanyaan onboarding dinamis per kondisi; progressive minimum setup tetap P0.
 - Insight card non-klinis berbasis seed.
 - Settings non-kritis.
 - Notification preferences di dalam aplikasi.
@@ -141,6 +143,7 @@ Food/menu tidak boleh masuk MVP packet kecuali human verdict baru mengubah scope
 - Family Member/caregiver: Rina Pratama.
 - Patient 1: Maya Pratama, skenario diabetes tipe 2 sintetis.
 - Patient 2: Raka Pratama, data berbeda untuk bukti isolation.
+- Setidaknya satu optional fact Raka berstatus `UNKNOWN` untuk membuktikan sparse-profile behavior.
 - Kode akses sintetis yang berbeda untuk setiap Patient.
 - Check-in normal dan satu check-in perlu perhatian.
 - Dua obat/reminder yang dicatat caregiver untuk Maya; data berbeda untuk Raka.
@@ -156,6 +159,7 @@ Tidak boleh memakai nama, nomor telepon, nomor identitas, dokumen, hasil lab, ob
 | Area | Acceptance Minimum |
 | --- | --- |
 | Auth | Caregiver dan Patient masuk melalui mekanisme terpisah |
+| Progressive profile | Profile minimum dapat dibuat tanpa tebakan; skipped fact tetap `UNKNOWN` |
 | Isolation | Request dengan `patientProfileId` yang tidak boleh diakses ditolak API/database |
 | Profile switch | Semua panel dan query mengikuti Patient aktif tanpa data lama tertinggal |
 | Daily care | Check-in dan reminder diabetes demo tampil sebagai data yang dicatat, bukan saran klinis |
@@ -223,3 +227,4 @@ Tidak ada keputusan provider besar yang masih pending untuk memulai scaffold. Te
 - 15 Juli 2026: Mengunci scope OCR, review manusia, Supabase private storage, dan SOS web Realtime.
 - 16 Juli 2026: Step 2 refinement, mengganti demo narrative dari elderly/Parent care ke chronic illness Patient care dengan diabetes tipe 2 sebagai demo condition.
 - 16 Juli 2026: Step 6/7 consistency pass, menegaskan bahwa technical terminology untuk scaffold memakai Patient.
+- 16 Juli 2026: Mengunci progressive minimum Patient Profile setup dan explicit unknown/none/reported semantics sebagai P0 data-integrity behavior.
