@@ -1,6 +1,6 @@
 # Packet 04: Caregiver Auth and Membership Authorization
 
-Status: Draft
+Status: Ready
 
 Driver / DRI: Bernard
 
@@ -43,6 +43,15 @@ Route handlers and server actions can resolve a verified caregiver, Care Circle 
 - Hosted Supabase project or approved local Supabase setup.
 - Caregiver auth method is available enough for demo.
 - Real provider values are available only in local untracked env files.
+
+## Entry Readiness Evidence
+
+- Packet 03 is `Done`; its migration is applied and its idempotent synthetic seed is present on the development Supabase.
+- Supabase Auth is reachable and contains the synthetic Owner and Family Member identities.
+- Email/password remains the locked caregiver auth method. Usable demo passwords are established as part of Packet 04 and are never committed.
+- Required local env values are available through ignored `web/.env`; `PATIENT_SESSION_SECRET` is provisioned with at least 32 bytes without exposing its value.
+- Packet 01 scripts/test harness and Packet 02 server-only env/provider boundaries pass fresh regression checks.
+- No schema, provider, role, privacy, or product decision remains unresolved.
 
 ## Hard Dependencies
 
@@ -117,4 +126,3 @@ Route handlers and server actions can resolve a verified caregiver, Care Circle 
 ## Handoff Notes
 
 Report auth helper names, request context type, role guard names, test evidence, unsupported auth paths, and any Supabase setup gap. Packet 05 must reuse this authorization layer.
-

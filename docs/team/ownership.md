@@ -94,7 +94,8 @@ Format change log:
 - Packet 01 scaffold, shell route, npm scripts, dan test harness sudah tersedia di `/web`.
 - Stack, provider, model data, kontrak API, OCR flow, serta SOS web sudah dikunci dalam dokumen teknis.
 - Ozan sudah mengunci keputusan produk progressive Patient Profile onboarding; Bernard, Daniel, dan Al sudah menyetujui schema/API, UX, seed/privacy, dan AI context yang diperlukan untuk memulai Packet 03.
-- Packet 03 berstatus `Ready`: Packet 02 sudah masuk `dev`, Supabase development sudah disiapkan Bernard, dan local secrets tersedia hanya di `web/.env` yang di-ignore Git.
+- Packet 03 berstatus `Done`: implementasi commit `9c5daf3`, migration/seed, seluruh acceptance criteria, review Daniel/Al, dan QA Ozan sudah lulus.
+- Packet 04 berstatus `Ready`: Supabase Auth dan synthetic caregiver identities tersedia, local env lengkap dan di-ignore, serta tidak ada dependency P3 yang tertunda.
 - Status setiap packet tetap diputuskan Ozan berdasarkan acceptance criteria dan bukti QA; keberadaan scaffold tidak otomatis menyelesaikan packet fitur berikutnya.
 - Packet 13 demo-readiness checklist tetap `Not Run` sampai seluruh flow MVP selesai dan diuji.
 
