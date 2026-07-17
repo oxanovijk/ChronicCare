@@ -3,6 +3,7 @@ import { ZodError } from "zod";
 import { CaregiverAuthError } from "@/lib/auth/caregiver";
 import { PatientAuthError } from "@/lib/auth/patient";
 import { PatientProfileError } from "@/lib/patient-profile/service";
+import { InvitationError } from "@/lib/invitations/service";
 
 const headers = { "Cache-Control": "private, no-store" };
 
@@ -14,6 +15,7 @@ export function apiErrorResponse(
   let status = 500;
   let code = "INTERNAL_ERROR";
   let message = "Terjadi kesalahan. Coba lagi.";
+  let details: { onboardingDefaults: Record<string, string> } | undefined;
 
   if (error instanceof ZodError) {
     status = 400;
@@ -32,6 +34,18 @@ export function apiErrorResponse(
       status = 403;
       code = error.code;
       message = "Anda tidak memiliki akses.";
+    } else if (error.code === "ONBOARDING_REQUIRED") {
+      status = 409;
+      code = error.code;
+      message = "Selesaikan pendaftaran caregiver untuk melanjutkan.";
+      if (
+        error.onboardingDefaults &&
+        Object.keys(error.onboardingDefaults).length > 0
+      ) {
+        details = { onboardingDefaults: error.onboardingDefaults } as {
+          onboardingDefaults: Record<string, string>;
+        };
+      }
     } else {
       status = 429;
       code = error.code;
@@ -50,10 +64,17 @@ export function apiErrorResponse(
           ? "Maksimal dua Patient Profile dapat dibuat."
           : "Perubahan bertabrakan dengan data yang sudah ada.";
     }
+  } else if (error instanceof InvitationError) {
+    status = error.code === "NOT_FOUND" ? 404 : 409;
+    code = error.code;
+    message =
+      error.code === "NOT_FOUND"
+        ? "Undangan tidak tersedia atau sudah tidak berlaku."
+        : "Undangan sudah digunakan atau berubah.";
   }
 
   return Response.json(
-    { error: { code, message, requestId } },
+    { error: { code, message, requestId, ...(details ? { details } : {}) } },
     { status, headers },
   );
 }

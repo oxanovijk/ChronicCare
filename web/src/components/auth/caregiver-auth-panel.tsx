@@ -5,10 +5,14 @@ import { ShieldCheck } from "@phosphor-icons/react/dist/csr/ShieldCheck";
 import { SignIn } from "@phosphor-icons/react/dist/csr/SignIn";
 import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
 import { SpinnerGap } from "@phosphor-icons/react/dist/csr/SpinnerGap";
+import { UserPlus } from "@phosphor-icons/react/dist/csr/UserPlus";
+import Link from "next/link";
 
+import { OwnerOnboardingForm } from "@/components/auth/owner-onboarding-form";
+import { InvitationPanel } from "@/components/auth/invitation-panel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -35,6 +39,10 @@ type AuthState =
   | { status: "checking" }
   | { status: "signed-out" }
   | { status: "signed-in"; context: CaregiverContext }
+  | {
+      status: "onboarding-required";
+      initialValues: { displayName?: string; careCircleName?: string };
+    }
   | { status: "denied" }
   | { status: "error" };
 
@@ -49,6 +57,25 @@ async function fetchCaregiverContext(): Promise<AuthState> {
     return { status: "signed-in", context: body.data };
   }
   if (response.status === 401) return { status: "signed-out" };
+  if (response.status === 409) {
+    const body = (await response.json().catch(() => null)) as {
+      error?: {
+        code?: string;
+        details?: {
+          onboardingDefaults?: {
+            displayName?: string;
+            careCircleName?: string;
+          };
+        };
+      };
+    } | null;
+    if (body?.error?.code === "ONBOARDING_REQUIRED") {
+      return {
+        status: "onboarding-required",
+        initialValues: body.error.details?.onboardingDefaults ?? {},
+      };
+    }
+  }
   if (response.status === 403) return { status: "denied" };
   return { status: "error" };
 }
@@ -190,6 +217,7 @@ export function CaregiverAuthPanel() {
             </AlertDescription>
           </Alert>
           <CaregiverProfilePanel role={state.context.membership.role} />
+          {state.context.membership.role === "OWNER" ? <InvitationPanel /> : null}
         </CardContent>
         <CardFooter>
           <Button
@@ -210,12 +238,21 @@ export function CaregiverAuthPanel() {
     );
   }
 
+  if (state.status === "onboarding-required") {
+    return (
+      <OwnerOnboardingForm
+        initialValues={state.initialValues}
+        onComplete={(context) => setState({ status: "signed-in", context })}
+      />
+    );
+  }
+
   return (
     <Card className="care-auth-card care-auth-signed-out">
       <CardHeader>
         <CardTitle>Masuk sebagai caregiver</CardTitle>
         <CardDescription>
-          Gunakan akun caregiver demo yang disiapkan secara privat.
+          Masuk sebagai Owner atau Family Member yang sudah terdaftar.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -282,6 +319,15 @@ export function CaregiverAuthPanel() {
             Masuk sebagai caregiver
           </Button>
         </form>
+        <div className="mt-4 border-t pt-4">
+          <Link
+            href="/caregiver/register"
+            className={buttonVariants({ variant: "outline", className: "w-full" })}
+          >
+            <UserPlus aria-hidden="true" />
+            Buat akun Owner
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );

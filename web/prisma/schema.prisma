@@ -71,6 +71,14 @@ enum ActorType {
   @@map("actor_type")
 }
 
+enum CheckInMood {
+  GOOD
+  OKAY
+  UNWELL
+
+  @@map("check_in_mood")
+}
+
 model User {
   id                         String                 @id @db.Uuid
   displayName                String                 @map("display_name") @db.VarChar(120)
@@ -87,6 +95,7 @@ model User {
   updatedPatientProfiles     PatientProfile[]       @relation("PatientProfileUpdatedBy")
   deactivatedPatientProfiles PatientProfile[]       @relation("PatientProfileDeactivatedBy")
   createdPatientAccessCodes  PatientAccessCode[]    @relation("PatientAccessCodeCreatedBy")
+  submittedCheckIns          CheckIn[]              @relation("CheckInSubmittedByUser")
   auditEvents                AuditEvent[]           @relation("AuditActorUser")
 
   @@map("users")
@@ -179,6 +188,7 @@ model PatientProfile {
   deactivatedBy            User?                      @relation("PatientProfileDeactivatedBy", fields: [deactivatedByUserId], references: [id], onDelete: Restrict)
   accessCodes              PatientAccessCode[]
   sessions                 PatientSession[]
+  checkIns                 CheckIn[]
   auditEvents              AuditEvent[]               @relation("AuditTargetPatientProfile")
   actorAuditEvents         AuditEvent[]               @relation("AuditActorPatientProfile")
 
@@ -215,6 +225,26 @@ model PatientSession {
   patientProfile   PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
 
   @@map("patient_sessions")
+}
+
+model CheckIn {
+  id                 String         @id @default(uuid()) @db.Uuid
+  patientProfileId   String         @map("patient_profile_id") @db.Uuid
+  submittedByUserId  String?        @map("submitted_by_user_id") @db.Uuid
+  submittedByPatient Boolean        @default(false) @map("submitted_by_patient")
+  mood               CheckInMood
+  conditionText      String?        @map("condition_text") @db.Text
+  painLevel          Int?           @map("pain_level") @db.SmallInt
+  medicationTaken    Boolean?       @map("medication_taken")
+  complaintText      String?        @map("complaint_text") @db.Text
+  needsFamilyHelp    Boolean        @default(false) @map("needs_family_help")
+  createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  patientProfile     PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
+  submittedBy        User?          @relation("CheckInSubmittedByUser", fields: [submittedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([patientProfileId, createdAt(sort: Desc)])
+  @@map("check_ins")
 }
 
 model AuditEvent {

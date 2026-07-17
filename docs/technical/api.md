@@ -30,6 +30,8 @@ Reviewer: Ozan
 
 Caregiver sign-in memakai Supabase Auth email/password. Browser menyimpan Supabase session dalam cookie melalui `@supabase/ssr`. Route Handler membaca user ID dari session, lalu mengambil membership aplikasi dari `care_circle_members`.
 
+Owner baru boleh self-register melalui Supabase Auth, lalu menyelesaikan bootstrap server-side yang membuat `users`, satu `care_circles`, dan membership `OWNER` secara atomik dan idempotent. Family Member tidak boleh self-assign role atau Care Circle; ia hanya dapat bergabung melalui invitation token valid yang dibuat Owner. Patient tidak memakai Supabase Auth dan tetap masuk dengan access code.
+
 ### 2.2 Patient
 
 Patient mengirim access code ke endpoint login. Server membandingkan hash, membuat opaque session token, menyimpan hash token di `patient_sessions`, dan mengirim cookie:
@@ -106,6 +108,8 @@ Public error codes:
 | 502 | `PROVIDER_UNAVAILABLE` | Azure or Supabase integration failed safely |
 | 504 | `PROVIDER_TIMEOUT` | Provider exceeded request budget |
 | 500 | `INTERNAL_ERROR` | Unexpected server failure without internal detail |
+
+Caregiver Auth user yang sudah terverifikasi tetapi belum memiliki row `users` menerima `409 ONBOARDING_REQUIRED`. Auth user yang pernah menjadi anggota tetapi tidak lagi memiliki membership aktif menerima `403 FORBIDDEN` dan tidak boleh membuat Care Circle baru melalui bootstrap.
 
 ## 4. Common Types
 
@@ -215,13 +219,28 @@ Rules:
 
 Revokes the current Patient session and clears the cookie. Response status is `204`.
 
+### `POST /onboarding/owner`
+
+Authenticated Supabase user only. Request:
+
+```json
+{
+  "displayName": "Nadia Santoso",
+  "careCircleName": "Keluarga Nadia"
+}
+```
+
+The server serializes concurrent attempts, creates the public user, Care Circle, active Owner membership, and audit event in one transaction, and returns the same verified caregiver context on an idempotent retry. Client metadata, role, and `careCircleId` are never authorization inputs.
+
 ## 6. Care Circle and Patient Profiles
 
 | Method | Path | Actor | Purpose |
 |---|---|---|---|
 | GET | `/care-circle` | Caregiver | Current Care Circle and membership summary |
 | GET | `/care-circle/members` | Caregiver | Active members and roles |
-| POST | `/care-circle/invitations` | Owner | Create P1 invitation code |
+| POST | `/care-circle/invitations` | Owner | Create a one-time Family invitation |
+| GET | `/care-circle/invitations/{token}` | Public token holder | Preview valid invitation using minimum Care Circle data |
+| POST | `/care-circle/invitations/{token}/accept` | Authenticated caregiver | Atomically consume invitation and create Family membership |
 | DELETE | `/care-circle/members/{userId}` | Owner | Mark Family Member removed |
 | GET | `/patient-profiles` | Caregiver | List up to two profiles |
 | POST | `/patient-profiles` | Owner | Add first or second profile |
@@ -229,6 +248,15 @@ Revokes the current Patient session and clears the cookie. Response status is `2
 | PATCH | `/patient-profiles/{patientProfileId}` | Owner or Family Member | Update allowed caregiving fields |
 | POST | `/patient-profiles/{patientProfileId}/access-code` | Owner | Regenerate Patient access code |
 | POST | `/patient-profiles/{patientProfileId}/deactivate` | Owner | End active care for a profile without hard delete |
+
+Invitation rules:
+
+- The generated token has at least 256 bits of entropy; only its SHA-256 hash is stored.
+- Default expiry is 24 hours and the token is single-use and revocable.
+- Preview returns only Care Circle name and expiry. Invalid, expired, revoked, and used tokens share a generic `404` response.
+- Accept fixes role to `FAMILY_MEMBER` server-side. Request body contains only `displayName`.
+- An existing active Owner or a user belonging to another Care Circle cannot consume the invitation.
+- The raw token may appear in the invitation URL but never in logs, audit metadata, or database rows.
 
 Create Patient Profile request:
 
@@ -299,6 +327,12 @@ Rules:
 Patient Profile responses include the fact statuses, masked BPJS metadata when available, and `setupChecklist`. There is no stored completion percentage.
 
 `broadLocationRecorded` is true when either `locationLabel` or `city` is present. `recommendedActions` is ordered deterministically: allergies, current medications, emergency contact, primary conditions, BPJS, date of birth, broad location, then usual facility. Actions for already reviewed/recorded items are omitted.
+
+### `POST /patient-profiles/{patientProfileId}/access-code`
+
+Owner only. The server validates that the active Patient Profile belongs to the Owner's Care Circle, generates a cryptographically random six-digit code, and stores only its Argon2id hash. Issuance is serialized across active Patient codes so one raw code cannot resolve to two Patient Profiles.
+
+Creating or regenerating a code atomically revokes the previous active code and all active Patient sessions for that profile, creates the new hash-only record, and writes a minimized audit event. The response returns the raw code exactly once with `Cache-Control: private, no-store`; the raw code never enters logs, audit metadata, URLs, profile DTOs, or browser persistence. Family Member and Patient requests are denied.
 
 ### `POST /patient-profiles/{patientProfileId}/deactivate`
 

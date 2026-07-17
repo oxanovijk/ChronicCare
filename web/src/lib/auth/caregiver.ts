@@ -3,11 +3,20 @@ import "server-only";
 import type { PrismaClient } from "@/generated/prisma/client";
 import type { MemberRole } from "@/generated/prisma/enums";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  type OwnerOnboardingDefaults,
+  ownerOnboardingDefaultsFromMetadata,
+} from "@/lib/onboarding/schemas";
 
 type SupabaseServerClient = Awaited<
   ReturnType<typeof createSupabaseServerClient>
 >;
-type MembershipReader = Pick<PrismaClient, "careCircleMember">;
+type MembershipReader = Pick<PrismaClient, "careCircleMember" | "user">;
+
+export type AuthenticatedCaregiverUser = {
+  id: string;
+  onboardingDefaults?: OwnerOnboardingDefaults;
+};
 
 export type CaregiverAuthContext = {
   actorType: "CAREGIVER";
@@ -16,10 +25,34 @@ export type CaregiverAuthContext = {
 };
 
 export class CaregiverAuthError extends Error {
-  constructor(public readonly code: "UNAUTHENTICATED" | "FORBIDDEN") {
+  constructor(
+    public readonly code:
+      | "UNAUTHENTICATED"
+      | "FORBIDDEN"
+      | "ONBOARDING_REQUIRED",
+    public readonly onboardingDefaults?: OwnerOnboardingDefaults,
+  ) {
     super(code);
     this.name = "CaregiverAuthError";
   }
+}
+
+export async function resolveAuthenticatedCaregiverUser(
+  dependencies: { supabase?: SupabaseServerClient } = {},
+): Promise<AuthenticatedCaregiverUser> {
+  const supabase =
+    dependencies.supabase ?? (await createSupabaseServerClient());
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) throw new CaregiverAuthError("UNAUTHENTICATED");
+  const onboardingDefaults = ownerOnboardingDefaultsFromMetadata(
+    data.user.user_metadata,
+  );
+  return {
+    id: data.user.id,
+    ...(Object.keys(onboardingDefaults).length > 0
+      ? { onboardingDefaults }
+      : {}),
+  };
 }
 
 export async function resolveCaregiverAuthContext(
@@ -28,16 +61,14 @@ export async function resolveCaregiverAuthContext(
     db?: MembershipReader;
   } = {},
 ): Promise<CaregiverAuthContext> {
-  const supabase =
-    dependencies.supabase ?? (await createSupabaseServerClient());
-  const { data, error } = await supabase.auth.getUser();
-
-  if (error || !data.user) throw new CaregiverAuthError("UNAUTHENTICATED");
+  const authUser = await resolveAuthenticatedCaregiverUser({
+    supabase: dependencies.supabase,
+  });
 
   const db = dependencies.db ?? (await import("@/lib/db/client")).prisma;
   const membership = await db.careCircleMember.findFirst({
     where: {
-      userId: data.user.id,
+      userId: authUser.id,
       status: "ACTIVE",
       careCircle: { isActive: true },
     },
@@ -48,11 +79,20 @@ export async function resolveCaregiverAuthContext(
     },
   });
 
-  if (!membership) throw new CaregiverAuthError("FORBIDDEN");
+  if (!membership) {
+    const applicationUser = await db.user.findUnique({
+      where: { id: authUser.id },
+      select: { id: true },
+    });
+    throw new CaregiverAuthError(
+      applicationUser ? "FORBIDDEN" : "ONBOARDING_REQUIRED",
+      applicationUser ? undefined : authUser.onboardingDefaults,
+    );
+  }
 
   return {
     actorType: "CAREGIVER",
-    user: { id: data.user.id, displayName: membership.user.displayName },
+    user: { id: authUser.id, displayName: membership.user.displayName },
     membership: {
       careCircleId: membership.careCircleId,
       role: membership.role,

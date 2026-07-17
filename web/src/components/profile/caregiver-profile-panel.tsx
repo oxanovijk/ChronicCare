@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { PatientAccessCodePanel } from "@/components/profile/patient-access-code-panel";
 
 type FactStatus = "UNKNOWN" | "NONE_REPORTED" | "REPORTED";
 type BpjsStatus = "UNKNOWN" | "NOT_REGISTERED" | "REGISTERED";
@@ -692,6 +693,13 @@ export function CaregiverProfilePanel({
           />
           {role === "OWNER" ? (
             <>
+              <Separator />
+              <PatientAccessCodePanel
+                patientProfile={{
+                  id: profile.id,
+                  displayName: profile.displayName,
+                }}
+              />
               <Separator />
               <div className="care-danger-zone space-y-2">
                 <h3 className="font-medium">Akhiri perawatan profil</h3>
