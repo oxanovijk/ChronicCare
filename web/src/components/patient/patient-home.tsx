@@ -1,18 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  AlertTriangle,
-  CalendarCheck,
-  Check,
-  ClipboardCheck,
-  HeartPulse,
-  LoaderCircle,
-  RefreshCw,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowClockwise } from "@phosphor-icons/react/dist/csr/ArrowClockwise";
+import { CalendarCheck } from "@phosphor-icons/react/dist/csr/CalendarCheck";
+import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
+import { Check } from "@phosphor-icons/react/dist/csr/Check";
+import { ClipboardText } from "@phosphor-icons/react/dist/csr/ClipboardText";
+import { CloudRain } from "@phosphor-icons/react/dist/csr/CloudRain";
+import { CloudSun } from "@phosphor-icons/react/dist/csr/CloudSun";
+import { Heartbeat } from "@phosphor-icons/react/dist/csr/Heartbeat";
+import { ShieldCheck } from "@phosphor-icons/react/dist/csr/ShieldCheck";
+import { SpinnerGap } from "@phosphor-icons/react/dist/csr/SpinnerGap";
+import { Sun } from "@phosphor-icons/react/dist/csr/Sun";
+import { Warning } from "@phosphor-icons/react/dist/csr/Warning";
 
 import { PatientLogoutButton } from "@/components/auth/patient-logout-button";
+import { BrandMark } from "@/components/brand-mark";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,27 +57,29 @@ const moodOptions: Array<{
   value: CheckInMood;
   label: string;
   helper: string;
-  selectedClass: string;
 }> = [
   {
     value: "GOOD",
     label: "Baik",
     helper: "Hari terasa lancar",
-    selectedClass: "border-emerald-600 bg-emerald-50 text-emerald-950",
   },
   {
     value: "OKAY",
     label: "Biasa saja",
     helper: "Ada sedikit perubahan",
-    selectedClass: "border-amber-600 bg-amber-50 text-amber-950",
   },
   {
     value: "UNWELL",
     label: "Kurang baik",
     helper: "Butuh lebih diperhatikan",
-    selectedClass: "border-rose-600 bg-rose-50 text-rose-950",
   },
 ];
+
+const moodIcons = {
+  GOOD: Sun,
+  OKAY: CloudSun,
+  UNWELL: CloudRain,
+};
 
 const moodLabels: Record<CheckInMood, string> = {
   GOOD: "Baik",
@@ -218,34 +223,34 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 sm:py-10">
-      <header className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-3">
-          <Badge variant="secondary" className="gap-1.5">
-            <ShieldCheck aria-hidden="true" />
-            Profil aktif: {patientProfile.relationshipLabel}
+    <main className="production-patient-home">
+      <header className="production-patient-home-header">
+        <BrandMark />
+        <div className="production-patient-home-actions">
+          <Badge variant="secondary" className="patient-profile-badge">
+            <ShieldCheck aria-hidden="true" weight="bold" />
+            {patientProfile.displayName} · {patientProfile.relationshipLabel}
           </Badge>
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold sm:text-3xl">
-              Halo, {patientProfile.displayName}
-            </h1>
-            <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
-              Ceritakan kondisi hari ini. Jawaban singkat juga tidak apa-apa.
-            </p>
-          </div>
+          <PatientLogoutButton />
         </div>
-        <PatientLogoutButton />
       </header>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(17rem,0.8fr)]">
-        <Card className="border-t-4 border-t-emerald-600">
+      <div className="production-patient-home-content">
+        <section className="patient-home-intro" aria-labelledby="patient-home-title">
+          <p className="patient-home-eyebrow">Ruang perawatan Anda</p>
+          <h1 id="patient-home-title">Halo, {patientProfile.displayName}</h1>
+          <p>Ceritakan kondisi hari ini. Jawaban singkat juga tidak apa-apa.</p>
+        </section>
+
+        <div className="patient-checkin-layout">
+        <Card className="patient-checkin-card">
           <CardHeader>
-            <div className="flex items-start gap-3">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800">
-                <HeartPulse aria-hidden="true" />
+            <div className="patient-checkin-card-heading">
+              <span className="patient-checkin-card-icon">
+                <Heartbeat aria-hidden="true" weight="bold" />
               </span>
-              <div className="space-y-1">
-                <CardTitle className="text-lg">Check-in hari ini</CardTitle>
+              <div>
+                <CardTitle>Check-in hari ini</CardTitle>
                 <CardDescription>
                   Catat yang Anda rasakan. ChroniCare tidak menilai atau
                   mengubah pengobatan.
@@ -254,15 +259,15 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
             </div>
           </CardHeader>
           <CardContent>
-            <form className="space-y-6" onSubmit={submit} noValidate>
+            <form className="patient-checkin-form" onSubmit={submit} noValidate>
               {submitState === "success" ? (
                 <Alert
                   ref={successRef}
                   role="status"
                   tabIndex={-1}
-                  className="border-emerald-200 bg-emerald-50 text-emerald-950"
+                  className="patient-checkin-success"
                 >
-                  <Check aria-hidden="true" />
+                  <Check aria-hidden="true" weight="bold" />
                   <AlertTitle>Check-in berhasil disimpan</AlertTitle>
                   <AlertDescription>
                     Terima kasih sudah berbagi kondisi hari ini.
@@ -271,7 +276,7 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
               ) : null}
               {submitState === "error" ? (
                 <Alert ref={errorRef} variant="destructive" tabIndex={-1}>
-                  <AlertTriangle aria-hidden="true" />
+                  <Warning aria-hidden="true" weight="fill" />
                   <AlertTitle>Check-in belum tersimpan</AlertTitle>
                   <AlertDescription>
                     Data belum berubah. Periksa koneksi lalu coba lagi.
@@ -279,23 +284,27 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
                 </Alert>
               ) : null}
 
-              <fieldset className="space-y-3" aria-invalid={validationError}>
-                <legend className="text-sm font-medium">
+              <fieldset className="patient-mood-fieldset" aria-invalid={validationError}>
+                <legend>
                   Bagaimana kondisi Anda hari ini?
                 </legend>
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                  {moodOptions.map((option) => (
-                    <label
-                      key={option.value}
-                      onClick={() => {
-                        setMood(option.value);
-                        setValidationError(false);
-                      }}
-                      className={cn(
-                        "relative flex min-h-20 cursor-pointer flex-col justify-center rounded-lg border bg-background px-3 py-2 transition-colors hover:bg-muted/60 focus-within:ring-3 focus-within:ring-ring/40",
-                        mood === option.value && option.selectedClass,
-                      )}
-                    >
+                <div className="patient-mood-options">
+                  {moodOptions.map((option) => {
+                    const MoodIcon = moodIcons[option.value];
+                    const selected = mood === option.value;
+                    return (
+                      <label
+                        key={option.value}
+                        onClick={() => {
+                          setMood(option.value);
+                          setValidationError(false);
+                        }}
+                        className={cn(
+                          "patient-mood-option",
+                          `patient-mood-${option.value.toLowerCase()}`,
+                          selected && "is-selected",
+                        )}
+                      >
                       <input
                         ref={option.value === "GOOD" ? firstMoodRef : undefined}
                         className="sr-only"
@@ -309,12 +318,15 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
                           setValidationError(false);
                         }}
                       />
-                      <span className="font-medium">{option.label}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {option.helper}
-                      </span>
-                    </label>
-                  ))}
+                        <MoodIcon className="patient-mood-icon" aria-hidden="true" weight="duotone" />
+                        <span className="patient-mood-label">{option.label}</span>
+                        <span className="patient-mood-helper">{option.helper}</span>
+                        {selected ? (
+                          <span className="patient-mood-selected"><Check aria-hidden="true" weight="bold" /> Dipilih</span>
+                        ) : null}
+                      </label>
+                    );
+                  })}
                 </div>
                 {validationError ? (
                   <p className="text-sm text-destructive">Pilih kondisi hari ini.</p>
@@ -332,11 +344,12 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
                 />
               </div>
 
-              <details className="group rounded-lg border bg-muted/20 p-3 open:bg-background">
-                <summary className="cursor-pointer font-medium">
-                  Tambahkan detail lain (opsional)
+              <details className="patient-checkin-details">
+                <summary>
+                  <span>Tambahkan detail lain (opsional)</span>
+                  <CaretDown aria-hidden="true" weight="bold" />
                 </summary>
-                <div className="mt-5 space-y-5 border-t pt-5">
+                <div className="patient-checkin-details-content">
                   <div className="space-y-3">
                     <label className="flex items-center gap-2 text-sm font-medium">
                       <input
@@ -428,8 +441,8 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
               </details>
 
               {urgent ? (
-                <Alert variant="destructive" aria-live="assertive">
-                  <AlertTriangle aria-hidden="true" />
+                <Alert className="patient-checkin-urgent" variant="destructive" aria-live="assertive">
+                  <Warning aria-hidden="true" weight="fill" />
                   <AlertTitle>Cari bantuan sekarang</AlertTitle>
                   <AlertDescription>
                     Segera hubungi keluarga, caregiver, atau layanan medis/IGD.
@@ -438,11 +451,11 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
                 </Alert>
               ) : null}
 
-              <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={submitting}>
+              <Button type="submit" size="lg" className="patient-checkin-submit" disabled={submitting}>
                 {submitting ? (
-                  <LoaderCircle className="animate-spin" aria-hidden="true" />
+                  <SpinnerGap className="animate-spin" aria-hidden="true" weight="bold" />
                 ) : (
-                  <ClipboardCheck aria-hidden="true" />
+                  <ClipboardText aria-hidden="true" weight="bold" />
                 )}
                 {submitting ? "Menyimpan..." : "Simpan check-in"}
               </Button>
@@ -450,22 +463,22 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
           </CardContent>
         </Card>
 
-        <section aria-labelledby="recent-check-ins" className="space-y-4">
-          <div className="flex items-center gap-2">
-            <CalendarCheck className="size-5 text-emerald-700" aria-hidden="true" />
-            <h2 id="recent-check-ins" className="text-lg font-semibold">
+        <section aria-labelledby="recent-check-ins" className="patient-checkin-history">
+          <div className="patient-checkin-history-heading">
+            <span><CalendarCheck aria-hidden="true" weight="duotone" /></span>
+            <h2 id="recent-check-ins">
               Check-in terbaru
             </h2>
           </div>
 
           {items === null ? (
-            <div role="status" className="space-y-3" aria-live="polite">
-              <p className="text-sm text-muted-foreground">Memuat check-in terbaru...</p>
+            <div role="status" className="patient-checkin-history-loading" aria-live="polite">
+              <p>Memuat check-in terbaru...</p>
               <Skeleton className="h-24 w-full" />
             </div>
           ) : loadError ? (
             <Alert variant="destructive">
-              <AlertTriangle aria-hidden="true" />
+              <Warning aria-hidden="true" weight="fill" />
               <AlertTitle>Riwayat belum dapat dimuat</AlertTitle>
               <AlertDescription>
                 <Button
@@ -479,19 +492,19 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
                     void loadCheckIns();
                   }}
                 >
-                  <RefreshCw aria-hidden="true" />
+                  <ArrowClockwise aria-hidden="true" weight="bold" />
                   Coba lagi
                 </Button>
               </AlertDescription>
             </Alert>
           ) : items.length === 0 ? (
-            <div className="rounded-lg border border-dashed p-5 text-sm text-muted-foreground">
+            <div className="patient-checkin-history-empty">
               Belum ada check-in. Mulai saat sudah siap.
             </div>
           ) : (
-            <ol className="space-y-3">
+            <ol className="patient-checkin-history-list">
               {items.map((item) => (
-                <li key={item.id} className="rounded-lg border bg-background p-4">
+                <li key={item.id}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-medium">{moodLabels[item.mood]}</p>
@@ -513,6 +526,7 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
             </ol>
           )}
         </section>
+        </div>
       </div>
     </main>
   );

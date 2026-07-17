@@ -7,7 +7,10 @@ test.describe("shell routes", () => {
     await page.goto("/");
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "ChroniCare" }),
+      page.getByRole("heading", {
+        level: 1,
+        name: "Satu langkah tenang untuk mulai merawat.",
+      }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "Buka area caregiver" }),
@@ -21,7 +24,10 @@ test.describe("shell routes", () => {
     await page.goto("/caregiver");
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Area Caregiver" }),
+      page.getByRole("heading", {
+        level: 1,
+        name: "Konteks perawatan yang jelas, tanpa kebisingan.",
+      }),
     ).toBeVisible();
     await expect(page.getByLabel("Email caregiver")).toBeVisible();
     await expect(page.getByLabel("Kata sandi")).toBeVisible();
@@ -34,7 +40,10 @@ test.describe("shell routes", () => {
     await page.goto("/patient/login");
 
     await expect(
-      page.getByRole("heading", { level: 1, name: "Masuk sebagai Patient" }),
+      page.getByRole("heading", {
+        level: 1,
+        name: "Selamat datang. Mari mulai dengan aman.",
+      }),
     ).toBeVisible();
     await expect(page.getByLabel("Kode akses Patient")).toBeEnabled();
     await expect(

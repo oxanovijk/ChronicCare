@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { LoaderCircle, LogOut } from "lucide-react";
+import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
+import { SpinnerGap } from "@phosphor-icons/react/dist/csr/SpinnerGap";
 import { useRouter } from "next/navigation";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -35,7 +36,7 @@ export function PatientLogoutButton() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="patient-logout-control">
       {error ? (
         <Alert variant="destructive" aria-live="assertive">
           <AlertTitle>Belum dapat keluar</AlertTitle>
@@ -51,9 +52,9 @@ export function PatientLogoutButton() {
         disabled={submitting}
       >
         {submitting ? (
-          <LoaderCircle className="animate-spin" aria-hidden="true" />
+          <SpinnerGap className="animate-spin" aria-hidden="true" />
         ) : (
-          <LogOut aria-hidden="true" />
+          <SignOut aria-hidden="true" />
         )}
         Keluar
       </Button>

@@ -1,71 +1,62 @@
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr/ArrowRight";
+import { User } from "@phosphor-icons/react/dist/ssr/User";
+import { UsersThree } from "@phosphor-icons/react/dist/ssr/UsersThree";
 import Link from "next/link";
 
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { BrandMark } from "@/components/brand-mark";
 
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-16">
-      <div className="flex max-w-2xl flex-col items-center gap-4 text-center">
-        <Badge variant="secondary">
-          Pra-rilis - autentikasi caregiver aktif
-        </Badge>
-        <h1 className="text-4xl font-semibold tracking-tight">ChroniCare</h1>
-        <p className="text-lg text-muted-foreground">
-          Membantu pasien chronic illness dan caregiver menjaga rutinitas
-          perawatan jangka panjang dalam satu Care Circle: check-in harian,
-          pengingat, dokumen kesehatan, dan koordinasi keluarga.
-        </p>
-      </div>
+    <main className="role-gateway">
+      <header className="role-gateway-header">
+        <BrandMark />
+        <span className="role-gateway-status">Care in Motion</span>
+      </header>
 
-      <div className="grid w-full max-w-2xl gap-4 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Caregiver</CardTitle>
-            <CardDescription>
-              Area caregiver untuk memantau konteks perawatan Patient.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link
-              href="/caregiver"
-              className={cn(buttonVariants(), "w-full")}
-            >
-              Buka area caregiver
-            </Link>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Patient</CardTitle>
-            <CardDescription>
-              Halaman masuk Patient dengan kode akses dari Care Circle.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link
-              href="/patient/login"
-              className={cn(buttonVariants({ variant: "outline" }), "w-full")}
-            >
-              Buka halaman masuk Patient
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      <section className="role-gateway-content" aria-labelledby="gateway-title">
+        <div className="role-gateway-intro">
+          <span className="section-kicker"><span />Ruang perawatan bersama</span>
+          <h1 id="gateway-title">Satu langkah tenang untuk mulai merawat.</h1>
+          <p>
+            ChroniCare membantu Patient dan caregiver mengakses Care Circle
+            mereka melalui jalur yang aman dan terpisah.
+          </p>
+        </div>
 
-      <p className="max-w-2xl text-center text-sm text-muted-foreground">
-        ChroniCare adalah alat bantu koordinasi perawatan, bukan alat
-        diagnosis, bukan penentu dosis obat, dan bukan pengganti dokter, IGD,
-        ambulans, atau BPJS.
-      </p>
+        <div className="role-choice-grid" aria-label="Pilih cara masuk">
+          <article className="role-choice role-choice-patient">
+            <span className="role-choice-icon" aria-hidden="true"><User size={28} weight="bold" /></span>
+            <div>
+              <span className="role-choice-label">Untuk Patient</span>
+              <h2>Masuk dengan kode akses</h2>
+              <p>Gunakan kode privat yang diberikan oleh Owner Care Circle.</p>
+            </div>
+            <Link href="/patient/login" className="role-choice-action">
+              Buka halaman masuk Patient <ArrowRight size={20} weight="bold" aria-hidden="true" />
+            </Link>
+          </article>
+
+          <article className="role-choice role-choice-caregiver">
+            <span className="role-choice-icon" aria-hidden="true"><UsersThree size={28} weight="bold" /></span>
+            <div>
+              <span className="role-choice-label">Untuk Caregiver</span>
+              <h2>Kelola Patient Profile</h2>
+              <p>Masuk sebagai Owner atau Family Member yang telah terverifikasi.</p>
+            </div>
+            <Link href="/caregiver" className="role-choice-action role-choice-action-secondary">
+              Buka area caregiver <ArrowRight size={20} weight="bold" aria-hidden="true" />
+            </Link>
+          </article>
+        </div>
+      </section>
+
+      <footer className="role-gateway-footer">
+        <strong>Koordinasi perawatan, bukan keputusan medis.</strong>
+        <span>
+          ChroniCare bukan alat diagnosis, penentu dosis, atau pengganti dokter,
+          IGD, ambulans, maupun BPJS.
+        </span>
+      </footer>
     </main>
   );
 }
