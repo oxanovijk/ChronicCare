@@ -11,6 +11,7 @@ import { SpinnerGap } from "@phosphor-icons/react/dist/csr/SpinnerGap";
 import Link from "next/link";
 
 import { BrandMark } from "@/components/brand-mark";
+import { CaregiverSosCenter } from "@/components/sos/caregiver-sos-center";
 import { Button } from "@/components/ui/button";
 
 export function CaregiverProductionShell({
@@ -47,7 +48,7 @@ export function CaregiverProductionShell({
       </aside>
       <div className="caregiver-production-stage">
         <header className="caregiver-production-mobile-header"><BrandMark compact /><span>Ruang Caregiver</span></header>
-        <main id="caregiver-production-content" className="caregiver-production-main">{children}</main>
+        <main id="caregiver-production-content" className="caregiver-production-main"><CaregiverSosCenter />{children}</main>
         <nav className="caregiver-production-mobile-nav" aria-label="Navigasi caregiver mobile">
           <Link href="/caregiver" className={activeSection === "overview" ? "is-active" : undefined} aria-current={activeSection === "overview" ? "page" : undefined}><House size={20} weight={activeSection === "overview" ? "fill" : "regular"} aria-hidden="true" /><span>Ringkasan</span></Link>
           <Link href="/caregiver#daily-care"><ListChecks size={20} aria-hidden="true" /><span>Perawatan</span></Link>
