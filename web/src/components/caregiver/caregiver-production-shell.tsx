@@ -9,6 +9,7 @@ import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
 import { SpinnerGap } from "@phosphor-icons/react/dist/csr/SpinnerGap";
 
 import { BrandMark } from "@/components/brand-mark";
+import { CaregiverSosCenter } from "@/components/sos/caregiver-sos-center";
 import { Button } from "@/components/ui/button";
 
 export function CaregiverProductionShell({
@@ -42,7 +43,7 @@ export function CaregiverProductionShell({
       </aside>
       <div className="caregiver-production-stage">
         <header className="caregiver-production-mobile-header"><BrandMark compact /><span>Ruang Caregiver</span></header>
-        <main id="caregiver-production-content" className="caregiver-production-main">{children}</main>
+        <main id="caregiver-production-content" className="caregiver-production-main"><CaregiverSosCenter />{children}</main>
         <nav className="caregiver-production-mobile-nav" aria-label="Navigasi caregiver mobile">
           <a href="#caregiver-production-content" className="is-active" aria-current="page"><House size={20} weight="fill" aria-hidden="true" /><span>Ringkasan</span></a>
           <a href="#daily-care"><ListChecks size={20} aria-hidden="true" /><span>Perawatan</span></a>

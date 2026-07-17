@@ -29,7 +29,7 @@ This index keeps execution packets small enough for one focused Codex session. I
 | 09 | [Document Upload, OCR, and Review](packets/09-document-upload-ocr-and-review.md) | Al | Draft | Private upload, OCR/fallback, caregiver review, confirmed-only summary |
 | 10 | [Faskes and BPJS Helper](packets/10-faskes-and-bpjs-helper.md) | Daniel | Draft | Safe Tangerang facility/BPJS navigation |
 | 11 | [Chatbot Safety Gateway and Personas](packets/11-chatbot-safety-gateway-and-personas.md) | Al | Draft | Patient/Caregiver chat with profile-bound context, refusal rules, fallback |
-| 12 | [SOS Realtime and Handling](packets/12-sos-realtime-and-handling.md) | Bernard | Draft | Patient SOS, open-dashboard Realtime alert, audio opt-in, atomic handling |
+| 12 | [SOS Realtime and Handling](packets/12-sos-realtime-and-handling.md) | Bernard | Blocked | Patient SOS, open-dashboard Realtime alert, audio opt-in, atomic handling |
 | 13 | [QA, Deploy, and Demo Rehearsal](packets/13-qa-deploy-and-demo-rehearsal.md) | Ozan | Draft | Evidence-based readiness verdict, deploy/local fallback, rehearsal assets |
 
 ## Order and Parallel Work
@@ -133,6 +133,7 @@ Run `npm run test:e2e` when the packet adds or changes a user journey.
 
 | Packet | From | To | Timestamp | Evidence | Approved by |
 | --- | --- | --- | --- | --- | --- |
+| 12 | Draft | Blocked | 2026-07-17 18:08 +07:00 | Observable SOS outcome and all Packet 12-focused checks passed, including 200 unit/integration tests, build, final four-context Realtime E2E, responsive/keyboard/audio/conflict/isolation QA, and live RLS/publication probes; `Done` is withheld because the applied Packet 09 migration is missing from the repository chain and the full E2E command also retained an unrelated 30-second caregiver-registration timeout | User-authorized integrated run; no external human approval recorded |
 | 08 | Draft | Done | 2026-07-17 14:42 +07:00 | Human team review accepted the Packet 08 caregiver dashboard and daily-care flow; Prisma generate/validate/migration status and synthetic seed passed, lint/typecheck/build passed, 186 unit/integration tests and the Packet 08 desktop/mobile E2E journey passed, with two pre-existing repo-wide E2E assertions remaining separately documented | Human team review |
 | 07 | Review | Done | 2026-07-17 10:54 +07:00 | Ozan completed human manual acceptance; fresh closure evidence passed 17 focused check-in tests and 1 mobile/desktop Patient Playwright journey, with all eight P7 acceptance criteria satisfied | Ozan |
 | 05 | Done | Done | 2026-07-17 10:33 +07:00 | Corrective P5 completion adds Owner-only hash-only Patient-code issue/rotation, one-time display, collision avoidance, old code/session revocation, Family denial, 141 unit/integration tests, 18 live E2E without skip, responsive QA, and synthetic cleanup | Ozan |
