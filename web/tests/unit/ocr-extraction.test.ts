@@ -5,6 +5,32 @@ import {
   EXTRACTION_SCHEMA_VERSION,
   documentExtractionV1Schema,
 } from "@/lib/ai/extraction/schema";
+import { countPdfPages } from "@/lib/ocr/analyze";
+
+describe("pre-provider page counting", () => {
+  const pdfWithPages = (count: number) =>
+    Buffer.from(
+      `%PDF-1.4\n1 0 obj << /Type /Pages /Count ${count} >> endobj\n${Array.from(
+        { length: count },
+        (_, i) => `${i + 2} 0 obj << /Type /Page /Parent 1 0 R >> endobj`,
+      ).join("\n")}\n%%EOF`,
+    );
+
+  it("counts /Type /Page objects without counting the /Pages root", () => {
+    expect(countPdfPages(pdfWithPages(1), "application/pdf")).toBe(1);
+    expect(countPdfPages(pdfWithPages(4), "application/pdf")).toBe(4);
+  });
+
+  it("returns 0 (unknown) for object-stream PDFs instead of guessing", () => {
+    expect(
+      countPdfPages(Buffer.from("%PDF-1.6 compressed"), "application/pdf"),
+    ).toBe(0);
+  });
+
+  it("treats images as a single page", () => {
+    expect(countPdfPages(Buffer.from("png-bytes"), "image/png")).toBe(1);
+  });
+});
 
 describe("document-extraction.v1 schema", () => {
   it("accepts the demo fallback fixture unchanged", () => {

@@ -27,7 +27,11 @@ import {
   statObject,
 } from "@/lib/documents/storage";
 import { getProviderFlags } from "@/lib/env/server";
-import { OcrError, analyzeDocumentBytes } from "@/lib/ocr/analyze";
+import {
+  OcrError,
+  analyzeDocumentBytes,
+  countPdfPages,
+} from "@/lib/ocr/analyze";
 import { PatientProfileError } from "@/lib/patient-profile/service";
 
 export class DocumentError extends Error {
@@ -347,8 +351,19 @@ export async function extractDocument(
   let ocr;
   try {
     const bytes = await downloadObject(document.storagePath);
+
+    // Pre-provider page gate: Document Intelligence F0 only analyzes the
+    // first two pages, so its reported count cannot enforce the limit.
+    // Counting locally also rejects oversized documents before any spend.
+    const localPageCount = countPdfPages(bytes, document.mimeType);
+    if (localPageCount > flags.OCR_MAX_PAGES) {
+      await markFailed(db, documentId, "PAGE_LIMIT_EXCEEDED");
+      throw new DocumentError("PAGE_LIMIT_EXCEEDED");
+    }
+
     ocr = await analyzeDocumentBytes(bytes);
   } catch (error) {
+    if (error instanceof DocumentError) throw error;
     if (flags.OCR_FALLBACK_MODE === "synthetic-demo") return fallback();
     await markFailed(
       db,

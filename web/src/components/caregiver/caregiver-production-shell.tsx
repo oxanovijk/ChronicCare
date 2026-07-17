@@ -34,7 +34,7 @@ export function CaregiverProductionShell({
         <nav aria-label="Navigasi caregiver">
           <a href="#caregiver-production-content" className="is-active" aria-current="page"><House size={21} weight="fill" aria-hidden="true" /><span>Ringkasan</span></a>
           <a href="#daily-care"><ListChecks size={21} aria-hidden="true" /><span>Perawatan</span></a>
-          <span aria-disabled="true"><FileText size={21} aria-hidden="true" /><span>Dokumen</span><small>Belum tersedia</small></span>
+          <a href="#documents"><FileText size={21} aria-hidden="true" /><span>Dokumen</span></a>
           <span aria-disabled="true"><ChatCircleDots size={21} aria-hidden="true" /><span>Asisten</span><small>Belum tersedia</small></span>
         </nav>
         <div className="caregiver-production-person"><span>{initials}</span><div><strong>{caregiverName}</strong><small>{role === "OWNER" ? "Owner" : "Family Member"}</small></div></div>
@@ -46,7 +46,7 @@ export function CaregiverProductionShell({
         <nav className="caregiver-production-mobile-nav" aria-label="Navigasi caregiver mobile">
           <a href="#caregiver-production-content" className="is-active" aria-current="page"><House size={20} weight="fill" aria-hidden="true" /><span>Ringkasan</span></a>
           <a href="#daily-care"><ListChecks size={20} aria-hidden="true" /><span>Perawatan</span></a>
-          <span aria-disabled="true"><FileText size={20} aria-hidden="true" /><span>Dokumen</span></span>
+          <a href="#documents"><FileText size={20} aria-hidden="true" /><span>Dokumen</span></a>
           <span aria-disabled="true"><ChatCircleDots size={20} aria-hidden="true" /><span>Asisten</span></span>
         </nav>
       </div>

@@ -86,6 +86,7 @@ export function DocumentsPanel({
   patientName: string;
 }) {
   const [documents, setDocuments] = useState<DocumentSummary[] | null>(null);
+  const [listError, setListError] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -107,10 +108,13 @@ export function DocumentsPanel({
         if (!response.ok) throw new Error("DOCUMENTS_UNAVAILABLE");
         return ((await response.json()) as { data: DocumentSummary[] }).data;
       })
-      .then(setDocuments)
+      .then((data) => {
+        setDocuments(data);
+        setListError(false);
+      })
       .catch((cause) => {
         if (cause instanceof DOMException && cause.name === "AbortError") return;
-        setError("Daftar dokumen belum dapat dimuat.");
+        setListError(true);
       });
     return () => controller.abort();
   }, [patientProfileId, reload]);
@@ -243,7 +247,7 @@ export function DocumentsPanel({
   }
 
   return (
-    <section className="care-data-card" aria-label="Dokumen kesehatan">
+    <section className="care-data-card" id="documents" aria-label="Dokumen kesehatan">
       <div className="care-card-title">
         <FileText size={22} aria-hidden="true" />
         <span>Dokumen &amp; OCR</span>
@@ -314,11 +318,22 @@ export function DocumentsPanel({
         identitas lain. Maksimum 5 MB dan 3 halaman. File tersimpan privat.
       </p>
 
-      {documents === null ? (
-        <p aria-busy="true">
-          <SpinnerGap className="animate-spin" size={16} aria-hidden="true" />{" "}
-          Memuat dokumen…
+      {listError ? (
+        <p className="form-error" role="alert">
+          Daftar dokumen belum dapat dimuat.{" "}
+          <Button size="sm" variant="outline" onClick={refresh}>
+            Muat ulang daftar
+          </Button>
         </p>
+      ) : null}
+
+      {documents === null ? (
+        !listError && (
+          <p aria-busy="true">
+            <SpinnerGap className="animate-spin" size={16} aria-hidden="true" />{" "}
+            Memuat dokumen…
+          </p>
+        )
       ) : documents.length ? (
         <ul className="care-record-list">
           {documents.map((item) => (
