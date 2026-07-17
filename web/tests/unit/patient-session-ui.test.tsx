@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { PatientLoginForm } from "@/components/auth/patient-login-form";
 import { PatientLogoutButton } from "@/components/auth/patient-logout-button";
@@ -10,6 +10,8 @@ const replace = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace }),
 }));
+
+afterEach(() => vi.restoreAllMocks());
 
 describe("Patient login form", () => {
   it.each([
@@ -28,6 +30,26 @@ describe("Patient login form", () => {
     expect(await screen.findByText(message)).toBeInTheDocument();
     expect(screen.getByLabelText("Kode akses Patient")).toHaveValue("");
     expect(document.body.textContent).not.toContain("secret-code");
+  });
+
+  it("rejects a pasted Family invitation URL without calling Patient auth", async () => {
+    const fetch = vi.spyOn(globalThis, "fetch");
+    const user = userEvent.setup();
+    render(<PatientLoginForm />);
+
+    await user.type(
+      screen.getByLabelText("Kode akses Patient"),
+      "http://localhost:3000/caregiver/invite/synthetic-token",
+    );
+    await user.click(screen.getByRole("button", { name: "Masuk" }));
+
+    expect(
+      await screen.findByText(
+        "Ini tautan undangan Family Member, bukan kode akses Patient.",
+      ),
+    ).toBeInTheDocument();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Kode akses Patient")).toHaveValue("");
   });
 });
 

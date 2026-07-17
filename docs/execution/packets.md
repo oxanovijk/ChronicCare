@@ -2,7 +2,7 @@
 
 Produk: ChroniCare
 
-Status: Locked packet structure for MVP v1; Packets 01 through 06 are `Done`, Packet 07 is `Ready`, and each remaining packet status remains evidence-driven
+Status: Locked packet structure for MVP v1; Packets 01 through 07 are `Done`, and each remaining packet status remains evidence-driven
 
 DRI: Ozan
 
@@ -22,9 +22,9 @@ This index keeps execution packets small enough for one focused Codex session. I
 | 02 | [Env and Provider Boundary](packets/02-env-and-provider-boundary.md) | Bernard | Done | Typed env validation, server-only Supabase/Azure boundaries, safe fallback flags |
 | 03 | [Data Schema, Prisma, and Seed Base](packets/03-data-schema-prisma-and-seed-base.md) | Bernard | Done | Minimum identity/profile schema, explicit fact states, audit helper, synthetic seed base |
 | 04 | [Caregiver Auth and Membership Authorization](packets/04-caregiver-auth-and-membership-authorization.md) | Bernard | Done | Caregiver session resolution, Owner/Family Member authorization, role tests |
-| 05 | [Patient Access Code and Profile Isolation](packets/05-patient-access-code-and-profile-isolation.md) | Bernard | Done | Minimum profile API, Patient code login, Patient Profile binding, Maya/Raka isolation |
+| 05 | [Patient Access Code and Profile Isolation](packets/05-patient-access-code-and-profile-isolation.md) | Bernard | Done | Minimum profile API, Owner-issued Patient codes, bound login/session, Maya/Raka isolation |
 | 06 | [Patient Profile Lifecycle Deactivation](packets/06-patient-profile-lifecycle-deactivation.md) | Bernard | Done | Owner-only non-destructive profile deactivation and Patient access revocation |
-| 07 | [Patient Homepage and Check-In](packets/07-patient-homepage-and-check-in.md) | Daniel | Ready | Cheerful Patient homepage and profile-bound check-in flow |
+| 07 | [Patient Homepage and Check-In](packets/07-patient-homepage-and-check-in.md) | Daniel | Done | Cheerful Patient homepage and profile-bound check-in flow |
 | 08 | [Caregiver Dashboard, Medication, and Reminder](packets/08-caregiver-dashboard-medication-and-reminder.md) | Daniel | Draft | Informative caregiver dashboard with medication/reminder basics |
 | 09 | [Document Upload, OCR, and Review](packets/09-document-upload-ocr-and-review.md) | Al | Draft | Private upload, OCR/fallback, caregiver review, confirmed-only summary |
 | 10 | [Faskes and BPJS Helper](packets/10-faskes-and-bpjs-helper.md) | Daniel | Draft | Safe Tangerang facility/BPJS navigation |
@@ -133,7 +133,10 @@ Run `npm run test:e2e` when the packet adds or changes a user journey.
 
 | Packet | From | To | Timestamp | Evidence | Approved by |
 | --- | --- | --- | --- | --- | --- |
-| 07 | Draft | Ready | 2026-07-17 06:21 +07:00 | P6 lifecycle exclusion is Done; P3 CheckIn schema, P5 bound Patient session helpers, ignored local env, clean resettable profiles, and development database are available | Ozan |
+| 07 | Review | Done | 2026-07-17 10:54 +07:00 | Ozan completed human manual acceptance; fresh closure evidence passed 17 focused check-in tests and 1 mobile/desktop Patient Playwright journey, with all eight P7 acceptance criteria satisfied | Ozan |
+| 05 | Done | Done | 2026-07-17 10:33 +07:00 | Corrective P5 completion adds Owner-only hash-only Patient-code issue/rotation, one-time display, collision avoidance, old code/session revocation, Family denial, 141 unit/integration tests, 18 live E2E without skip, responsive QA, and synthetic cleanup | Ozan |
+| 07 | Ready | Review | 2026-07-17 06:51 +07:00 | Bound `/patient` check-in UI/API, locked Prisma model/migration, role and safety reviews, 101 unit tests, 15 E2E without skip, build, database constraints, cross-profile denial, responsive checks, and zero remaining QA fixtures passed; final human acceptance remains | Ozan |
+| 07 | Draft | Ready | 2026-07-17 06:21 +07:00 | P6 lifecycle exclusion is Done; the locked CheckIn contract and P7 schema allowance, P5 bound Patient session helpers, ignored local env, clean resettable profiles, and development database are available | Ozan |
 | 06 | Review | Done | 2026-07-17 06:21 +07:00 | All 8 acceptance criteria passed; Daniel/Al/Ozan reviews, 84 unit tests, 14 E2E without skip, live role/revocation/history/audit QA, responsive keyboard checks, seed reset, and secret scan passed | Ozan |
 | 06 | Ready | Review | 2026-07-17 06:21 +07:00 | Commit `157892b` plus current QA corrections provide Owner-only atomic deactivation, careful UI states, active-list exclusion, access revocation, deterministic reset, and reviewable evidence | Ozan |
 | 06 | Draft | Ready | 2026-07-17 04:09 +07:00 | P5 profile isolation is Done; P3 lifecycle/code/session fields, P4 Owner guard, ignored local env, and resettable synthetic fixtures are available; profile-wide atomic revocation remains explicit P6 scope | Ozan |

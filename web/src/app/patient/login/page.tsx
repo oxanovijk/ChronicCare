@@ -21,7 +21,7 @@ export default function PatientLoginShellPage() {
           Masuk sebagai Patient
         </h1>
         <p className="text-muted-foreground">
-          Masuk dengan kode akses dari Care Circle-mu.
+          Masuk dengan kode akses yang dibuat oleh caregiver-mu. Patient tidak perlu membuat akun.
         </p>
       </div>
 

@@ -27,6 +27,7 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       NEXT_DIST_DIR: ".next-e2e",
+      NEXT_PUBLIC_APP_URL: e2eBaseUrl,
     },
   },
 });

@@ -116,6 +116,7 @@ Owner can create a profile without guessing optional data, caregivers can comple
 - Client-supplied role, `careCircleId`, and `patientProfileId` are never trusted without server validation.
 - Tests cover Maya/Raka read denial, wrong code, expired/revoked code, caregiver profile switch, and Patient trying caregiver route.
 - Browser logs and errors do not reveal access code validity or hidden profile details.
+- Owner can create or regenerate a Patient access code for an active profile; only a hash is stored, the raw code is shown once, and the previous code/session access is revoked atomically.
 
 ## Automated Checks
 
@@ -124,6 +125,7 @@ Owner can create a profile without guessing optional data, caregivers can comple
 | `npm test -- patient-session` from `/web` if supported | Valid code creates bound session; invalid/expired code rejects safely. |
 | `npm test -- profile-isolation` from `/web` if supported | Maya/Raka cross-profile access is denied. |
 | `npm test -- patient-profile` from `/web` if supported | Minimum create, progressive update, status contradictions, and setup checklist cases pass. |
+| `npm test -- patient-access-code` from `/web` | Owner-only issue/rotation, hash-only storage, collision retry, session revocation, route, and UI cases pass. |
 | `npm run typecheck` from `/web` | Patient session and profile helper types compile. |
 | `npm run lint` from `/web` | Auth/profile code lint cleanly. |
 | `npm run test:e2e` from `/web` if profile routes exist | Patient login and caregiver profile switch happy/negative paths pass. |
@@ -136,6 +138,7 @@ Owner can create a profile without guessing optional data, caregivers can comple
 - Log in with Maya Patient code and try to open Raka route directly.
 - Try wrong, expired, or revoked Patient code and confirm generic copy.
 - Confirm Patient UI is simpler than caregiver UI and has no admin/document/member access.
+- As Owner, create/rotate a code for the active profile; verify Family Member denial, one-time display, old-code/session failure, and new-code login.
 
 ## Exit Review Evidence
 
@@ -191,6 +194,7 @@ Review completed by Daniel, Al, and Ozan on 2026-07-17 against commit
 | 12 | Pass | Client role/circle/profile spoofing is ignored or denied by server-resolved context tests. |
 | 13 | Pass | Unit and E2E coverage includes wrong/expired/revoked code, both cross-profile directions, caregiver switching, and Patient caregiver-route denial. |
 | 14 | Pass | Responsive browser sessions emitted zero fresh console errors; API and tracked-secret scans found no code validity detail or hidden profile data. |
+| 15 | Pass | Corrective P5 tests and live E2E prove Owner-only issuance, six-digit collision retry, hash-only persistence, one-time display, old-code/session revocation, Family denial, and login with the replacement code. |
 
 ### Automated Check Results
 
@@ -234,6 +238,25 @@ not deleted, and each has one active, non-expired, non-locked, hash-only code.
 - Corrected this packet's stale planned paths to the implemented App Router
   paths. No locked API, role, data, or privacy contract changed.
 
+### Corrective Completion Evidence - 2026-07-17
+
+- Added `rotatePatientAccessCode` and the locked
+  `POST /api/v1/patient-profiles/{patientProfileId}/access-code` route.
+- Issuance is Owner-only, same-origin, scoped to an active profile in the
+  verified Care Circle, globally serialized for the MVP, and retries raw-code
+  collisions against every active Argon2id hash.
+- Rotation atomically revokes the previous active code and active Patient
+  sessions, stores only the new Argon2id hash, and emits a minimized audit
+  event. The raw code is returned/displayed once and never persisted.
+- Owner UI separates `Akses Patient` from `Undang Family Member`; Family Member
+  sees neither Owner action. Patient login rejects a pasted HTTP(S) invitation
+  locally without probing invitation validity.
+- Fresh verification: lint and typecheck passed; 141 tests in 34 files passed;
+  production build included the access-code route; 18 Playwright tests passed
+  without skip. Live E2E covered 390x844 and 1440x900, code/session rotation,
+  canonical invitation origin, role denial, expected negative HTTP console
+  responses, no unexpected hydration/page error, and synthetic cleanup.
+
 ## Documentation Update Rules
 
 - Do not change role/access docs unless a locked permission changes and human allows it.
@@ -257,8 +280,9 @@ not deleted, and each has one active, non-expired, non-locked, hash-only code.
   `revokePatientSession`; shared `/auth/me` resolution uses
   `resolveAuthContext`.
 - Routes: `/api/v1/auth/patient/login`,
-  `/api/v1/auth/patient/logout`, `/api/v1/patient-profiles`, and
-  `/api/v1/patient-profiles/[patientProfileId]`; UI routes are
+  `/api/v1/auth/patient/logout`, `/api/v1/patient-profiles`,
+  `/api/v1/patient-profiles/[patientProfileId]`, and
+  `/api/v1/patient-profiles/[patientProfileId]/access-code`; UI routes are
   `/patient/login`, `/patient`, and `/caregiver`.
 - Cookie: opaque, HTTP-only `chronicare_patient_session`, with the locked
   eight-hour server-side session lifetime.
