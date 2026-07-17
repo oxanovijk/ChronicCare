@@ -28,6 +28,32 @@ function profile(id: string, displayName: string, relationshipLabel: string) {
 }
 
 describe("caregiver profile switching", () => {
+  it("renders facilities directly for the selected Patient Profile", async () => {
+    const maya = profile("maya-id", "Maya Pratama", "Maya");
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url === "/api/v1/patient-profiles") {
+        return Response.json({ data: [maya] });
+      }
+      if (url.endsWith("maya-id")) return Response.json({ data: maya });
+      if (url.includes("/api/v1/facilities")) {
+        return Response.json({ data: { items: [], total: 0, filterOptions: { cities: [], areas: [], facilityTypes: [], services: [], specialties: [] }, appliedFilters: {} } });
+      }
+      if (url.includes("/api/v1/bpjs-guides")) {
+        return Response.json({ data: { items: [], total: 0, version: "packet10.v1" } });
+      }
+      return new Response(null, { status: 404 });
+    });
+
+    render(<CaregiverProfilePanel role="OWNER" caregiverName="Dimas" view="facilities" />);
+
+    expect(await screen.findByRole("heading", { name: "Faskes & panduan BPJS" })).toBeInTheDocument();
+    expect(screen.getByText("Konteks aktif: Maya Pratama")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Selamat datang, Dimas" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Kelola detail Patient Profile")).not.toBeInTheDocument();
+    expect(screen.queryByText("Tambah Patient Profile")).not.toBeInTheDocument();
+  });
+
   it("clears Maya details while Raka is still loading", async () => {
     const maya = profile("maya-id", "Maya Pratama", "Maya");
     const raka = profile("raka-id", "Raka Pratama", "Raka");

@@ -1,6 +1,6 @@
 # Packet 10: Faskes and BPJS Helper
 
-Status: Draft
+Status: Done
 
 Driver / DRI: Daniel
 
@@ -25,7 +25,7 @@ Give caregivers a safe, fast way to filter static Tangerang facility data and re
 
 ## User-Visible Outcome
 
-Caregiver opens faskes/BPJS helper from the active Patient dashboard and filters facilities by area, BPJS, emergency unit, service, or specialty.
+Caregiver opens the dedicated Fasilitas Kesehatan page from the caregiver sidebar and filters facilities by area, BPJS, emergency unit, service, or specialty while the active Patient Profile remains visible.
 
 ## Covered Canonical Sources
 
@@ -122,3 +122,9 @@ Caregiver opens faskes/BPJS helper from the active Patient dashboard and filters
 
 Give Ozan one stable filter sequence, one fallback screenshot, source limitation wording, dataset source notes, and any known no-result limitations.
 
+## Completion Evidence
+
+- Automated verification completed on 2026-07-17: 38 focused unit/integration tests, 3 Packet 10 E2E scenarios, lint, typecheck, and production build passed.
+- Owner, Family Member, Patient denial, active-profile switching, filter/reset/no-result, BPJS guide, and responsive flows were covered by focused tests.
+- Ozan completed final human QA on 2026-07-17 and confirmed the implementation is sesuai.
+- Packet 10 status changed from `Draft` to `Done` by explicit human verdict.

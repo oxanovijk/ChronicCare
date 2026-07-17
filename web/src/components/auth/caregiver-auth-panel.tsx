@@ -88,7 +88,11 @@ async function resolveInitialAuthState(): Promise<AuthState> {
   return fetchCaregiverContext();
 }
 
-export function CaregiverAuthPanel() {
+export function CaregiverAuthPanel({
+  activeSection = "overview",
+}: {
+  activeSection?: "overview" | "facilities";
+} = {}) {
   const [state, setState] = useState<AuthState>({ status: "checking" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -186,6 +190,7 @@ export function CaregiverAuthPanel() {
       <CaregiverProductionShell
         caregiverName={state.context.user.displayName}
         role={state.context.membership.role}
+        activeSection={activeSection}
         onLogout={() => void handleLogout()}
         loggingOut={submitting}
       >
@@ -200,16 +205,16 @@ export function CaregiverAuthPanel() {
               <AlertDescription>{formError}</AlertDescription>
             </Alert>
           ) : null}
-          <Alert>
+          {activeSection === "overview" ? <Alert>
             <ShieldCheck aria-hidden="true" />
             <AlertTitle>Sesi caregiver aktif · {roleLabel}</AlertTitle>
             <AlertDescription>
               Patient Profile hanya dimuat setelah server memverifikasi Care
               Circle dan peran akun ini.
             </AlertDescription>
-          </Alert>
-          <CaregiverProfilePanel role={state.context.membership.role} caregiverName={state.context.user.displayName} />
-          {state.context.membership.role === "OWNER" ? <details className="care-owner-tools"><summary>Kelola undangan Family Member</summary><InvitationPanel /></details> : null}
+          </Alert> : null}
+          <CaregiverProfilePanel role={state.context.membership.role} caregiverName={state.context.user.displayName} view={activeSection === "facilities" ? "facilities" : "dashboard"} />
+          {activeSection === "overview" && state.context.membership.role === "OWNER" ? <details className="care-owner-tools"><summary>Kelola undangan Family Member</summary><InvitationPanel /></details> : null}
         </div>
       </CaregiverProductionShell>
     );
