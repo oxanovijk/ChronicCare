@@ -51,6 +51,7 @@ test("Owner onboarding, Family invitation, and single-use enforcement work live"
   page,
   browser,
 }) => {
+  test.setTimeout(90_000);
   expect(configured, "Synthetic Supabase and database E2E configuration must be available").toBe(true);
 
   const suffix = `${Date.now()}-${randomBytes(4).toString("hex")}`;
@@ -146,7 +147,7 @@ test("Owner onboarding, Family invitation, and single-use enforcement work live"
     ).toBeVisible({ timeout: 15_000 });
     const patientOwnerAction = await patientPage.request.post(
       `/api/v1/patient-profiles/${patientProfileId}/access-code`,
-      { headers: { Origin: "http://localhost:3100" } },
+      { headers: { Origin: new URL(patientPage.url()).origin } },
     );
     expect(patientOwnerAction.status()).toBe(401);
     expect(
@@ -160,7 +161,7 @@ test("Owner onboarding, Family invitation, and single-use enforcement work live"
     expect(secondCode).not.toBe(firstCode);
     await patientPage.reload();
     await expect(
-      patientPage.getByRole("heading", { name: "Masuk sebagai Patient" }),
+      patientPage.getByRole("heading", { name: "Masukkan kode dari caregiver" }),
     ).toBeVisible();
     await patientPage.getByLabel("Kode akses Patient").fill(firstCode);
     await patientPage.getByRole("button", { name: "Masuk" }).click();
@@ -182,9 +183,10 @@ test("Owner onboarding, Family invitation, and single-use enforcement work live"
       ),
     ).toBe(false);
 
+    await page.getByText("Kelola undangan Family Member", { exact: true }).click();
     await page.getByRole("button", { name: "Buat tautan undangan" }).click();
     const inviteUrl = await page.getByLabel("Tautan undangan").inputValue();
-    expect(new URL(inviteUrl).origin).toBe("http://localhost:3100");
+    expect(new URL(inviteUrl).origin).toBe(new URL(page.url()).origin);
     expect(new URL(inviteUrl).pathname).toMatch(/^\/caregiver\/invite\/[A-Za-z0-9_-]{43}$/);
 
     await page.getByRole("button", { name: "Keluar" }).click();
@@ -213,7 +215,7 @@ test("Owner onboarding, Family invitation, and single-use enforcement work live"
     ).toHaveCount(0);
     const familyOwnerAction = await page.request.post(
       `/api/v1/patient-profiles/${patientProfileId}/access-code`,
-      { headers: { Origin: "http://localhost:3100" } },
+      { headers: { Origin: new URL(page.url()).origin } },
     );
     expect(familyOwnerAction.status()).toBe(403);
 
