@@ -3,7 +3,6 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { ShieldCheck } from "@phosphor-icons/react/dist/csr/ShieldCheck";
 import { SignIn } from "@phosphor-icons/react/dist/csr/SignIn";
-import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
 import { SpinnerGap } from "@phosphor-icons/react/dist/csr/SpinnerGap";
 import { UserPlus } from "@phosphor-icons/react/dist/csr/UserPlus";
 import Link from "next/link";
@@ -11,19 +10,18 @@ import Link from "next/link";
 import { OwnerOnboardingForm } from "@/components/auth/owner-onboarding-form";
 import { InvitationPanel } from "@/components/auth/invitation-panel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CaregiverProfilePanel } from "@/components/profile/caregiver-profile-panel";
+import { CaregiverProductionShell } from "@/components/caregiver/caregiver-production-shell";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type CaregiverContext = {
@@ -185,19 +183,13 @@ export function CaregiverAuthPanel() {
       state.context.membership.role === "OWNER" ? "Owner" : "Family Member";
 
     return (
-      <Card className="care-auth-card care-auth-signed-in">
-        <CardHeader>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="space-y-1">
-              <CardTitle>{state.context.user.displayName}</CardTitle>
-              <CardDescription>
-                Identitas dan peran telah diverifikasi oleh server.
-              </CardDescription>
-            </div>
-            <Badge variant="secondary">{roleLabel}</Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
+      <CaregiverProductionShell
+        caregiverName={state.context.user.displayName}
+        role={state.context.membership.role}
+        onLogout={() => void handleLogout()}
+        loggingOut={submitting}
+      >
+        <div className="care-auth-signed-in">
           {formError ? (
             <Alert
               variant="destructive"
@@ -210,31 +202,16 @@ export function CaregiverAuthPanel() {
           ) : null}
           <Alert>
             <ShieldCheck aria-hidden="true" />
-            <AlertTitle>Sesi caregiver aktif</AlertTitle>
+            <AlertTitle>Sesi caregiver aktif · {roleLabel}</AlertTitle>
             <AlertDescription>
               Patient Profile hanya dimuat setelah server memverifikasi Care
               Circle dan peran akun ini.
             </AlertDescription>
           </Alert>
-          <CaregiverProfilePanel role={state.context.membership.role} />
-          {state.context.membership.role === "OWNER" ? <InvitationPanel /> : null}
-        </CardContent>
-        <CardFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleLogout}
-            disabled={submitting}
-          >
-            {submitting ? (
-              <SpinnerGap className="animate-spin" aria-hidden="true" />
-            ) : (
-              <SignOut aria-hidden="true" />
-            )}
-            Keluar
-          </Button>
-        </CardFooter>
-      </Card>
+          <CaregiverProfilePanel role={state.context.membership.role} caregiverName={state.context.user.displayName} />
+          {state.context.membership.role === "OWNER" ? <details className="care-owner-tools"><summary>Kelola undangan Family Member</summary><InvitationPanel /></details> : null}
+        </div>
+      </CaregiverProductionShell>
     );
   }
 
