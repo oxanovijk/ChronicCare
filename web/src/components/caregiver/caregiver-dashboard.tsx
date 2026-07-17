@@ -147,7 +147,7 @@ export function CaregiverDashboard({ patientProfile, caregiverName, role }: { pa
 
         <aside className="care-dashboard-rail" aria-label="Konteks Packet 08">
           <section className="care-setup-card"><div className="care-card-title"><FirstAid size={22} aria-hidden="true" /><span>Checklist setup</span></div><p>Advisory saja. Data yang belum diketahui tidak memblokir daily care.</p>{data.setupChecklist.recommendedActions.length ? <ul>{data.setupChecklist.recommendedActions.slice(0, 4).map((action) => <li key={action}><WarningCircle size={16} aria-hidden="true" />{setupLabels[action] ?? "Tinjau data Patient"}</li>)}</ul> : <p className="care-complete-line"><CheckCircle size={18} weight="fill" aria-hidden="true" />Tidak ada saran pengisian saat ini.</p>}</section>
-          <section className="care-unavailable-card"><h2>Fitur berikutnya</h2><ul><li><span>Dokumen & OCR</span><small>Belum tersedia</small></li><li><span>Asisten caregiver</span><small>Belum tersedia</small></li><li><span>SOS Realtime</span><small>Belum tersedia</small></li><li><span>Faskes/BPJS</span><small>Belum tersedia</small></li></ul></section>
+          <section className="care-unavailable-card"><h2>Fitur &amp; bantuan</h2><ul><li><span>Dokumen & OCR</span><small>Belum tersedia</small></li><li><span>Asisten caregiver</span><small>Belum tersedia</small></li><li><span>SOS Realtime</span><small>Belum tersedia</small></li></ul></section>
         </aside>
       </div>
     </div>

@@ -27,7 +27,7 @@ This index keeps execution packets small enough for one focused Codex session. I
 | 07 | [Patient Homepage and Check-In](packets/07-patient-homepage-and-check-in.md) | Daniel | Done | Cheerful Patient homepage and profile-bound check-in flow |
 | 08 | [Caregiver Dashboard, Medication, and Reminder](packets/08-caregiver-dashboard-medication-and-reminder.md) | Daniel | Done | Informative caregiver dashboard with medication/reminder basics |
 | 09 | [Document Upload, OCR, and Review](packets/09-document-upload-ocr-and-review.md) | Al | Draft | Private upload, OCR/fallback, caregiver review, confirmed-only summary |
-| 10 | [Faskes and BPJS Helper](packets/10-faskes-and-bpjs-helper.md) | Daniel | Draft | Safe Tangerang facility/BPJS navigation |
+| 10 | [Faskes and BPJS Helper](packets/10-faskes-and-bpjs-helper.md) | Daniel | Done | Safe Tangerang facility/BPJS navigation |
 | 11 | [Chatbot Safety Gateway and Personas](packets/11-chatbot-safety-gateway-and-personas.md) | Al | Draft | Patient/Caregiver chat with profile-bound context, refusal rules, fallback |
 | 12 | [SOS Realtime and Handling](packets/12-sos-realtime-and-handling.md) | Bernard | Draft | Patient SOS, open-dashboard Realtime alert, audio opt-in, atomic handling |
 | 13 | [QA, Deploy, and Demo Rehearsal](packets/13-qa-deploy-and-demo-rehearsal.md) | Ozan | Draft | Evidence-based readiness verdict, deploy/local fallback, rehearsal assets |

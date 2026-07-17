@@ -1,0 +1,451 @@
+[
+  {
+    "sourceKey": "puskesmas-cipondoh",
+    "name": "Puskesmas Cipondoh",
+    "facilityType": "PUSKESMAS",
+    "city": "Kota Tangerang",
+    "area": "Cipondoh",
+    "addressText": "Jl. KH. Hasyim Ashari No.01, RT.001/RW.001, Cipondoh, Kec. Cipondoh, Kota Tangerang, Banten 15148",
+    "phoneNumber": "081809881326",
+    "supportsBpjs": true,
+    "hasEmergencyUnit": true,
+    "services": [
+      "Poli Umum",
+      "Laboratorium",
+      "Farmasi",
+      "UGD",
+      "PONED"
+    ],
+    "specialties": [],
+    "sourceLabel": "Portal Resmi Puskesmas Cipondoh",
+    "sourceUrl": "https://puskesmas.tangerangkota.go.id/upt/cipondoh/layanan_menu_jadwal",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "puskesmas-karawaci-baru",
+    "name": "Puskesmas Karawaci Baru",
+    "facilityType": "PUSKESMAS",
+    "city": "Kota Tangerang",
+    "area": "Karawaci",
+    "addressText": "Jl. Beringin Raya, RT.002/RW.004, Karawaci Baru, Kec. Karawaci, Kota Tangerang, Banten 15116",
+    "phoneNumber": null,
+    "supportsBpjs": null,
+    "hasEmergencyUnit": true,
+    "services": [
+      "Poli Umum",
+      "Poli PTM",
+      "Laboratorium",
+      "Farmasi",
+      "UGD",
+      "PONED"
+    ],
+    "specialties": [],
+    "sourceLabel": "Portal Resmi Puskesmas Karawaci Baru",
+    "sourceUrl": "https://puskesmas.tangerangkota.go.id/upt/karawacibaru/layanan_menu_jadwal",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "puskesmas-ciledug",
+    "name": "Puskesmas Ciledug",
+    "facilityType": "PUSKESMAS",
+    "city": "Kota Tangerang",
+    "area": "Ciledug",
+    "addressText": "Jl. Raden Patah No.90, RT.002/RW.003, Sudimara Barat, Kec. Ciledug, Kota Tangerang, Banten 15151",
+    "phoneNumber": "08119228831",
+    "supportsBpjs": null,
+    "hasEmergencyUnit": true,
+    "services": [
+      "Poli Umum",
+      "Laboratorium",
+      "Farmasi",
+      "UGD"
+    ],
+    "specialties": [],
+    "sourceLabel": "Portal Resmi Puskesmas Ciledug",
+    "sourceUrl": "https://puskesmas.tangerangkota.go.id/upt/ciledug/layanan_menu_jadwal",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "puskesmas-cikokol",
+    "name": "Puskesmas Cikokol",
+    "facilityType": "PUSKESMAS",
+    "city": "Kota Tangerang",
+    "area": "Tangerang",
+    "addressText": "QJXH+X62, Jl. MH. Thamrin, RT.003/RW.002, Cikokol, Kec. Tangerang, Kota Tangerang, Banten 15117",
+    "phoneNumber": "087773833570",
+    "supportsBpjs": true,
+    "hasEmergencyUnit": true,
+    "services": [
+      "Poli Umum",
+      "Poli PTM",
+      "Laboratorium",
+      "Farmasi",
+      "UGD"
+    ],
+    "specialties": [],
+    "sourceLabel": "Portal Resmi Puskesmas Cikokol",
+    "sourceUrl": "https://puskesmas.tangerangkota.go.id/upt/cikokol/layanan_menu_jadwal",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "puskesmas-sukasari",
+    "name": "Puskesmas Sukasari",
+    "facilityType": "PUSKESMAS",
+    "city": "Kota Tangerang",
+    "area": "Tangerang",
+    "addressText": "Jl. Veteran No.1, RT.005/RW.013, Sukasari, Kec. Tangerang, Kota Tangerang, Banten 15118",
+    "phoneNumber": null,
+    "supportsBpjs": null,
+    "hasEmergencyUnit": true,
+    "services": [
+      "Poli Umum",
+      "Laboratorium",
+      "Farmasi",
+      "UGD"
+    ],
+    "specialties": [],
+    "sourceLabel": "Portal Resmi Puskesmas Sukasari",
+    "sourceUrl": "https://puskesmas.tangerangkota.go.id/upt/sukasari/layanan_menu_jadwal",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "puskesmas-pondok-jagung",
+    "name": "UPTD Puskesmas Pondok Jagung",
+    "facilityType": "PUSKESMAS",
+    "city": "Tangerang Selatan",
+    "area": "Serpong Utara",
+    "addressText": "Jl. Raya Serpong Kilometer 7, Pondok Jagung, Kec. Serpong Utara, Kota Tangerang Selatan, Banten 15310",
+    "phoneNumber": "021-5372931",
+    "supportsBpjs": null,
+    "hasEmergencyUnit": true,
+    "services": [
+      "Dokter Umum",
+      "Laboratorium",
+      "Kefarmasian",
+      "Pelayanan Gawat Darurat",
+      "Rawat Inap"
+    ],
+    "specialties": [],
+    "sourceLabel": "Website Resmi Puskesmas Pondok Jagung",
+    "sourceUrl": "https://pkmpondokjagung.tangerangselatankota.go.id/",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "puskesmas-petir",
+    "name": "Puskesmas Petir",
+    "facilityType": "PUSKESMAS",
+    "city": "Kota Tangerang",
+    "area": "Cipondoh",
+    "addressText": "Jl. KH. Ahmad Dahlan, RT.006/RW.010, Petir, Kec. Cipondoh, Kota Tangerang, Banten 15147",
+    "phoneNumber": "021-55719380",
+    "supportsBpjs": null,
+    "hasEmergencyUnit": true,
+    "services": [
+      "Poli Umum",
+      "Laboratorium",
+      "Farmasi",
+      "UGD"
+    ],
+    "specialties": [],
+    "sourceLabel": "Portal Resmi Puskesmas Petir",
+    "sourceUrl": "https://puskesmas.tangerangkota.go.id/upt/petir/layanan_menu_jadwal",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "puskesmas-panunggangan",
+    "name": "Puskesmas Panunggangan",
+    "facilityType": "PUSKESMAS",
+    "city": "Kota Tangerang",
+    "area": "Pinang",
+    "addressText": "Jl. Kyai Maja No.2, Panunggangan, Kec. Pinang, Kota Tangerang, Banten 15143",
+    "phoneNumber": null,
+    "supportsBpjs": null,
+    "hasEmergencyUnit": true,
+    "services": [
+      "Poli Umum",
+      "Poli PTM",
+      "Laboratorium",
+      "Farmasi",
+      "UGD",
+      "PONED"
+    ],
+    "specialties": [],
+    "sourceLabel": "Portal Resmi Puskesmas Panunggangan",
+    "sourceUrl": "https://puskesmas.tangerangkota.go.id/upt/panunggangan/layanan_menu_jadwal",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "rsud-kota-tangerang",
+    "name": "RSUD Kota Tangerang",
+    "facilityType": "RUMAH_SAKIT",
+    "city": "Kota Tangerang",
+    "area": "Tangerang",
+    "addressText": "Jl. Pulau Putri Raya, Perumahan Modernland, Kelapa Indah, Kec. Tangerang, Kota Tangerang, Banten",
+    "phoneNumber": "021-29720200",
+    "supportsBpjs": true,
+    "hasEmergencyUnit": true,
+    "services": [
+      "IGD",
+      "Penyakit Dalam",
+      "Laboratorium",
+      "Farmasi",
+      "Rawat Jalan",
+      "Rawat Inap"
+    ],
+    "specialties": [],
+    "sourceLabel": "Website Resmi RSUD Kota Tangerang",
+    "sourceUrl": "https://rsud.tangerangkota.go.id/",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "rsu-kota-tangerang-selatan",
+    "name": "RSU Kota Tangerang Selatan",
+    "facilityType": "RUMAH_SAKIT",
+    "city": "Tangerang Selatan",
+    "area": "Pamulang",
+    "addressText": "Jl. Raya Pajajaran No.101, Pamulang Barat, Kec. Pamulang, Kota Tangerang Selatan, Banten 15417",
+    "phoneNumber": "150890",
+    "supportsBpjs": true,
+    "hasEmergencyUnit": true,
+    "services": [
+      "IGD",
+      "Penyakit Dalam",
+      "Laboratorium",
+      "Farmasi",
+      "Rawat Jalan",
+      "Rawat Inap"
+    ],
+    "specialties": [],
+    "sourceLabel": "Website Resmi RSU Kota Tangerang Selatan",
+    "sourceUrl": "https://rsu.tangerangselatankota.go.id/",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "rsud-serpong-utara",
+    "name": "RSUD Serpong Utara",
+    "facilityType": "RUMAH_SAKIT",
+    "city": "Tangerang Selatan",
+    "area": "Serpong Utara",
+    "addressText": "Jl. Raya Serpong Utara, Pakulonan, Kec. Serpong Utara, Kota Tangerang Selatan, Banten 15320",
+    "phoneNumber": "021-38929999",
+    "supportsBpjs": true,
+    "hasEmergencyUnit": null,
+    "services": [
+      "Penyakit Dalam",
+      "Rawat Jalan"
+    ],
+    "specialties": [],
+    "sourceLabel": "Website Resmi RSUD Serpong Utara",
+    "sourceUrl": "https://rsudserpongutara.tangerangselatankota.go.id/",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "rsud-pondok-aren",
+    "name": "RSUD Pondok Aren",
+    "facilityType": "RUMAH_SAKIT",
+    "city": "Tangerang Selatan",
+    "area": "Pondok Aren",
+    "addressText": "Jl. Raya Pondok Betung, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15221",
+    "phoneNumber": "081389260635",
+    "supportsBpjs": null,
+    "hasEmergencyUnit": true,
+    "services": [
+      "IGD",
+      "Penyakit Dalam",
+      "Laboratorium",
+      "Farmasi",
+      "Rawat Jalan",
+      "Rawat Inap"
+    ],
+    "specialties": [],
+    "sourceLabel": "Website Resmi RSUD Pondok Aren",
+    "sourceUrl": "https://rsudpondokaren.tangerangselatankota.go.id/",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "rs-sari-asih-cipondoh",
+    "name": "RS Sari Asih Cipondoh",
+    "facilityType": "RUMAH_SAKIT",
+    "city": "Kota Tangerang",
+    "area": "Cipondoh",
+    "addressText": "Jl. Maulana Hasanudin, Cipondoh, Kec. Cipondoh, Kota Tangerang, Banten",
+    "phoneNumber": "021-50943838",
+    "supportsBpjs": true,
+    "hasEmergencyUnit": true,
+    "services": [
+      "IGD",
+      "Penyakit Dalam",
+      "Laboratorium",
+      "Farmasi",
+      "Rawat Jalan",
+      "Rawat Inap",
+      "Medical Check Up"
+    ],
+    "specialties": [
+      "Patologi Klinik",
+      "Radiologi"
+    ],
+    "sourceLabel": "Halaman Cabang Resmi RS Sari Asih Cipondoh",
+    "sourceUrl": "https://www.sariasih.id/cabang/rs-sari-asih-cipondoh",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "primaya-hospital-tangerang",
+    "name": "Primaya Hospital Tangerang",
+    "facilityType": "RUMAH_SAKIT",
+    "city": "Kota Tangerang",
+    "area": "Tangerang",
+    "addressText": "Jl. MH. Thamrin No.3, Cikokol, Kec. Tangerang, Kota Tangerang, Banten 15117",
+    "phoneNumber": "1500007",
+    "supportsBpjs": true,
+    "hasEmergencyUnit": true,
+    "services": [
+      "IGD",
+      "Laboratorium",
+      "Rawat Inap",
+      "Medical Check Up"
+    ],
+    "specialties": [],
+    "sourceLabel": "Website Resmi Primaya Hospital Tangerang",
+    "sourceUrl": "https://primayahospital.com/rumah-sakit/tangerang/",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "rsu-kabupaten-tangerang",
+    "name": "RSU Kabupaten Tangerang",
+    "facilityType": "RUMAH_SAKIT",
+    "city": "Kota Tangerang",
+    "area": "Tangerang",
+    "addressText": "Jl. A. Yani No.9, Sukaasih, Kec. Tangerang, Kota Tangerang, Banten 15111",
+    "phoneNumber": "021-5523507",
+    "supportsBpjs": true,
+    "hasEmergencyUnit": true,
+    "services": [
+      "IGD",
+      "Penyakit Dalam",
+      "Laboratorium",
+      "Farmasi",
+      "Rawat Jalan",
+      "Rawat Inap"
+    ],
+    "specialties": [],
+    "sourceLabel": "Website Resmi RSU Kabupaten Tangerang",
+    "sourceUrl": "https://rsud-tangerangkab.id/rekanan/bpjs-kesehatan/",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "rs-sari-asih-ciputat",
+    "name": "RS Sari Asih Ciputat",
+    "facilityType": "RUMAH_SAKIT",
+    "city": "Tangerang Selatan",
+    "area": "Ciputat",
+    "addressText": "Jl. Otto Iskandardinata No.3, RT.004/RW.011, Ciputat, Kec. Ciputat, Kota Tangerang Selatan, Banten 15411",
+    "phoneNumber": "021-7410808",
+    "supportsBpjs": true,
+    "hasEmergencyUnit": true,
+    "services": [
+      "IGD",
+      "Penyakit Dalam",
+      "Laboratorium",
+      "Farmasi",
+      "Rawat Jalan",
+      "Rawat Inap"
+    ],
+    "specialties": [
+      "Patologi Klinik",
+      "Patologi Anatomi",
+      "Mikrobiologi Klinik"
+    ],
+    "sourceLabel": "Halaman Cabang Resmi RS Sari Asih Ciputat",
+    "sourceUrl": "https://www.sariasih.id/cabang/rs-sari-asih-ciputat",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "rs-emc-tangerang",
+    "name": "RS EMC Tangerang",
+    "facilityType": "RUMAH_SAKIT",
+    "city": "Kota Tangerang",
+    "area": "Tangerang",
+    "addressText": "Jl. KH. Hasyim Ashari No.24, Buaran Indah, Kec. Tangerang, Kota Tangerang, Banten 15119",
+    "phoneNumber": "150789",
+    "supportsBpjs": null,
+    "hasEmergencyUnit": null,
+    "services": [
+      "Penyakit Dalam",
+      "Laboratorium",
+      "Hemodialisa",
+      "Radiologi",
+      "Rawat Inap",
+      "Medical Check Up"
+    ],
+    "specialties": [
+      "Patologi Klinik",
+      "Patologi Anatomi",
+      "Mikrobiologi Klinik",
+      "Gizi Klinik"
+    ],
+    "sourceLabel": "Website Resmi RS EMC Tangerang",
+    "sourceUrl": "https://www.emc.id/id/hospitals/emc-tangerang",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "labkesda-kota-tangerang",
+    "name": "UPT Labkesda Kota Tangerang",
+    "facilityType": "LAB",
+    "city": "Kota Tangerang",
+    "area": "Tangerang",
+    "addressText": "Jl. TMP Taruna, Sukaasih, Kec. Tangerang, Kota Tangerang, Banten",
+    "phoneNumber": "081314680121",
+    "supportsBpjs": null,
+    "hasEmergencyUnit": null,
+    "services": [
+      "Laboratorium",
+      "Pemeriksaan Darah",
+      "Pemeriksaan Urine",
+      "Rontgen",
+      "EKG"
+    ],
+    "specialties": [],
+    "sourceLabel": "Pemerintah Kota Tangerang - Labkesda Kota Tangerang",
+    "sourceUrl": "https://www.tangerangkota.go.id/berita/detail/55607/labkesda-kota-tangerang-sediakan-layanan-pemeriksaan-kesehatan-calon-jemaah-haji",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "labkesda-tangerang-selatan",
+    "name": "UPTD Labkesda Kota Tangerang Selatan",
+    "facilityType": "LAB",
+    "city": "Tangerang Selatan",
+    "area": "Serpong",
+    "addressText": "Jl. Tekno Widya Blok H1 No.1, Ciater, Kec. Serpong, Kota Tangerang Selatan, Banten",
+    "phoneNumber": null,
+    "supportsBpjs": null,
+    "hasEmergencyUnit": null,
+    "services": [
+      "Laboratorium"
+    ],
+    "specialties": [],
+    "sourceLabel": "Pemerintah Kota Tangerang Selatan - UPTD Labkesda",
+    "sourceUrl": "https://simalih.tangerangselatankota.go.id/v2/information/PKPLH",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "sourceKey": "labkesda-kabupaten-tangerang",
+    "name": "UPTD Labkesda Kabupaten Tangerang",
+    "facilityType": "LAB",
+    "city": "Kabupaten Tangerang",
+    "area": "Cikupa",
+    "addressText": "Jl. Raya Serang KM 15, Talagasari, Kec. Cikupa, Kabupaten Tangerang, Banten 15710",
+    "phoneNumber": null,
+    "supportsBpjs": null,
+    "hasEmergencyUnit": null,
+    "services": [
+      "Laboratorium",
+      "Pemeriksaan Darah",
+      "Kimia Klinik"
+    ],
+    "specialties": [],
+    "sourceLabel": "Website Resmi UPTD Labkesda Kabupaten Tangerang",
+    "sourceUrl": "https://labkesda.tangerangkab.go.id/profil-konten/2284",
+    "lastReviewedAt": "2026-07-17"
+  }
+]

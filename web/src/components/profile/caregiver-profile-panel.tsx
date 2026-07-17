@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { PatientAccessCodePanel } from "@/components/profile/patient-access-code-panel";
 import { CaregiverDashboard } from "@/components/caregiver/caregiver-dashboard";
+import { FacilityHelper } from "@/components/facilities/facility-helper";
 
 type FactStatus = "UNKNOWN" | "NONE_REPORTED" | "REPORTED";
 type BpjsStatus = "UNKNOWN" | "NOT_REGISTERED" | "REGISTERED";
@@ -497,9 +498,11 @@ function ProfileEditor({
 export function CaregiverProfilePanel({
   role,
   caregiverName = "Caregiver",
+  view = "dashboard",
 }: {
   role: "OWNER" | "FAMILY_MEMBER";
   caregiverName?: string;
+  view?: "dashboard" | "facilities";
 }) {
   const [profiles, setProfiles] = useState<PatientProfile[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -687,7 +690,14 @@ export function CaregiverProfilePanel({
           Memuat {profiles?.find((item) => item.id === selectedId)?.displayName}.
         </div>
       ) : null}
-      {profile ? (
+      {profile && view === "facilities" ? (
+        <FacilityHelper
+          key={profile.id}
+          patientProfileId={profile.id}
+          patientName={profile.displayName}
+        />
+      ) : null}
+      {profile && view === "dashboard" ? (
         <>
           <CaregiverDashboard
             key={profile.id}
@@ -730,7 +740,7 @@ export function CaregiverProfilePanel({
         </>
       ) : null}
 
-      {role === "OWNER" && (profiles?.length ?? 0) < 2 ? (
+      {view === "dashboard" && role === "OWNER" && (profiles?.length ?? 0) < 2 ? (
         <>
           <Separator />
           <form className="care-create-profile space-y-3" onSubmit={createProfile}>
@@ -771,7 +781,7 @@ export function CaregiverProfilePanel({
         </>
       ) : null}
 
-      {role === "OWNER" && profiles?.length === 2 ? (
+      {view === "dashboard" && role === "OWNER" && profiles?.length === 2 ? (
         <p className="text-sm text-muted-foreground">
           Batas dua Patient Profile untuk MVP sudah terpakai.
         </p>
