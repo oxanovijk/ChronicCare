@@ -16,7 +16,6 @@ import { Warning } from "@phosphor-icons/react/dist/csr/Warning";
 
 import { PatientLogoutButton } from "@/components/auth/patient-logout-button";
 import { BrandMark } from "@/components/brand-mark";
-import { PatientSosAction } from "@/components/sos/patient-sos-action";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -242,8 +241,6 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
           <h1 id="patient-home-title">Halo, {patientProfile.displayName}</h1>
           <p>Ceritakan kondisi hari ini. Jawaban singkat juga tidak apa-apa.</p>
         </section>
-
-        <PatientSosAction patientProfileId={patientProfile.id} />
 
         <div className="patient-checkin-layout">
         <Card className="patient-checkin-card">

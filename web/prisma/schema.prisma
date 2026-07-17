@@ -147,15 +147,6 @@ enum ExtractionStatus {
   @@map("extraction_status")
 }
 
-enum SosStatus {
-  NEW
-  HANDLED
-  CANCELLED
-
-  @@map("sos_status")
-}
-}
-
 model User {
   id                         String                 @id @db.Uuid
   displayName                String                 @map("display_name") @db.VarChar(120)
@@ -181,8 +172,6 @@ model User {
   updatedHealthNotes         HealthNote[]           @relation("HealthNoteUpdatedBy")
   uploadedHealthDocuments    HealthDocument[]       @relation("HealthDocumentUploadedBy")
   reviewedExtractions        DocumentExtraction[]   @relation("DocumentExtractionReviewedBy")
-  createdSosEvents           SosEvent[]             @relation("SosEventCreatedBy")
-  handledSosEvents           SosEvent[]             @relation("SosEventHandledBy")
   auditEvents                AuditEvent[]           @relation("AuditActorUser")
 
   @@map("users")
@@ -282,7 +271,6 @@ model PatientProfile {
   healthNotes              HealthNote[]
   healthDocuments          HealthDocument[]
   documentExtractions      DocumentExtraction[]
-  sosEvents                SosEvent[]
   auditEvents              AuditEvent[]               @relation("AuditTargetPatientProfile")
   actorAuditEvents         AuditEvent[]               @relation("AuditActorPatientProfile")
 
@@ -475,27 +463,6 @@ model DocumentExtraction {
   @@index([healthDocumentId, createdAt(sort: Desc)])
   @@index([patientProfileId, status])
   @@map("document_extractions")
-model SosEvent {
-  id                 String         @id @default(uuid()) @db.Uuid
-  patientProfileId   String         @map("patient_profile_id") @db.Uuid
-  createdByPatient   Boolean        @default(true) @map("created_by_patient")
-  createdByUserId    String?        @map("created_by_user_id") @db.Uuid
-  status             SosStatus      @default(NEW)
-  message            String?        @db.VarChar(500)
-  locationLabel      String?        @map("location_label") @db.VarChar(160)
-  contactPhone       String?        @map("contact_phone") @db.VarChar(32)
-  handledByUserId    String?        @map("handled_by_user_id") @db.Uuid
-  handledAt          DateTime?      @map("handled_at") @db.Timestamptz(6)
-  cancelledAt        DateTime?      @map("cancelled_at") @db.Timestamptz(6)
-  createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt          DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
-  patientProfile     PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
-  createdBy          User?          @relation("SosEventCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
-  handledBy          User?          @relation("SosEventHandledBy", fields: [handledByUserId], references: [id], onDelete: Restrict)
-
-  @@index([patientProfileId, status, createdAt(sort: Desc)])
-  @@index([status, createdAt(sort: Desc)])
-  @@map("sos_events")
 }
 
 model AuditEvent {

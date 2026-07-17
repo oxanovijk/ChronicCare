@@ -1,6 +1,6 @@
 # Packet 12: SOS Realtime and Handling
 
-Status: Blocked
+Status: Draft
 
 Driver / DRI: Bernard
 
@@ -128,35 +128,4 @@ Patient creates SOS; an open authorized caregiver dashboard receives a persisten
 ## Handoff Notes
 
 Provide two-context setup instructions, sound opt-in step, Realtime indicator behavior, REST recovery method, conflict evidence, wrong-Care-Circle evidence, and visual-only fallback screenshot.
-
-## Integrated Exit Evidence - 2026-07-17
-
-This evidence was produced by the user-authorized integrated Packet 12 run. It does not record or impersonate an external human approval.
-
-| Acceptance item | Evidence |
-| --- | --- |
-| Profile-bound creation and Patient isolation | Route/service tests reject another Patient Profile; the final Playwright journey received `201` for Maya and `403`/`404` without Raka data for the wrong-profile attempt. |
-| Caregiver and Care Circle authorization | Server membership checks, allowlisted DTOs, RLS policy, direct RLS probe (`authorized_visible=1`, `outsider_visible=0`), and the four-context Playwright journey passed. |
-| Realtime visual insert/update | Authorized desktop and mobile caregiver dashboards received the persistent Maya alert from `sos_events`; the outsider dashboard received no event. |
-| Audio opt-in and visual fallback | Native Web Audio opt-in/test passed; a separate mobile context with `AudioContext` unavailable showed the blocked copy while the visual alert remained. |
-| Atomic handling | Two caregivers submitted `Saya tangani` together; exactly one handler persisted and exactly one verified conflict result was shown. |
-| Reconnect and focus recovery | Offline state retained the alert; online and focus events each produced an authoritative `GET /api/v1/sos-events?status=NEW` response. |
-| Responsive and keyboard behavior | The live journey passed at `390x844` and `1440x900`, found no horizontal overflow, and verified keyboard focus/Enter for Patient creation and caregiver handling. |
-| Safety and privacy boundaries | Copy states family coordination, open-dashboard delivery limits, and no official dispatch guarantee. DTO/tests exclude contact secrets, precise/live location, access/session values, and unrelated profiles. |
-
-Verification produced in this run:
-
-- `npm run lint`: passed.
-- `npm run typecheck`: passed.
-- `npm test`: passed, 46 files and 200 tests.
-- `npm run build`: passed; all three SOS routes were included in the production route manifest.
-- `npm test -- sos`: passed, 3 files and 14 tests.
-- Final `npm run test:e2e -- tests/e2e/sos.spec.ts`: passed, 1 journey in 48.5 seconds with no skip.
-- Full `npm run test:e2e`: Packet 12 passed, but the command did not pass overall: 14 passed, 7 unrelated credential-gated tests skipped, and the Packet 05 caregiver-registration journey timed out at 30 seconds. A one-test reproduction also timed out during the same cold-render path; no SOS assertion failed.
-- `npm run db:generate` and `prisma validate`: passed.
-- Development database probe: RLS enabled, policy and `supabase_realtime` publication present, `authenticated` has SELECT but not INSERT, authorized caregiver sees the row, outsider sees zero, browser-role insert is denied, and no probe SOS row remains.
-
-Current blocker:
-
-- The development database contains applied migration `20260717080837_packet_09_documents_ocr`, but that migration directory is absent from this working tree. `prisma migrate dev --create-only` therefore detected drift and required a destructive reset. The run did not reset the database or reconstruct an out-of-scope Packet 09 migration. Packet 12 SQL was dry-run, applied to the approved development database with `prisma db execute`, marked applied, and verified; however, the repository migration chain is not reproducible through the locked `npm run db:migrate` workflow until the exact Packet 09 migration artifact is restored. Packet 12 remains `Blocked`, not `Done`.
 
