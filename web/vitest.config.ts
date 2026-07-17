@@ -15,7 +15,13 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    include: ["tests/unit/**/*.test.{ts,tsx}"],
+    include: [
+      "tests/unit/**/*.test.{ts,tsx}",
+      "src/test/**/*.test.{ts,tsx}",
+    ],
     setupFiles: ["tests/setup.ts"],
+    css: true,
+    pool: "threads",
+    maxWorkers: 1,
   },
 });
