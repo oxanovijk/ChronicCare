@@ -213,6 +213,114 @@
 .patient-logout-control button { min-height: 46px; border-color: var(--border-strong); }
 .patient-session-footer { padding-block: 20px 26px; color: var(--ink-muted); font-size: 12px; }
 
+/* Production Patient Home — Packet 07 */
+.production-patient-home {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 92% 7%, rgb(246 183 60 / 15%) 0 100px, transparent 102px),
+    var(--canvas);
+  color: var(--ink);
+}
+.production-patient-home-header,
+.production-patient-home-content { width: min(100% - 32px, 1180px); margin-inline: auto; }
+.production-patient-home-header {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.production-patient-home-actions { display: flex; min-width: 0; align-items: center; gap: 10px; }
+.production-patient-home-actions .patient-profile-badge {
+  min-height: 36px;
+  max-width: min(52vw, 320px);
+  gap: 7px;
+  overflow: hidden;
+  border: 1px solid #acd7ce;
+  background: var(--primary-soft);
+  color: var(--primary-strong);
+  text-overflow: ellipsis;
+}
+.production-patient-home-actions .patient-profile-badge svg { flex: 0 0 auto; }
+.production-patient-home-actions .patient-logout-control { flex: 0 0 auto; }
+.production-patient-home-content { padding-block: clamp(34px, 6vw, 64px); }
+.patient-home-intro { max-width: 760px; margin-bottom: clamp(28px, 5vw, 46px); }
+.patient-home-eyebrow { margin: 0 0 12px; color: var(--primary); font-size: 12px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.patient-home-intro h1 { margin: 0; font-size: clamp(2.45rem, 8vw, 4.8rem); letter-spacing: -.065em; line-height: .98; }
+.patient-home-intro > p:last-child { max-width: 54ch; margin: 16px 0 0; color: var(--ink-muted); font-size: 17px; line-height: 1.65; }
+.patient-checkin-layout { display: grid; align-items: start; gap: 22px; }
+.patient-checkin-card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-top: 6px solid var(--energy);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow-raised);
+}
+.patient-checkin-card [data-slot="card-header"] { padding: 24px 22px 20px; border-bottom: 1px solid var(--border); }
+.patient-checkin-card [data-slot="card-content"] { padding: 24px 22px 28px; }
+.patient-checkin-card-heading { display: flex; align-items: flex-start; gap: 14px; }
+.patient-checkin-card-icon { display: grid; width: 50px; height: 50px; flex: 0 0 auto; place-items: center; border-radius: 17px; background: var(--primary-soft); color: var(--primary-strong); }
+.patient-checkin-card-icon svg { width: 26px; height: 26px; }
+.patient-checkin-card [data-slot="card-title"] { font-size: 22px; letter-spacing: -.035em; }
+.patient-checkin-card [data-slot="card-description"] { margin-top: 6px; color: var(--ink-muted); font-size: 15px; line-height: 1.6; }
+.patient-checkin-form { display: grid; gap: 24px; }
+.patient-checkin-form textarea { min-height: 112px; border-color: var(--border-strong); border-radius: 14px; background: #fffefc; font-size: 16px; line-height: 1.6; }
+.patient-checkin-form label,
+.patient-mood-fieldset legend { font-weight: 750; }
+.patient-mood-fieldset { display: grid; gap: 12px; }
+.patient-mood-options { display: grid; gap: 10px; }
+.patient-mood-option {
+  position: relative;
+  display: grid;
+  min-height: 112px;
+  cursor: pointer;
+  grid-template-columns: 42px 1fr;
+  grid-template-rows: auto auto;
+  align-content: center;
+  column-gap: 12px;
+  padding: 16px;
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  background: #fffefc;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+.patient-mood-option:hover { border-color: var(--primary); background: #f7fcfa; }
+.patient-mood-option:focus-within { outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent); outline-offset: 2px; }
+.patient-mood-option.is-selected { border-color: var(--primary); background: var(--primary-soft); }
+.patient-mood-okay.is-selected { border-color: #d28f11; background: #fff6d9; }
+.patient-mood-unwell.is-selected { border-color: var(--human); background: #fff0f1; }
+.patient-mood-icon { width: 36px; height: 36px; grid-row: 1 / 3; align-self: center; color: var(--primary); }
+.patient-mood-okay .patient-mood-icon { color: #a56b00; }
+.patient-mood-unwell .patient-mood-icon { color: var(--human); }
+.patient-mood-label { align-self: end; font-size: 17px; font-weight: 800; }
+.patient-mood-helper { align-self: start; color: var(--ink-muted); font-size: 13px; line-height: 1.35; }
+.patient-mood-selected { position: absolute; top: 8px; right: 9px; display: inline-flex; align-items: center; gap: 3px; color: var(--primary-strong); font-size: 10px; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; }
+.patient-mood-selected svg { width: 13px; height: 13px; }
+.patient-checkin-details { overflow: hidden; border: 1px solid var(--border); border-radius: 16px; background: #fbfdfc; }
+.patient-checkin-details summary { display: flex; min-height: 54px; cursor: pointer; list-style: none; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; font-weight: 750; }
+.patient-checkin-details summary::-webkit-details-marker { display: none; }
+.patient-checkin-details summary svg { flex: 0 0 auto; transition: transform 160ms ease; }
+.patient-checkin-details[open] summary svg { transform: rotate(180deg); }
+.patient-checkin-details-content { display: grid; gap: 20px; padding: 20px 16px; border-top: 1px solid var(--border); background: white; }
+.patient-checkin-details input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); }
+.patient-checkin-success { border-color: #9fd2c7; background: var(--primary-soft); color: var(--primary-strong); }
+.patient-checkin-urgent { border-width: 2px; }
+.patient-checkin-submit { width: 100%; min-height: 52px; border-radius: 15px; background: var(--primary); box-shadow: 0 5px 0 #094e4a; font-size: 16px; font-weight: 800; }
+.patient-checkin-submit:hover { background: var(--primary-strong); }
+.patient-checkin-history { display: grid; gap: 16px; padding: 22px; border: 1px solid var(--border); border-radius: 20px; background: rgb(255 255 255 / 78%); }
+.patient-checkin-history-heading { display: flex; align-items: center; gap: 11px; }
+.patient-checkin-history-heading > span { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border-radius: 14px; background: var(--primary-soft); color: var(--primary-strong); }
+.patient-checkin-history-heading svg { width: 22px; height: 22px; }
+.patient-checkin-history-heading h2 { font-size: 19px; font-weight: 800; letter-spacing: -.025em; }
+.patient-checkin-history-loading { display: grid; gap: 12px; color: var(--ink-muted); font-size: 14px; }
+.patient-checkin-history-empty { padding: 22px; border: 1px dashed var(--border-strong); border-radius: 15px; color: var(--ink-muted); font-size: 15px; line-height: 1.6; }
+.patient-checkin-history-list { display: grid; gap: 12px; }
+.patient-checkin-history-list > li { padding: 17px; border: 1px solid var(--border); border-radius: 15px; background: var(--surface); }
+
 .production-caregiver-page { min-height: 100dvh; background: var(--canvas); }
 .production-caregiver-header {
   position: sticky;
@@ -277,12 +385,18 @@
   .role-gateway-footer { grid-template-columns: auto 1fr; gap: 18px; }
   .patient-session-card { grid-template-columns: auto 1fr; }
   .patient-session-card .patient-logout-control { grid-column: 2; }
+  .patient-mood-options { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .patient-mood-option { min-height: 150px; grid-template-columns: 1fr; grid-template-rows: auto auto auto; text-align: center; }
+  .patient-mood-icon { grid-row: auto; justify-self: center; }
+  .patient-checkin-submit { width: auto; min-width: 220px; justify-self: start; }
 }
 
 @media (min-width: 980px) {
   .production-caregiver-layout { grid-template-columns: minmax(0, 1fr) 290px; }
   .care-auth-signed-in { grid-column: 1 / -1; }
   .care-auth-signed-in + .caregiver-security-note { grid-column: 1 / -1; }
+  .patient-checkin-layout { grid-template-columns: minmax(0, 1.6fr) minmax(280px, .72fr); }
+  .patient-checkin-history { position: sticky; top: 22px; }
 }
 
 @media (max-width: 520px) {
@@ -293,6 +407,13 @@
   .patient-session-content,
   .patient-session-footer,
   .production-caregiver-content { width: min(100% - 32px, 1180px); }
+  .production-patient-home-header { align-items: flex-start; }
+  .production-patient-home-actions { flex-direction: column; align-items: flex-end; }
+  .production-patient-home-actions .patient-profile-badge { max-width: 52vw; }
+  .production-patient-home-actions .patient-logout-control button { min-height: 44px; }
+  .patient-checkin-card [data-slot="card-header"],
+  .patient-checkin-card [data-slot="card-content"] { padding-inline: 18px; }
+  .patient-checkin-history { padding: 18px; }
   .role-gateway-status { display: none; }
   .role-gateway-content { padding-block: 28px 42px; }
   .role-gateway-intro h1 { font-size: clamp(2.35rem, 12vw, 3.2rem); }

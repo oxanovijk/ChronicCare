@@ -17,6 +17,19 @@ const patientProfile = {
 afterEach(() => vi.restoreAllMocks());
 
 describe("Patient check-in UI", () => {
+  it("uses the Care in Motion patient shell without unavailable feature navigation", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({ data: [] }),
+    );
+
+    render(<PatientHome patientProfile={patientProfile} />);
+
+    expect(screen.getByText("ChroniCare")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /reminder/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /assistant/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /sos/i })).not.toBeInTheDocument();
+  });
+
   it("shows the bound profile and a useful empty state after loading", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       Response.json({ data: [] }),

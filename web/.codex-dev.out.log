@@ -1,0 +1,53 @@
+
+> web@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.55.211.186:3000
+- Environments: .env.local
+✓ Ready in 1326ms
+
+ GET /caregiver 200 in 1454ms (next.js: 692ms, application-code: 762ms)
+ GET / 200 in 594ms (next.js: 244ms, application-code: 350ms)
+ GET /api/v1/auth/me 401 in 885ms (next.js: 728ms, application-code: 157ms)
+ GET / 200 in 217ms (next.js: 8ms, application-code: 210ms)
+ GET /caregiver 200 in 51ms (next.js: 9ms, application-code: 42ms)
+ GET /api/v1/auth/me 500 in 841ms (next.js: 13ms, application-code: 828ms)
+ GET /api/v1/auth/me 500 in 549ms (next.js: 5ms, application-code: 543ms)
+ GET /caregiver/register 200 in 186ms (next.js: 82ms, application-code: 105ms)
+ GET /caregiver 200 in 93ms (next.js: 16ms, application-code: 77ms)
+ GET /api/v1/auth/me 500 in 434ms (next.js: 26ms, application-code: 409ms)
+ GET /api/v1/auth/me 500 in 468ms (next.js: 9ms, application-code: 459ms)
+ GET / 200 in 60ms (next.js: 9ms, application-code: 50ms)
+ GET /patient/login 200 in 164ms (next.js: 121ms, application-code: 43ms)
+ GET / 200 in 40ms (next.js: 5ms, application-code: 35ms)
+ GET /caregiver 200 in 41ms (next.js: 6ms, application-code: 35ms)
+ GET /api/v1/auth/me 500 in 506ms (next.js: 7ms, application-code: 500ms)
+ GET /api/v1/auth/me 500 in 510ms (next.js: 24ms, application-code: 486ms)
+ GET / 200 in 58ms (next.js: 7ms, application-code: 51ms)
+ GET /caregiver 200 in 76ms (next.js: 10ms, application-code: 66ms)
+ GET /api/v1/auth/me 500 in 478ms (next.js: 19ms, application-code: 459ms)
+ GET /api/v1/auth/me 500 in 612ms (next.js: 6ms, application-code: 606ms)
+ GET /caregiver/register 200 in 45ms (next.js: 6ms, application-code: 39ms)
+ GET /caregiver 200 in 50ms (next.js: 6ms, application-code: 44ms)
+ GET /api/v1/auth/me 500 in 2.3s (next.js: 20ms, application-code: 2.3s)
+ GET /api/v1/auth/me 500 in 2.3s (next.js: 8ms, application-code: 2.3s)
+ GET / 200 in 81ms (next.js: 10ms, application-code: 72ms)
+ GET /caregiver 200 in 54ms (next.js: 6ms, application-code: 48ms)
+ GET /api/v1/auth/me 500 in 1144ms (next.js: 7ms, application-code: 1138ms)
+ GET /api/v1/auth/me 500 in 1176ms (next.js: 18ms, application-code: 1157ms)
+ GET /caregiver/register 200 in 59ms (next.js: 12ms, application-code: 46ms)
+ GET /auth/callback?code=69b2d953-10a6-43a5-8add-db5d56ff379c&next=%2Fcaregiver 307 in 2.5s (next.js: 2.4s, application-code: 45ms)
+ GET /caregiver?auth=callback-error 200 in 289ms (next.js: 15ms, application-code: 274ms)
+ GET /api/v1/auth/me 500 in 538ms (next.js: 12ms, application-code: 526ms)
+ GET /api/v1/auth/me 500 in 496ms (next.js: 13ms, application-code: 483ms)
+ GET /auth/callback?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired&next=%2Fcaregiver 307 in 29ms (next.js: 12ms, application-code: 17ms)
+ GET /caregiver?auth=callback-error 200 in 176ms (next.js: 15ms, application-code: 161ms)
+ GET /api/v1/auth/me 500 in 315ms (next.js: 10ms, application-code: 305ms)
+ GET / 200 in 131ms (next.js: 43ms, application-code: 88ms)
+ GET /patient/login 200 in 133ms (next.js: 18ms, application-code: 116ms)
+ GET / 200 in 116ms (next.js: 14ms, application-code: 101ms)
+ GET /caregiver 200 in 144ms (next.js: 17ms, application-code: 126ms)
+ GET /api/v1/auth/me 500 in 539ms (next.js: 24ms, application-code: 515ms)
+ GET /api/v1/auth/me 500 in 571ms (next.js: 49ms, application-code: 522ms)
