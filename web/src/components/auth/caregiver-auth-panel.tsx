@@ -1,7 +1,11 @@
 "use client";
 
 import { type FormEvent, useEffect, useState } from "react";
-import { LoaderCircle, LogIn, LogOut, ShieldCheck, UserPlus } from "lucide-react";
+import { ShieldCheck } from "@phosphor-icons/react/dist/csr/ShieldCheck";
+import { SignIn } from "@phosphor-icons/react/dist/csr/SignIn";
+import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
+import { SpinnerGap } from "@phosphor-icons/react/dist/csr/SpinnerGap";
+import { UserPlus } from "@phosphor-icons/react/dist/csr/UserPlus";
 import Link from "next/link";
 
 import { OwnerOnboardingForm } from "@/components/auth/owner-onboarding-form";
@@ -161,7 +165,7 @@ export function CaregiverAuthPanel() {
 
   if (state.status === "checking") {
     return (
-      <Card aria-live="polite">
+      <Card className="care-auth-card care-auth-checking" aria-live="polite">
         <CardHeader>
           <CardTitle>Memeriksa sesi caregiver</CardTitle>
           <CardDescription>
@@ -169,7 +173,7 @@ export function CaregiverAuthPanel() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex min-h-20 items-center gap-2 text-sm text-muted-foreground">
-          <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+          <SpinnerGap className="size-4 animate-spin" aria-hidden="true" />
           Mohon tunggu.
         </CardContent>
       </Card>
@@ -181,7 +185,7 @@ export function CaregiverAuthPanel() {
       state.context.membership.role === "OWNER" ? "Owner" : "Family Member";
 
     return (
-      <Card>
+      <Card className="care-auth-card care-auth-signed-in">
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-1">
@@ -223,9 +227,9 @@ export function CaregiverAuthPanel() {
             disabled={submitting}
           >
             {submitting ? (
-              <LoaderCircle className="animate-spin" aria-hidden="true" />
+              <SpinnerGap className="animate-spin" aria-hidden="true" />
             ) : (
-              <LogOut aria-hidden="true" />
+              <SignOut aria-hidden="true" />
             )}
             Keluar
           </Button>
@@ -244,7 +248,7 @@ export function CaregiverAuthPanel() {
   }
 
   return (
-    <Card>
+    <Card className="care-auth-card care-auth-signed-out">
       <CardHeader>
         <CardTitle>Masuk sebagai caregiver</CardTitle>
         <CardDescription>
@@ -279,7 +283,7 @@ export function CaregiverAuthPanel() {
           </Alert>
         ) : null}
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="care-auth-form" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="caregiver-email">Email caregiver</Label>
             <Input
@@ -306,11 +310,11 @@ export function CaregiverAuthPanel() {
               disabled={submitting}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={submitting}>
+          <Button type="submit" className="caregiver-primary-button w-full" disabled={submitting}>
             {submitting ? (
-              <LoaderCircle className="animate-spin" aria-hidden="true" />
+              <SpinnerGap className="animate-spin" aria-hidden="true" />
             ) : (
-              <LogIn aria-hidden="true" />
+              <SignIn aria-hidden="true" />
             )}
             Masuk sebagai caregiver
           </Button>

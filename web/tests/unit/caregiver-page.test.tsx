@@ -33,7 +33,10 @@ describe("caregiver page", () => {
     render(await CaregiverPage());
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "Area Caregiver" }),
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Konteks perawatan yang jelas, tanpa kebisingan.",
+      }),
     ).toBeInTheDocument();
   });
 
@@ -41,10 +44,10 @@ describe("caregiver page", () => {
     render(await CaregiverPage());
 
     expect(
-      screen.getByText("Autentikasi caregiver aktif"),
+      screen.getByText(/peran selalu diverifikasi oleh server/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Patient Profile terisolasi/),
+      screen.getByText(/Patient Profile tetap terisolasi/),
     ).toBeInTheDocument();
     expect(
       screen.queryByText(/Login caregiver.*belum tersedia/),
@@ -61,7 +64,7 @@ describe("caregiver page", () => {
     render(await CaregiverPage());
 
     expect(
-      screen.getByRole("link", { name: "Kembali ke beranda" }),
+      screen.getByRole("link", { name: "Beranda" }),
     ).toHaveAttribute("href", "/");
   });
 
