@@ -18,6 +18,8 @@ type AuditEventInput = {
   targetType: string;
   targetId?: string;
   requestId?: string;
+  /** Optional human note appended to the generated summary (e.g. a review rejection reason). */
+  note?: string;
 };
 
 const auditLabel = z.string().min(1).max(80).regex(/^[A-Z0-9_]+$/);
@@ -44,7 +46,9 @@ export function writeAuditEvent(
       targetType,
       targetId: input.targetId,
       requestId: input.requestId,
-      summary: `${action} ${targetType}`,
+      summary: input.note
+        ? `${action} ${targetType}: ${input.note}`.slice(0, 500)
+        : `${action} ${targetType}`,
       ...actor,
     },
   });

@@ -11,6 +11,7 @@ import { SpinnerGap } from "@phosphor-icons/react/dist/csr/SpinnerGap";
 import { WarningCircle } from "@phosphor-icons/react/dist/csr/WarningCircle";
 
 import { DailyCareForms } from "@/components/caregiver/daily-care-forms";
+import { DocumentsPanel } from "@/components/caregiver/documents-panel";
 import { Button } from "@/components/ui/button";
 
 type FactStatus = "UNKNOWN" | "NONE_REPORTED" | "REPORTED";
@@ -143,11 +144,14 @@ export function CaregiverDashboard({ patientProfile, caregiverName, role }: { pa
           </div>
 
           {activeForm ? <DailyCareForms kind={activeForm} patientProfileId={patientProfile.id} patientName={patientProfile.displayName} medications={data.activeMedications.map(({ id, name }) => ({ id, name }))} onClose={() => setActiveForm(null)} onSaved={() => { setNotice("Catatan perawatan sudah disimpan."); setReload((value) => value + 1); }} /> : null}
+
+          {/* key remounts the panel so no document state leaks across profile switches */}
+          <DocumentsPanel key={patientProfile.id} patientProfileId={patientProfile.id} patientName={patientProfile.displayName} />
         </div>
 
         <aside className="care-dashboard-rail" aria-label="Konteks Packet 08">
           <section className="care-setup-card"><div className="care-card-title"><FirstAid size={22} aria-hidden="true" /><span>Checklist setup</span></div><p>Advisory saja. Data yang belum diketahui tidak memblokir daily care.</p>{data.setupChecklist.recommendedActions.length ? <ul>{data.setupChecklist.recommendedActions.slice(0, 4).map((action) => <li key={action}><WarningCircle size={16} aria-hidden="true" />{setupLabels[action] ?? "Tinjau data Patient"}</li>)}</ul> : <p className="care-complete-line"><CheckCircle size={18} weight="fill" aria-hidden="true" />Tidak ada saran pengisian saat ini.</p>}</section>
-          <section className="care-unavailable-card"><h2>Fitur &amp; bantuan</h2><ul><li><span>Dokumen & OCR</span><small>Belum tersedia</small></li><li><span>Asisten caregiver</span><small>Belum tersedia</small></li><li><span>SOS Realtime</span><small>Belum tersedia</small></li></ul></section>
+          <section className="care-unavailable-card"><h2>Fitur berikutnya</h2><ul><li><span>Asisten caregiver</span><small>Belum tersedia</small></li><li><span>SOS Realtime</span><small>Belum tersedia</small></li><li><span>Faskes/BPJS</span><small>Belum tersedia</small></li></ul></section>
         </aside>
       </div>
     </div>

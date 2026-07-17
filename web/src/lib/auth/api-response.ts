@@ -2,6 +2,7 @@ import { ZodError } from "zod";
 
 import { CaregiverAuthError } from "@/lib/auth/caregiver";
 import { PatientAuthError } from "@/lib/auth/patient";
+import { DocumentError } from "@/lib/documents/service";
 import { PatientProfileError } from "@/lib/patient-profile/service";
 import { InvitationError } from "@/lib/invitations/service";
 
@@ -63,6 +64,30 @@ export function apiErrorResponse(
         error.code === "PATIENT_PROFILE_LIMIT_REACHED"
           ? "Maksimal dua Patient Profile dapat dibuat."
           : "Perubahan bertabrakan dengan data yang sudah ada.";
+    }
+  } else if (error instanceof DocumentError) {
+    code = error.code;
+    if (error.code === "NOT_FOUND") {
+      status = 404;
+      message = "Dokumen tidak ditemukan.";
+    } else if (error.code === "FILE_TOO_LARGE") {
+      status = 413;
+      message = "Ukuran file melebihi batas 5 MB.";
+    } else if (error.code === "PAGE_LIMIT_EXCEEDED") {
+      status = 422;
+      message = "Dokumen melebihi batas tiga halaman.";
+    } else if (error.code === "OWNER_REQUIRED") {
+      status = 403;
+      message = "Hanya Owner yang dapat melakukan tindakan ini.";
+    } else if (error.code === "EXTRACTION_FAILED") {
+      status = 502;
+      message = "Pembacaan dokumen gagal. Coba lagi.";
+    } else {
+      status = 409;
+      message =
+        error.code === "UPLOAD_INCOMPLETE"
+          ? "File belum terunggah dengan benar. Ulangi unggahan."
+          : "Status dokumen sudah berubah. Muat ulang halaman.";
     }
   } else if (error instanceof InvitationError) {
     status = error.code === "NOT_FOUND" ? 404 : 409;
