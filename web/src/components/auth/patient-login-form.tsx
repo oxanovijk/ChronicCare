@@ -22,10 +22,23 @@ export function PatientLoginForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const submittedCode = code;
+    const submittedCode = code.trim();
     setCode("");
-    setSubmitting(true);
     setError(null);
+
+    try {
+      const candidate = new URL(submittedCode);
+      if (candidate.protocol === "http:" || candidate.protocol === "https:") {
+        setError(
+          "Ini tautan undangan Family Member, bukan kode akses Patient.",
+        );
+        return;
+      }
+    } catch {
+      // Patient codes are opaque values, not URLs.
+    }
+
+    setSubmitting(true);
 
     try {
       const response = await fetch("/api/v1/auth/patient/login", {

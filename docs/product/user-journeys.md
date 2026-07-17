@@ -24,21 +24,23 @@ Demo condition: diabetes tipe 2
 
 ## 2. Owner: Membuat Care Circle
 
-Precondition: Owner telah masuk melalui Supabase Auth.
+Precondition: calon Owner belum memiliki membership aktif. Ia dapat membuat akun email/password atau masuk ke Auth user baru yang sudah terverifikasi.
 
 Alur:
 
-1. Owner membuat Care Circle.
-2. Owner memasukkan nama tampilan dan label hubungan Patient.
-3. Sistem menampilkan identitas minimum dan meminta konfirmasi.
-4. Sistem membuat Patient Profile dengan kondisi, alergi, obat aktif, kontak darurat, dan status BPJS sebagai `UNKNOWN`.
-5. Owner memilih `Lengkapi sekarang` atau `Isi nanti`.
-6. Jika melengkapi sekarang, setiap kelompok data menyediakan pilihan menambah informasi, menyatakan tidak ada yang diketahui/dilaporkan, atau tetap belum tahu.
+1. Calon Owner mendaftar melalui Supabase Auth dan memverifikasi email jika provider mewajibkannya.
+2. Owner memasukkan nama tampilan dan nama Care Circle.
+3. Sistem membuat User, Care Circle, dan membership Owner secara atomik dan idempotent.
+4. Owner memasukkan identitas minimum dan label hubungan Patient.
+5. Sistem menampilkan identitas minimum dan meminta konfirmasi.
+6. Sistem membuat Patient Profile dengan kondisi, alergi, obat aktif, kontak darurat, dan status BPJS sebagai `UNKNOWN`.
+7. Owner memilih `Lengkapi sekarang` atau `Isi nanti`.
+8. Jika melengkapi sekarang, setiap kelompok data menyediakan pilihan menambah informasi, menyatakan tidak ada yang diketahui/dilaporkan, atau tetap belum tahu.
    Untuk obat aktif, `Tambahkan informasi` membuka flow Medication; status `REPORTED` tidak ditulis langsung oleh form profile.
-7. Upload dokumen bersifat opsional dan hanya dilakukan setelah Patient Profile memiliki ID.
-8. Owner membuat kode akses Patient.
-9. Sistem menampilkan kode satu kali atau sesuai kebijakan demo.
-10. Owner masuk ke dashboard dengan Patient Profile pertama aktif dan setup checklist yang tidak memblokir penggunaan.
+9. Upload dokumen bersifat opsional dan hanya dilakukan setelah Patient Profile memiliki ID.
+10. Owner membuat kode akses Patient.
+11. Sistem menampilkan kode satu kali; membuat ulang kode mencabut kode dan session Patient lama untuk profile tersebut.
+12. Owner masuk ke dashboard dengan Patient Profile pertama aktif dan setup checklist yang tidak memblokir penggunaan.
 
 Success: Care Circle, membership Owner, minimum Patient Profile, dan hashed access code tersimpan sesuai transaction boundary. Optional profile details dapat disimpan pada request berikutnya tanpa membuat profile kedua.
 
@@ -57,10 +59,14 @@ Sparse-data rules:
 ## 3. Owner: Mengundang Family Member
 
 1. Owner membuat invite dengan expiry.
-2. Family Member membuka invite dan masuk/mendaftar.
-3. API memvalidasi token, expiry, dan status penggunaan.
-4. Membership dibuat satu kali.
-5. Family Member melihat Care Circle tanpa hak admin Owner.
+2. Sistem hanya menyimpan hash token dan menampilkan raw invitation URL satu kali untuk dibagikan Owner.
+3. Family Member membuka invite dan masuk atau mendaftar melalui halaman undangan tersebut.
+4. Jika email perlu diverifikasi, undangan belum dikonsumsi dan pengguna kembali ke URL yang sama setelah verifikasi.
+5. API memvalidasi token, expiry, revocation, dan status penggunaan.
+6. Membership `FAMILY_MEMBER` dibuat satu kali tanpa menerima role atau `careCircleId` dari client.
+7. Family Member melihat Care Circle tanpa hak admin Owner.
+
+Patient tidak memiliki flow daftar akun. Patient mendapat access code dari caregiver agar identitasnya tetap terikat ke satu Patient Profile yang dipilih caregiver.
 
 Owner dapat menghapus anggota jika fitur P1 dikerjakan. Family Member tidak dapat menghapus Owner atau anggota lain.
 

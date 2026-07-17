@@ -189,4 +189,35 @@ describe("caregiver auth panel", () => {
       screen.queryByText("Provider detail must stay hidden"),
     ).not.toBeInTheDocument();
   });
+
+  it("offers resumable Owner onboarding to a new verified Auth user", async () => {
+    getSession.mockResolvedValue({ data: { session: {} }, error: null });
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      Response.json(
+        {
+          error: {
+            code: "ONBOARDING_REQUIRED",
+            message: "Selesaikan pendaftaran caregiver untuk melanjutkan.",
+            details: {
+              onboardingDefaults: {
+                displayName: "Nadia Santoso",
+                careCircleName: "Keluarga Nadia",
+              },
+            },
+          },
+        },
+        { status: 409 },
+      ),
+    );
+
+    render(<CaregiverAuthPanel />);
+
+    expect(
+      await screen.findByRole("heading", { name: "Selesaikan pendaftaran Owner" }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Nama tampilan")).toHaveValue("Nadia Santoso");
+    expect(screen.getByLabelText("Nama Care Circle")).toHaveValue(
+      "Keluarga Nadia",
+    );
+  });
 });

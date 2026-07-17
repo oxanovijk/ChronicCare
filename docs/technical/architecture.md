@@ -116,6 +116,8 @@ Route Handlers stay thin. They parse input, resolve actor, call a domain service
 Responsibilities:
 
 - Read Supabase caregiver session.
+- Bootstrap a new authenticated Owner into one Care Circle atomically and idempotently.
+- Create hashed, expiring, single-use Family invitations and consume them atomically.
 - Resolve Owner or Family Member membership.
 - Validate Patient access code and Patient session.
 - Authorize `patientProfileId` before data access.
@@ -124,6 +126,8 @@ Responsibilities:
 Forbidden:
 
 - Trusting role, `careCircleId`, or active profile from client state.
+- Allowing Family Member self-registration without an Owner invitation or allowing Patient account registration.
+- Storing raw invitation tokens or exposing them through audit events.
 - Returning different wrong-code messages for existing and non-existing profiles.
 - Sharing caregiver JWT or service-role key with Patient sessions.
 

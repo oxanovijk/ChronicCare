@@ -72,6 +72,11 @@ Cross-profile leakage is a P0 blocker. Do not ship a demo workaround that hides 
 Caregiver:
 
 - Supabase Auth email/password.
+- Owner may self-register; public User, Care Circle, and Owner membership are created server-side in one idempotent transaction after Auth verification.
+- Family Member registration requires an unexpired, unrevoked, unused Owner invitation. Role and Care Circle are derived by the server, never supplied by the browser.
+- Invitation tokens use cryptographically secure randomness, are stored only as SHA-256 hashes, expire after 24 hours by default, and are single-use.
+- Invalid, expired, revoked, and used invitation responses are generic and do not reveal Care Circle membership.
+- A removed caregiver cannot use Owner onboarding to regain access or create a new Care Circle.
 - SSR cookie managed through `@supabase/ssr`.
 - Server resolves application membership on every protected request.
 
@@ -109,6 +114,8 @@ Changing a Patient access code revokes the old code and active Patient sessions.
 - Foreign keys use restrictive delete behavior for sensitive records.
 
 Browser code must not mutate application tables directly.
+
+Supabase Auth stores caregiver email and password identity. Application tables store only the minimum display identity and authorization membership; passwords, raw Auth tokens, and raw invitation tokens are never copied into Prisma-managed tables or audit metadata.
 
 ## 8. Health Document Storage
 

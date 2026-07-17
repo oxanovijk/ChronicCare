@@ -113,6 +113,7 @@ In scope:
 - Maximum two Patient Profiles.
 - Patient Profile may be created with only display name and relationship label; optional data is completed progressively.
 - Caregiver auth and Patient code/session.
+- Owner self-registration and invitation-only Family Member registration; Patient has no account registration.
 - Patient homepage and caregiver dashboard.
 - Check-in, medication/log, reminder, and health note basics.
 - Private document upload.
@@ -329,3 +330,4 @@ Before saying done, fixed, working, passing, ready, implemented, or deployed:
 | 2026-07-16 | Updated project state and command availability after Packet 01 scaffold | Keep guardrail aligned with verified repository state | Ozan | Bernard |
 | 2026-07-16 | Finalized Patient terminology as current implementation truth across guardrails | Step 6/7 consistency pass | Ozan | Bernard |
 | 2026-07-16 | Updated guardrail positioning to chronic illness Patient care; recorded diabetes tipe 2 demo condition, Patient terminology, and deactivation verdict | Human challenge update and scope verdict | Ozan | Bernard |
+| 2026-07-17 | Locked caregiver registration model: Owner self-registers, Family Member joins only by hashed expiring Owner invitation, and Patient remains access-code only | Human registration feature verdict | Ozan | Bernard |

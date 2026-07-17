@@ -1,6 +1,6 @@
 # Packet 07: Patient Homepage and Check-In
 
-Status: Ready
+Status: Done
 
 Driver / DRI: Daniel
 
@@ -49,10 +49,15 @@ Patient sees a warm, cheerful homepage and can submit a simple check-in that bel
 
 - Packet 06 is `Done`; deactivated profiles are excluded from active profile
   reads, Patient auth, and active caregiver selection.
-- Packet 03 already provides the `CheckIn` model and profile relation required
-  for P7; no unresolved schema/provider decision blocks implementation.
+- The locked data model already defined `CheckIn`, but Packet 03 implementation
+  did not include its Prisma model/table. P7's Allowed Files explicitly permit
+  adding it here, so this was an implementation gap rather than a new data-model
+  decision or entry blocker.
 - Packet 05 provides profile-bound Patient login/session helpers and explicit
   wrong-profile denial that P7 must reuse.
+- Packet 05 corrective completion also provides the Owner-only Patient-code
+  producer/UI required to enter that bound login journey without local fixture
+  knowledge; P7 itself remains responsible only for homepage and check-in.
 - Ignored local Patient/caregiver demo inputs and the development database are
   available; Maya and Raka are active, clean, and resettable through seed.
 - P7 must add the locked check-in API/UI and deactivated-profile write denial;
@@ -111,6 +116,29 @@ Patient sees a warm, cheerful homepage and can submit a simple check-in that bel
 | `npm run typecheck` from `/web` | Check-in route/UI types compile. |
 | `npm run lint` from `/web` | Patient homepage and check-in code lint cleanly. |
 | `npm run test:e2e` from `/web` if patient E2E exists | Patient login to check-in happy path passes. |
+
+## Implementation and Role Review Evidence
+
+Evidence captured on 2026-07-17:
+
+- Daniel review: `/patient` now presents the bound profile, inline check-in,
+  progressive optional details, recent-history loading/empty/error/success
+  states, keyboard focus recovery, and usable 390x844 and 1440x900 layouts.
+- Bernard review: migration `20260717064000_packet_07_check_ins` implements the
+  locked fields, submitter and pain constraints, descending profile/time index,
+  active-profile checks, explicit `patientProfileId`, same-origin mutation,
+  bound-Patient/Care Circle authorization, whitelist DTOs, and minimal audit.
+- Al review: copy does not diagnose, prescribe, change dose, interpret labs, or
+  provide diet advice. Explicit urgent phrases produce only a short route to
+  family/caregiver or medical/IGD help and do not claim that SOS was sent.
+- Ozan review: Prisma generate/validate/migrate/status, constraint probes, 101
+  unit tests, lint, typecheck, production build, and 15 E2E tests passed without
+  skip. Maya-to-Raka POST returned a generic 403; synthetic check-in/audit QA
+  records were removed and the remaining fixture count was zero.
+- Human acceptance completed by Ozan on 2026-07-17 after manual QA of the
+  synthetic Patient journey. Fresh closure checks also passed: 17/17 focused
+  check-in tests and the Patient mobile/desktop Playwright journey (1/1).
+- All eight acceptance criteria are satisfied and no P7 blocker remains.
 
 ## Manual QA
 

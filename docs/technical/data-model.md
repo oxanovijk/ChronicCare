@@ -208,7 +208,7 @@ Medication status is a cross-table rule:
 | `created_at` | `timestamptz` | default `now()` |
 | `updated_at` | `timestamptz` | required |
 
-Store Argon2id or bcrypt hash, never raw codes. Only one active code is allowed per Patient Profile through a partial unique index.
+Store Argon2id or bcrypt hash, never raw codes. Only one active code is allowed per Patient Profile through a partial unique index. New raw codes are checked against all active hashes under a serialized issuance transaction so a code resolves to exactly one active profile.
 
 When a Patient Profile is deactivated, all active access codes for that profile are revoked in the same transaction.
 
@@ -506,7 +506,7 @@ Locked enforcement:
 
 - Creating a Care Circle, Owner membership, and first Patient Profile uses one transaction.
 - Creating a minimum Patient Profile initializes fact and BPJS statuses to `UNKNOWN`; optional detail updates occur separately and do not create another profile.
-- Creating or regenerating a Patient access code revokes the previous active code in one transaction.
+- Creating or regenerating a Patient access code revokes the previous active code and active Patient sessions in one transaction.
 - Deactivating a Patient Profile sets status, stores reason metadata, revokes active Patient access codes and sessions, and writes audit in one transaction.
 - Confirming OCR updates extraction and document status atomically.
 - Handling SOS uses conditional update `status = NEW`; a second handler receives conflict instead of overwriting the first.
