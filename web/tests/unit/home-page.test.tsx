@@ -14,6 +14,13 @@ describe("root page", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText(/bukan alat\s+diagnosis/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "ChroniCare membantu Patient dan keluarga menjalani rutinitas perawatan dari satu tempat.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Masukkan kode dari caregiver Anda.")).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/Owner Care Circle|terverifikasi/i);
   });
 
   it("links to the caregiver and patient login shells", () => {

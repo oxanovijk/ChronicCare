@@ -65,7 +65,8 @@ export function OwnerOnboardingForm({
           <h2>Selesaikan pendaftaran Owner</h2>
         </CardTitle>
         <CardDescription>
-          Akun sudah terverifikasi. Buat Care Circle pertama untuk melanjutkan.
+          Email Anda sudah dikonfirmasi. Sekarang beri nama ruang perawatan
+          keluarga Anda.
         </CardDescription>
       </CardHeader>
       <CardContent>

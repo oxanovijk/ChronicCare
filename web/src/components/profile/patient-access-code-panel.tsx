@@ -135,9 +135,9 @@ export function PatientAccessCodePanel({
           <DialogHeader>
             <DialogTitle>Terbitkan kode Patient baru?</DialogTitle>
             <DialogDescription>
-              Kode lama dan seluruh sesi Patient yang masih aktif untuk
-              {` ${patientProfile.displayName}`} akan dicabut. Riwayat perawatan
-              tidak berubah.
+              Kode lama tidak dapat dipakai lagi. {patientProfile.displayName}
+              akan keluar dari perangkat yang masih terhubung. Riwayat
+              perawatan tidak berubah.
             </DialogDescription>
           </DialogHeader>
           {error ? (

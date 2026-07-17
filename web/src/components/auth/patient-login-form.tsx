@@ -83,18 +83,18 @@ export function PatientLoginForm() {
               placeholder="Masukkan kode akses"
             />
           </div>
-          <p id="patient-access-hint" className="field-hint">Gunakan kode yang diberikan oleh Owner Care Circle.</p>
+          <p id="patient-access-hint" className="field-hint">Masukkan kode dari caregiver Anda.</p>
           {error ? <p id="patient-access-error" className="field-error" role="alert">{error}</p> : null}
         </div>
 
         <button type="submit" className="primary-button" disabled={submitting}>
-          <span>{submitting ? "Memeriksa kode…" : "Masuk"}</span>
+          <span>{submitting ? "Memeriksa kode..." : "Masuk"}</span>
           {submitting ? <span className="button-spinner" aria-hidden="true" /> : <ArrowRight size={21} weight="bold" aria-hidden="true" />}
         </button>
 
         <div className="privacy-note">
           <ShieldCheck size={21} weight="bold" aria-hidden="true" />
-          <span><strong>Kode tetap privat.</strong>Kode tidak disimpan di browser atau ditampilkan kembali setelah dikirim.</span>
+          <span><strong>Kode tetap privat.</strong>Kode akan dikosongkan setelah dikirim dan tidak ditampilkan kembali.</span>
         </div>
       </form>
     </section>

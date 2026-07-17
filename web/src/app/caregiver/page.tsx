@@ -31,8 +31,7 @@ export default async function CaregiverPage() {
           <span className="section-kicker"><span />Area Caregiver</span>
           <h1 id="caregiver-title">Konteks perawatan yang jelas, tanpa kebisingan.</h1>
           <p>
-            Masuk sebagai Owner atau Family Member. Sesi, Care Circle, dan
-            peran selalu diverifikasi oleh server.
+            Masuk untuk melihat dan mengatur perawatan anggota keluarga.
           </p>
         </div>
 
@@ -41,10 +40,10 @@ export default async function CaregiverPage() {
           <aside className="caregiver-security-note">
             <LockKey size={24} weight="bold" aria-hidden="true" />
             <div>
-              <strong>Patient Profile tetap terisolasi</strong>
+              <strong>Data setiap Patient tetap terpisah</strong>
               <p>
-                Saat profile aktif diganti, konteks lama dibersihkan sebelum
-                profile baru dimuat. Pilihan di layar bukan authorization.
+                Pilih Patient yang ingin Anda dampingi. Informasi yang tampil
+                akan mengikuti Patient tersebut.
               </p>
             </div>
           </aside>

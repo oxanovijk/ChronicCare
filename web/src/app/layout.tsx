@@ -5,11 +5,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "ChroniCare — Care in Motion",
+    default: "ChroniCare | Care in Motion",
     template: "%s | ChroniCare",
   },
   description:
-    "Koordinasi perawatan jangka panjang untuk pasien chronic illness dan caregiver dalam satu Care Circle.",
+    "ChroniCare membantu Patient dan caregiver menjalani rutinitas perawatan jangka panjang dari satu tempat.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -14,6 +14,13 @@ vi.mock("next/navigation", () => ({
 afterEach(() => vi.restoreAllMocks());
 
 describe("Patient login form", () => {
+  it("explains the access code without internal role terminology", () => {
+    render(<PatientLoginForm />);
+
+    expect(screen.getByText("Masukkan kode dari caregiver Anda.")).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/Owner Care Circle/i);
+  });
+
   it.each([
     [401, "Kode tidak valid atau sudah tidak berlaku."],
     [500, "Proses masuk belum dapat diselesaikan. Coba lagi."],

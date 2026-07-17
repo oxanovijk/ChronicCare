@@ -84,20 +84,20 @@ describe("caregiver profile switching", () => {
     const user = userEvent.setup();
     render(<CaregiverProfilePanel role="OWNER" />);
     expect(
-      await screen.findByText("Belum ada Patient Profile pada Care Circle ini."),
+      await screen.findByText("Belum ada Patient yang ditambahkan."),
     ).toBeInTheDocument();
 
     await user.type(screen.getByLabelText("Nama tampilan"), "Profil QA");
     await user.type(screen.getByLabelText("Label hubungan"), "QA");
     await user.click(
-      screen.getByRole("button", { name: "Buat profil minimum" }),
+      screen.getByRole("button", { name: "Tambahkan Patient" }),
     );
 
     expect(
-      await screen.findByText("Patient Profile belum dapat dibuat"),
+      await screen.findByText("Patient belum dapat ditambahkan"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("Patient Profile belum dapat dimuat"),
+      screen.queryByText("Data Patient belum dapat dimuat"),
     ).not.toBeInTheDocument();
   });
 });

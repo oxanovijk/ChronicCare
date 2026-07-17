@@ -14,7 +14,7 @@ describe("connected Caregiver flow", () => {
     render(<PatientContextControl />);
     expect(screen.getByText(/kabar terbaru maya/i)).toBeVisible();
     await user.selectOptions(screen.getByLabelText(/patient profile aktif/i), "raka");
-    expect(screen.getByText(/menyiapkan konteks raka/i)).toBeVisible();
+    expect(screen.getByText(/data raka belum tersedia/i)).toBeVisible();
     expect(screen.queryByText(/kabar terbaru maya/i)).not.toBeInTheDocument();
   });
 
@@ -24,7 +24,11 @@ describe("connected Caregiver flow", () => {
     const input = screen.getByLabelText(/pilih dokumen sintetis/i);
     await user.upload(input, new File(["unsafe"], "notes.txt", { type: "text/plain" }));
     expect(screen.getByRole("alert")).toHaveTextContent(/pdf, jpg, atau png/i);
-    expect(screen.getByText(/jumlah halaman pdf diperiksa kembali di server/i)).toBeVisible();
+    expect(
+      screen.getByText(
+        /jenis file, ukuran, dan jumlah halaman akan diperiksa kembali sebelum dokumen diproses/i,
+      ),
+    ).toBeVisible();
   });
 
   test("keeps OCR in review until caregiver confirms", async () => {
@@ -58,7 +62,7 @@ describe("connected Caregiver flow", () => {
   test("filters static facilities and discloses contact details", async () => {
     const user = userEvent.setup();
     render(<FacilityHelper />);
-    expect(screen.getByText(/data statis tangerang/i)).toBeVisible();
+    expect(screen.getByText(/data contoh untuk wilayah Tangerang/i)).toBeVisible();
     await user.selectOptions(screen.getByLabelText(/wilayah/i), "cipondoh");
     expect(screen.getByText("Puskesmas Cipondoh")).toBeVisible();
     await user.click(screen.getByRole("button", { name: /lihat kontak puskesmas cipondoh/i }));

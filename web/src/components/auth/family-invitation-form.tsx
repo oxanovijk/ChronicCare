@@ -201,7 +201,8 @@ export function FamilyInvitationForm({ token }: { token: string }) {
       <CardHeader>
         <CardTitle>Gabung ke {preview?.careCircleName}</CardTitle>
         <CardDescription>
-          Akses Family Member ditetapkan oleh server setelah undangan diterima.
+          Setelah bergabung, Anda dapat membantu mengelola perawatan di Care
+          Circle ini.
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -27,7 +27,10 @@ describe("Owner Patient access-code controls", () => {
       screen.getByRole("button", { name: "Buat atau ganti kode Patient" }),
     );
     expect(
-      screen.getByText(/kode lama dan seluruh sesi Patient yang masih aktif/i),
+      screen.getByText(/kode lama tidak dapat dipakai lagi/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Maya Pratama.*akan keluar dari perangkat yang masih terhubung/i),
     ).toBeInTheDocument();
     await user.click(
       screen.getByRole("button", { name: "Terbitkan kode baru" }),

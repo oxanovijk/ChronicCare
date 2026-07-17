@@ -433,7 +433,7 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
                     <span>
                       <span className="block font-medium">Saya perlu bantuan keluarga</span>
                       <span className="text-muted-foreground">
-                        Catatan ini akan terlihat oleh caregiver yang berwenang.
+                        Catatan ini akan terlihat oleh caregiver Anda.
                       </span>
                     </span>
                   </label>

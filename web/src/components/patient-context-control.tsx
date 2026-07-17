@@ -8,11 +8,11 @@ export function PatientContextControl() {
   return (
     <>
       <section className="patient-context-bar">
-        <div><span className="section-kicker"><span aria-hidden="true" /> Patient context</span><h1>{profile === "maya" ? "Maya Pratama" : "Raka Pratama"}</h1><p>{profile === "maya" ? "Demo kondisi · Diabetes tipe 2" : "Profil sintetis kedua · Tidak aktif dalam demo"}</p></div>
+        <div><span className="section-kicker"><span aria-hidden="true" /> Patient yang dipilih</span><h1>{profile === "maya" ? "Maya Pratama" : "Raka Pratama"}</h1><p>{profile === "maya" ? "Data contoh · Diabetes tipe 2" : "Data contoh belum tersedia"}</p></div>
         <label>Patient Profile aktif<select aria-label="Patient Profile aktif" value={profile} onChange={(event) => setProfile(event.target.value)}><option value="maya">Maya Pratama</option><option value="raka">Raka Pratama</option></select></label>
       </section>
       {profile === "raka" ? (
-        <section className="empty-context" aria-live="polite"><span className="skeleton-orbit" aria-hidden="true" /><h2>Menyiapkan konteks Raka.</h2><p>Konten Maya telah dibersihkan. Pilih Maya kembali untuk melanjutkan connected demo flow.</p></section>
+        <section className="empty-context" aria-live="polite"><span className="skeleton-orbit" aria-hidden="true" /><h2>Data Raka belum tersedia.</h2><p>Pilih Maya untuk kembali melihat contoh alur perawatan.</p></section>
       ) : (
         <div className="dashboard-grid">
           <section className="care-summary"><span className="card-index">01 · Hari ini</span><h2>Kabar terbaru Maya</h2><div className="support-signal"><strong>Butuh dukungan</strong><span>17 Juli · 08.42</span></div><p>“Saya ingin ditemani bicara.”</p><small>Status ini bukan klasifikasi keadaan darurat.</small></section>

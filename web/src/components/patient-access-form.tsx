@@ -88,7 +88,7 @@ export function PatientAccessForm() {
         <ShieldCheck size={20} weight="fill" aria-hidden="true" />
         <span>
           <strong>Privasi Anda tetap dijaga.</strong>
-          Eksperimen ini hanya memakai data sintetis.
+          Halaman contoh ini hanya menggunakan data sintetis.
         </span>
       </div>
     </form>

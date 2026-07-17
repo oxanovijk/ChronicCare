@@ -33,7 +33,7 @@ export function DocumentUploadForm() {
         <input id="document-file" className="sr-only" type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={choose} />
         {error ? <p className="form-error" role="alert">{error}</p> : null}
       </div>
-      <aside className="upload-rules"><h3>Sebelum upload</h3><ul><li>Gunakan data sintetis saja.</li><li>File disiapkan sebagai dokumen privat.</li><li>OCR dimulai terpisah setelah upload berhasil.</li></ul><p>Jumlah halaman PDF diperiksa kembali di server karena validasi browser saja tidak cukup.</p></aside>
+      <aside className="upload-rules"><h3>Sebelum upload</h3><ul><li>Gunakan data sintetis saja.</li><li>File disiapkan sebagai dokumen privat.</li><li>OCR dimulai terpisah setelah upload berhasil.</li></ul><p>Jenis file, ukuran, dan jumlah halaman akan diperiksa kembali sebelum dokumen diproses.</p></aside>
       {file ? <div className="upload-progress" aria-live="polite"><div><strong>{file.name}</strong><span>{progress < 100 ? `Mengunggah · ${progress}%` : "Upload selesai · Siap mulai OCR"}</span></div><progress max="100" value={progress}>{progress}%</progress>{progress < 100 ? <button type="button" onClick={() => { setFile(null); setProgress(0); }}>Batalkan upload</button> : <a className="primary-button" href="/prototype/caregiver/documents/review">Mulai OCR demo</a>}</div> : null}
     </section>
   );

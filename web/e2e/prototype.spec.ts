@@ -119,7 +119,11 @@ test("Care in Motion connects Screen 03–10 with honest mock states", async ({
 
   await page.goto("/prototype/caregiver/documents/upload");
   await expect(page.getByRole("heading", { name: /upload dokumen kesehatan/i })).toBeVisible();
-  await expect(page.getByText(/jumlah halaman pdf diperiksa kembali di server/i)).toBeVisible();
+  await expect(
+    page.getByText(
+      /jenis file, ukuran, dan jumlah halaman akan diperiksa kembali sebelum dokumen diproses/i,
+    ),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
   await page.screenshot({ path: "test-results/screen-05-document-upload-1440x900.png", fullPage: true, caret: "initial" });
 
@@ -145,7 +149,7 @@ test("Care in Motion connects Screen 03–10 with honest mock states", async ({
   await page.screenshot({ path: "test-results/screen-09-caregiver-sos-1440x900.png", fullPage: true, caret: "initial" });
 
   await page.goto("/prototype/caregiver/facilities");
-  await expect(page.getByText(/data statis tangerang/i)).toBeVisible();
+  await expect(page.getByText(/data contoh untuk wilayah Tangerang/i)).toBeVisible();
   await page.getByLabel("Wilayah").selectOption("cipondoh");
   await expect(page.getByRole("heading", { name: "Puskesmas Cipondoh" })).toBeVisible();
   await expectNoHorizontalOverflow(page);

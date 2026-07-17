@@ -40,15 +40,16 @@ describe("caregiver page", () => {
     ).toBeInTheDocument();
   });
 
-  it("states that caregiver authentication is active", async () => {
+  it("explains the caregiver area without implementation language", async () => {
     render(await CaregiverPage());
 
     expect(
-      screen.getByText(/peran selalu diverifikasi oleh server/i),
+      screen.getByText(/masuk untuk melihat dan mengatur perawatan/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Patient Profile tetap terisolasi/),
+      screen.getByText("Data setiap Patient tetap terpisah"),
     ).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/server|authorization|konteks lama/i);
     expect(
       screen.queryByText(/Login caregiver.*belum tersedia/),
     ).not.toBeInTheDocument();

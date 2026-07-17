@@ -23,8 +23,8 @@ export default function PatientLoginShellPage() {
           <span className="section-kicker"><span />Akses Patient</span>
           <h1 id="patient-access-title">Selamat datang. <span>Mari mulai dengan aman.</span></h1>
           <p>
-            Kode akses menghubungkan sesi ini hanya ke Patient Profile milikmu
-            di dalam Care Circle. Patient tidak perlu membuat akun.
+            Masukkan kode dari caregiver untuk membuka ruang perawatanmu.
+            Kamu tidak perlu membuat akun.
           </p>
         </section>
         <PatientLoginForm />

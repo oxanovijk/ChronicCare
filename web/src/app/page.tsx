@@ -18,8 +18,8 @@ export default function Home() {
           <span className="section-kicker"><span />Ruang perawatan bersama</span>
           <h1 id="gateway-title">Satu langkah tenang untuk mulai merawat.</h1>
           <p>
-            ChroniCare membantu Patient dan caregiver mengakses Care Circle
-            mereka melalui jalur yang aman dan terpisah.
+            ChroniCare membantu Patient dan keluarga menjalani rutinitas
+            perawatan dari satu tempat.
           </p>
         </div>
 
@@ -29,7 +29,7 @@ export default function Home() {
             <div>
               <span className="role-choice-label">Untuk Patient</span>
               <h2>Masuk dengan kode akses</h2>
-              <p>Gunakan kode privat yang diberikan oleh Owner Care Circle.</p>
+              <p>Masukkan kode dari caregiver Anda.</p>
             </div>
             <Link href="/patient/login" className="role-choice-action">
               Buka halaman masuk Patient <ArrowRight size={20} weight="bold" aria-hidden="true" />
@@ -40,8 +40,8 @@ export default function Home() {
             <span className="role-choice-icon" aria-hidden="true"><UsersThree size={28} weight="bold" /></span>
             <div>
               <span className="role-choice-label">Untuk Caregiver</span>
-              <h2>Kelola Patient Profile</h2>
-              <p>Masuk sebagai Owner atau Family Member yang telah terverifikasi.</p>
+              <h2>Dampingi Patient</h2>
+              <p>Masuk untuk melihat dan mengatur kebutuhan perawatannya.</p>
             </div>
             <Link href="/caregiver" className="role-choice-action role-choice-action-secondary">
               Buka area caregiver <ArrowRight size={20} weight="bold" aria-hidden="true" />

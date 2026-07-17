@@ -106,7 +106,8 @@ export function CaregiverRegistrationForm() {
         <MailCheck aria-hidden="true" />
         <AlertTitle>Periksa email Anda</AlertTitle>
         <AlertDescription>
-          Buka tautan verifikasi, lalu masuk untuk menyelesaikan Care Circle.
+          Kami mengirim tautan konfirmasi ke email Anda. Setelah dikonfirmasi,
+          kembali dan masuk untuk melanjutkan.
         </AlertDescription>
       </Alert>
     );
@@ -117,7 +118,8 @@ export function CaregiverRegistrationForm() {
       <CardHeader>
         <CardTitle>Buat akun Owner</CardTitle>
         <CardDescription>
-          Owner membuat Care Circle baru. Family Member bergabung lewat undangan.
+          Daftar sebagai Owner untuk membuat ruang perawatan. Family Member
+          dapat bergabung melalui undangan.
         </CardDescription>
       </CardHeader>
       <CardContent>

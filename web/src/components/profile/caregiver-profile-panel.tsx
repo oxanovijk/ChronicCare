@@ -149,7 +149,9 @@ function DeactivateProfileDialog({
           <DialogTitle>Akhiri perawatan profil</DialogTitle>
           <DialogDescription>
             {profile.displayName} akan dikeluarkan dari alur perawatan aktif.
-            Riwayat tetap tersimpan, sedangkan kode dan sesi Patient dicabut.
+            Riwayat perawatan tetap tersimpan. Kode akses lama tidak dapat
+            digunakan lagi, dan Patient akan keluar dari perangkat yang masih
+            terhubung.
             Ini bukan pembatalan langganan atau pembayaran.
           </DialogDescription>
         </DialogHeader>
@@ -345,7 +347,7 @@ function ProfileEditor({
           </AlertTitle>
           <AlertDescription>
             {notice === "saved"
-              ? "Perubahan hanya diterapkan pada Patient Profile aktif."
+              ? `Perubahan ini hanya berlaku untuk ${profile.displayName}.`
               : "Periksa status dan nilai yang dipilih, lalu coba lagi."}
           </AlertDescription>
         </Alert>
@@ -508,7 +510,7 @@ export function CaregiverProfilePanel({
   const [createNotice, setCreateNotice] = useState<
     "created" | "error" | null
   >(null);
-  const [lifecycleNotice, setLifecycleNotice] = useState(false);
+  const [lifecycleNotice, setLifecycleNotice] = useState<string | null>(null);
   const lifecycleNoticeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -574,12 +576,15 @@ export function CaregiverProfilePanel({
   }
 
   function removeDeactivatedProfile(patientProfileId: string) {
+    const deactivatedProfile = profiles?.find(
+      (item) => item.id === patientProfileId,
+    );
     const remaining =
       profiles?.filter((item) => item.id !== patientProfileId) ?? [];
     setProfiles(remaining);
     setProfile(null);
     setSelectedId(remaining[0]?.id ?? null);
-    setLifecycleNotice(true);
+    setLifecycleNotice(deactivatedProfile?.displayName ?? "Patient");
   }
 
   async function createProfile(event: FormEvent<HTMLFormElement>) {
@@ -611,7 +616,7 @@ export function CaregiverProfilePanel({
     return (
       <div className="care-profile-loading flex min-h-24 items-center gap-2 text-sm text-muted-foreground">
         <SpinnerGap className="size-4 animate-spin" aria-hidden="true" />
-        Memuat Patient Profile.
+        Memuat data Patient.
       </div>
     );
   }
@@ -620,7 +625,7 @@ export function CaregiverProfilePanel({
     <div className="care-profile-workspace space-y-5">
       {error ? (
         <Alert variant="destructive">
-          <AlertTitle>Patient Profile belum dapat dimuat</AlertTitle>
+          <AlertTitle>Data Patient belum dapat dimuat</AlertTitle>
           <AlertDescription>Muat ulang halaman untuk mencoba lagi.</AlertDescription>
         </Alert>
       ) : null}
@@ -631,12 +636,12 @@ export function CaregiverProfilePanel({
         >
           <AlertTitle>
             {createNotice === "created"
-              ? "Patient Profile berhasil dibuat"
-              : "Patient Profile belum dapat dibuat"}
+              ? "Patient berhasil ditambahkan"
+              : "Patient belum dapat ditambahkan"}
           </AlertTitle>
           <AlertDescription>
             {createNotice === "created"
-              ? "Data opsional tetap Belum diketahui dan dapat diisi nanti."
+              ? "Informasi lain dapat dilengkapi nanti."
               : "Periksa nama dan label hubungan, lalu coba lagi."}
           </AlertDescription>
         </Alert>
@@ -648,10 +653,12 @@ export function CaregiverProfilePanel({
           tabIndex={-1}
           aria-live="polite"
         >
-          <AlertTitle>Patient Profile dinonaktifkan</AlertTitle>
+          <AlertTitle>
+            Perawatan untuk {lifecycleNotice} telah diakhiri
+          </AlertTitle>
           <AlertDescription>
-            Profil sudah keluar dari alur aktif. Riwayat tetap tersimpan dan
-            akses Patient telah dicabut.
+            Riwayat perawatan tetap tersimpan. Kode akses lama tidak dapat
+            digunakan lagi.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -674,7 +681,7 @@ export function CaregiverProfilePanel({
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">
-          Belum ada Patient Profile pada Care Circle ini.
+          Belum ada Patient yang ditambahkan.
         </p>
       )}
 
@@ -721,10 +728,10 @@ export function CaregiverProfilePanel({
         <>
           <Separator />
           <form className="care-create-profile space-y-3" onSubmit={createProfile}>
-            <h3 className="font-medium">Tambah Patient Profile</h3>
+            <h3 className="font-medium">Tambah Patient</h3>
             <p className="text-sm text-muted-foreground">
-              Nama dan label hubungan cukup untuk membuat profil. Data opsional
-              dapat diisi nanti tanpa menebak.
+              Isi nama dan hubungan Anda dengan Patient. Informasi lainnya
+              dapat dilengkapi nanti.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
@@ -752,7 +759,7 @@ export function CaregiverProfilePanel({
               ) : (
                 <Plus aria-hidden="true" />
               )}
-              Buat profil minimum
+              Tambahkan Patient
             </Button>
           </form>
         </>
@@ -760,7 +767,7 @@ export function CaregiverProfilePanel({
 
       {role === "OWNER" && profiles?.length === 2 ? (
         <p className="text-sm text-muted-foreground">
-          Batas dua Patient Profile untuk MVP sudah terpakai.
+          Anda sudah mencapai batas Patient untuk Care Circle ini.
         </p>
       ) : null}
     </div>

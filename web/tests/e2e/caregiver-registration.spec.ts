@@ -105,7 +105,7 @@ test("Owner onboarding, Family invitation, and single-use enforcement work live"
         response.url().endsWith("/api/v1/patient-profiles") &&
         response.request().method() === "POST",
     );
-    await page.getByRole("button", { name: "Buat profil minimum" }).click();
+    await page.getByRole("button", { name: "Tambahkan Patient" }).click();
     const createProfileResponse = await createProfileResponsePromise;
     expect(createProfileResponse.status()).toBe(201);
     const createdProfile = await createProfileResponse.json();

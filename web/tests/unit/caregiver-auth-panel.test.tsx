@@ -30,6 +30,18 @@ describe("caregiver auth panel", () => {
     });
   });
 
+  it("uses user-facing copy while preparing the account", () => {
+    getSession.mockReturnValue(new Promise(() => {}));
+
+    render(<CaregiverAuthPanel />);
+
+    expect(screen.getByText("Menyiapkan akun Anda")).toBeInTheDocument();
+    expect(
+      screen.getByText("Sebentar, kami sedang membuka ruang perawatan Anda."),
+    ).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/sesi|server/i);
+  });
+
   it("shows an accessible email/password form when signed out", async () => {
     const fetch = vi.spyOn(globalThis, "fetch");
 
@@ -87,6 +99,11 @@ describe("caregiver auth panel", () => {
 
     expect(await screen.findByText("Dimas Pratama")).toBeInTheDocument();
     expect(screen.getByText("Owner")).toBeInTheDocument();
+    expect(screen.getByText("Akun siap digunakan")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Pilih Patient untuk melihat dan memperbarui informasi perawatannya/i),
+    ).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/diverifikasi oleh server/i);
     expect(screen.queryByText("Family Member")).not.toBeInTheDocument();
     expect(fetch).toHaveBeenCalledWith(
       "/api/v1/auth/me",

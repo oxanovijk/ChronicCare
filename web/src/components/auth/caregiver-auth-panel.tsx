@@ -167,9 +167,9 @@ export function CaregiverAuthPanel() {
     return (
       <Card className="care-auth-card care-auth-checking" aria-live="polite">
         <CardHeader>
-          <CardTitle>Memeriksa sesi caregiver</CardTitle>
+          <CardTitle>Menyiapkan akun Anda</CardTitle>
           <CardDescription>
-            ChroniCare sedang memverifikasi sesi melalui server.
+            Sebentar, kami sedang membuka ruang perawatan Anda.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex min-h-20 items-center gap-2 text-sm text-muted-foreground">
@@ -191,7 +191,7 @@ export function CaregiverAuthPanel() {
             <div className="space-y-1">
               <CardTitle>{state.context.user.displayName}</CardTitle>
               <CardDescription>
-                Identitas dan peran telah diverifikasi oleh server.
+                Anda masuk sebagai {roleLabel}.
               </CardDescription>
             </div>
             <Badge variant="secondary">{roleLabel}</Badge>
@@ -210,10 +210,10 @@ export function CaregiverAuthPanel() {
           ) : null}
           <Alert>
             <ShieldCheck aria-hidden="true" />
-            <AlertTitle>Sesi caregiver aktif</AlertTitle>
+            <AlertTitle>Akun siap digunakan</AlertTitle>
             <AlertDescription>
-              Patient Profile hanya dimuat setelah server memverifikasi Care
-              Circle dan peran akun ini.
+              Pilih Patient untuk melihat dan memperbarui informasi
+              perawatannya.
             </AlertDescription>
           </Alert>
           <CaregiverProfilePanel role={state.context.membership.role} />
@@ -258,15 +258,15 @@ export function CaregiverAuthPanel() {
       <CardContent>
         {state.status === "denied" ? (
           <Alert variant="destructive" className="mb-4">
-            <AlertTitle>Akses Care Circle tidak tersedia</AlertTitle>
+            <AlertTitle>Akun belum terhubung ke Care Circle</AlertTitle>
             <AlertDescription>
-              Akun ini belum memiliki membership caregiver aktif.
+              Mintalah Owner mengundang akun ini, lalu coba masuk kembali.
             </AlertDescription>
           </Alert>
         ) : null}
         {state.status === "error" ? (
           <Alert variant="destructive" className="mb-4">
-            <AlertTitle>Sesi belum dapat diperiksa</AlertTitle>
+            <AlertTitle>Kami belum bisa membuka akun Anda</AlertTitle>
             <AlertDescription>
               Coba muat ulang halaman atau masuk kembali.
             </AlertDescription>

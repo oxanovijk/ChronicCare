@@ -65,7 +65,10 @@ describe("caregiver Patient Profile lifecycle UI", () => {
       screen.getByRole("button", { name: "Nonaktifkan profil" }),
     );
     expect(
-      screen.getByText(/Riwayat tetap tersimpan, sedangkan kode dan sesi/),
+      screen.getByText(/Kode akses lama tidak dapat digunakan lagi/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Patient akan keluar dari perangkat yang masih terhubung/),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/bukan pembatalan langganan atau pembayaran/),
@@ -80,7 +83,7 @@ describe("caregiver Patient Profile lifecycle UI", () => {
     );
 
     expect(
-      await screen.findByText("Patient Profile dinonaktifkan"),
+      await screen.findByText("Perawatan untuk Maya Pratama telah diakhiri"),
     ).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveFocus();
     expect(
