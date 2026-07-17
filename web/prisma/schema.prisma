@@ -114,6 +114,39 @@ enum ReminderStatus {
   @@map("reminder_status")
 }
 
+enum DocumentCategory {
+  BPJS_CARD
+  REFERRAL_LETTER
+  PRESCRIPTION
+  LAB_RESULT
+  MEDICAL_RESUME
+  CONTROL_CARD
+  OTHER
+
+  @@map("document_category")
+}
+
+enum DocumentStatus {
+  UPLOADING
+  UPLOADED
+  PROCESSING
+  REVIEW_REQUIRED
+  CONFIRMED
+  REJECTED
+  FAILED
+
+  @@map("document_status")
+}
+
+enum ExtractionStatus {
+  PENDING_REVIEW
+  CONFIRMED
+  REJECTED
+  FAILED
+
+  @@map("extraction_status")
+}
+
 model User {
   id                         String                 @id @db.Uuid
   displayName                String                 @map("display_name") @db.VarChar(120)
@@ -137,6 +170,8 @@ model User {
   createdReminders           Reminder[]             @relation("ReminderCreatedBy")
   createdHealthNotes         HealthNote[]           @relation("HealthNoteCreatedBy")
   updatedHealthNotes         HealthNote[]           @relation("HealthNoteUpdatedBy")
+  uploadedHealthDocuments    HealthDocument[]       @relation("HealthDocumentUploadedBy")
+  reviewedExtractions        DocumentExtraction[]   @relation("DocumentExtractionReviewedBy")
   auditEvents                AuditEvent[]           @relation("AuditActorUser")
 
   @@map("users")
@@ -230,10 +265,12 @@ model PatientProfile {
   accessCodes              PatientAccessCode[]
   sessions                 PatientSession[]
   checkIns                 CheckIn[]
-  medications             Medication[]
-  medicationLogs          MedicationLog[]
-  reminders               Reminder[]
-  healthNotes             HealthNote[]
+  medications              Medication[]
+  medicationLogs           MedicationLog[]
+  reminders                Reminder[]
+  healthNotes              HealthNote[]
+  healthDocuments          HealthDocument[]
+  documentExtractions      DocumentExtraction[]
   auditEvents              AuditEvent[]               @relation("AuditTargetPatientProfile")
   actorAuditEvents         AuditEvent[]               @relation("AuditActorPatientProfile")
 
@@ -371,6 +408,61 @@ model HealthNote {
 
   @@index([patientProfileId, createdAt(sort: Desc)])
   @@map("health_notes")
+}
+
+model HealthDocument {
+  id                    String               @id @default(uuid()) @db.Uuid
+  patientProfileId      String               @map("patient_profile_id") @db.Uuid
+  category              DocumentCategory
+  title                 String               @db.VarChar(180)
+  bucketName            String               @default("health-documents") @map("bucket_name") @db.VarChar(80)
+  storagePath           String               @unique @map("storage_path") @db.Text
+  originalFileName      String               @map("original_file_name") @db.VarChar(255)
+  mimeType              String               @map("mime_type") @db.VarChar(80)
+  fileSizeBytes         Int                  @map("file_size_bytes")
+  pageCount             Int?                 @map("page_count") @db.SmallInt
+  sha256                String               @db.Char(64)
+  status                DocumentStatus
+  uploadedByUserId      String               @map("uploaded_by_user_id") @db.Uuid
+  confirmedExtractionId String?              @unique @map("confirmed_extraction_id") @db.Uuid
+  createdAt             DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime             @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt             DateTime?            @map("deleted_at") @db.Timestamptz(6)
+  patientProfile        PatientProfile       @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
+  uploadedBy            User                 @relation("HealthDocumentUploadedBy", fields: [uploadedByUserId], references: [id], onDelete: Restrict)
+  confirmedExtraction   DocumentExtraction?  @relation("HealthDocumentConfirmedExtraction", fields: [confirmedExtractionId], references: [id], onDelete: Restrict)
+  extractions           DocumentExtraction[] @relation("DocumentExtractionDocument")
+
+  @@index([patientProfileId, status])
+  @@map("health_documents")
+}
+
+model DocumentExtraction {
+  id                   String           @id @default(uuid()) @db.Uuid
+  patientProfileId     String           @map("patient_profile_id") @db.Uuid
+  healthDocumentId     String           @map("health_document_id") @db.Uuid
+  ocrProvider          String           @map("ocr_provider") @db.VarChar(80)
+  ocrModel             String           @map("ocr_model") @db.VarChar(80)
+  extractorProvider    String           @map("extractor_provider") @db.VarChar(80)
+  extractorModel       String           @map("extractor_model") @db.VarChar(120)
+  schemaVersion        String           @default("document-extraction.v1") @map("schema_version") @db.VarChar(24)
+  rawText              String           @map("raw_text") @db.Text
+  structuredData       Json             @map("structured_data") @db.JsonB
+  confidence           Decimal?         @db.Decimal(5, 4)
+  status               ExtractionStatus
+  failureCode          String?          @map("failure_code") @db.VarChar(80)
+  reviewedByUserId     String?          @map("reviewed_by_user_id") @db.Uuid
+  reviewedAt           DateTime?        @map("reviewed_at") @db.Timestamptz(6)
+  createdAt            DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  patientProfile       PatientProfile   @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
+  healthDocument       HealthDocument   @relation("DocumentExtractionDocument", fields: [healthDocumentId], references: [id], onDelete: Restrict)
+  reviewedBy           User?            @relation("DocumentExtractionReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: Restrict)
+  confirmedForDocument HealthDocument?  @relation("HealthDocumentConfirmedExtraction")
+
+  @@index([healthDocumentId, createdAt(sort: Desc)])
+  @@index([patientProfileId, status])
+  @@map("document_extractions")
 }
 
 model AuditEvent {
