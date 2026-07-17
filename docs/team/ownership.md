@@ -91,15 +91,23 @@ Format change log:
 
 ## 7. Status Saat Ini
 
-- Repo masih documentation-first dan belum memiliki scaffold aplikasi.
+- Packet 01 scaffold, shell route, npm scripts, dan test harness sudah tersedia di `/web`.
 - Stack, provider, model data, kontrak API, OCR flow, serta SOS web sudah dikunci dalam dokumen teknis.
-- Status packet tetap `Draft` sampai file aplikasi, command, credential demo, dan dependency packet benar-benar tersedia.
-- QA checklist tetap `Not Run` sampai ada implementasi yang diuji.
+- Ozan sudah mengunci keputusan produk progressive Patient Profile onboarding; Bernard, Daniel, dan Al sudah menyetujui schema/API, UX, seed/privacy, dan AI context yang diperlukan untuk memulai Packet 03.
+- Packet 03 berstatus `Done`: implementasi commit `9c5daf3`, migration/seed, seluruh acceptance criteria, review Daniel/Al, dan QA Ozan sudah lulus.
+- Packet 04 berstatus `Done`: caregiver login UI, verified server auth context, active membership resolution, Owner guard, generic error handling, role-spoof denial, privacy scan, responsive manual QA, 45 unit tests, dan 7 E2E sudah lulus review Daniel, Al, dan Ozan.
+- Packet 05 berstatus `Done`: minimum profile API/UI, Patient code login, profile-bound session, progressive setup state, bidirectional Maya/Raka isolation, responsive QA, DTO privacy review, 72 unit tests, dan 14 E2E tanpa skip sudah lulus review Daniel, Al, dan Ozan.
+- Packet 06 berstatus `Done`: Owner-only non-destructive deactivation, atomic code/session revocation, active-list exclusion, careful responsive dialog, audit minimization, deterministic seed reset, 84 unit tests, dan 14 E2E tanpa skip sudah lulus review Daniel, Al, dan Ozan.
+- Packet 07 berstatus `Ready`: CheckIn schema, profile-bound Patient session, lifecycle exclusion, ignored local env, development database, dan clean resettable Maya/Raka tersedia; check-in API/UI tetap scope implementasi Packet 07.
+- Status setiap packet tetap diputuskan Ozan berdasarkan acceptance criteria dan bukti QA; keberadaan scaffold tidak otomatis menyelesaikan packet fitur berikutnya.
+- Packet 13 demo-readiness checklist tetap `Not Run` sampai seluruh flow MVP selesai dan diuji.
 
 ## 8. Change Log
 
 | Tanggal | Dokumen | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|---|
+| 2026-07-16 | `docs/team/ownership.md` | Mencatat progressive Patient Profile contract sebagai keputusan lintas product, data, UX, dan AI | Menjaga review Bernard, Daniel, Al, dan QA Ozan eksplisit saat Packet 03/05/08/11 berjalan | Ozan | Bernard, Daniel, Al |
+| 2026-07-16 | `docs/team/ownership.md` | Memperbarui status repo setelah scaffold Packet 01 tersedia | Menyelaraskan ownership guardrail dengan kondisi implementasi aktual | Ozan | Bernard |
 | 2026-07-16 | `docs/team/ownership.md` | Memecah ownership packet dari 9 menjadi 13 packet dan memakai hybrid role ownership per bidang | Menyesuaikan execution packet agar setiap packet layak dikerjakan dalam satu prompt implementasi | Ozan | Bernard |
 | 2026-07-16 | `docs/team/ownership.md` | Memecah ownership packet dari 7 menjadi 9 packet | Menyesuaikan execution packet agar OCR, daily care, SOS, dan QA lebih implementable dalam satu sesi | Ozan | Bernard |
 | 2026-07-16 | `docs/team/ownership.md` | Mengubah packet ownership ke Patient terminology | Menyelaraskan execution docs dengan chronic illness Patient positioning | Ozan | Bernard |

@@ -155,11 +155,12 @@ Exit target:
 
 ### Hours 5 to 7: Packet 03 - Data Schema, Prisma, and Seed Base
 
-Implement minimum identity/profile schema, audit foundation, and synthetic Owner/Family/Patient Profile seed base.
+Implement minimum identity/profile schema, explicit progressive fact states, audit foundation, and synthetic Owner/Family/Patient Profile seed base.
 
 Exit target:
 
 - Prisma generation works.
+- Minimum profile defaults optional facts to `UNKNOWN`, and contradictory states are rejected.
 - Synthetic Owner, Family Member, Maya, and Raka fixtures exist.
 - No real data or credential is committed.
 
@@ -175,11 +176,12 @@ Exit target:
 
 ### Hours 9 to 10.5: Packet 05 - Patient Access Code and Profile Isolation
 
-Implement Patient code login/session, caregiver active Patient Profile switching, and Maya/Raka isolation.
+Implement minimum profile create/update API, Patient code login/session, caregiver active Patient Profile switching, and Maya/Raka isolation.
 
 Exit target:
 
 - Patient code opens exactly one bound Patient Profile.
+- Owner can create a minimum profile and leave optional facts unknown without blocking use.
 - Caregiver profile switch clears stale state.
 - Wrong role/profile access is denied.
 
@@ -205,11 +207,12 @@ Exit target:
 
 ### Hours 14 to 16: Packet 08 - Caregiver Dashboard, Medication, and Reminder
 
-Build caregiver dashboard summary, medication/reminder basics, active profile state, and daily-care update surfaces.
+Build caregiver dashboard summary, derived setup checklist, medication/reminder basics, active profile state, and daily-care update surfaces.
 
 Exit target:
 
 - Caregiver sees latest check-in, medication text, reminder state, and empty states for active profile.
+- Dashboard distinguishes unknown, none reported, and recorded fact states.
 - Maya/Raka switching has no stale data.
 - Dashboard hosts entry points for document, chatbot, SOS, and faskes packets.
 
@@ -355,5 +358,6 @@ Do not rescue scope by adding food/menu recommendation, real subscription, push 
 
 | Date | Change | Reason | DRI | Reviewer |
 | --- | --- | --- | --- | --- |
+| 2026-07-16 | Added progressive Patient Profile work across schema, profile API, dashboard, and chatbot packets | Preserve unknown data honestly through the implementation sequence | Ozan | Bernard |
 | 2026-07-16 | Refined execution workflow from 9 broad packets to 13 one-prompt-sized execution packets | Align packet scope with human request for single-prompt implementability while preserving 30-hour delivery | Ozan | Bernard |
 | 2026-07-16 | Refined execution flow for chronic illness Patient positioning, diabetes tipe 2 demo, deactivation, and food/menu cut line | Challenge update and human scope verdict | Ozan | Bernard |

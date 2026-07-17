@@ -1,6 +1,6 @@
 # Packet 04: Caregiver Auth and Membership Authorization
 
-Status: Draft
+Status: Done
 
 Driver / DRI: Bernard
 
@@ -44,6 +44,15 @@ Route handlers and server actions can resolve a verified caregiver, Care Circle 
 - Caregiver auth method is available enough for demo.
 - Real provider values are available only in local untracked env files.
 
+## Entry Readiness Evidence
+
+- Packet 03 is `Done`; its migration is applied and its idempotent synthetic seed is present on the development Supabase.
+- Supabase Auth is reachable and contains the synthetic Owner and Family Member identities.
+- Email/password remains the locked caregiver auth method. Usable demo passwords are established as part of Packet 04 and are never committed.
+- Required local env values are available through ignored `web/.env`; `PATIENT_SESSION_SECRET` is provisioned with at least 32 bytes without exposing its value.
+- Packet 01 scripts/test harness and Packet 02 server-only env/provider boundaries pass fresh regression checks.
+- No schema, provider, role, privacy, or product decision remains unresolved.
+
 ## Hard Dependencies
 
 - Packet 01 scripts and test harness must exist.
@@ -61,10 +70,13 @@ Route handlers and server actions can resolve a verified caregiver, Care Circle 
 - `web/src/lib/auth/`
 - `web/src/lib/supabase/`
 - `web/src/app/api/v1/auth/`
-- `web/src/app/(caregiver)/`
+- `web/src/app/caregiver/`
+- `web/src/app/page.tsx`
 - `web/src/components/auth/`
 - `web/tests/**/auth*`
 - `web/tests/**/membership*`
+- `web/tests/**/caregiver*`
+- `web/tests/e2e/shell-routes.spec.ts`
 
 ## Out of Scope
 
@@ -101,6 +113,68 @@ Route handlers and server actions can resolve a verified caregiver, Care Circle 
 - Inspect server logs for token/session/header leakage.
 - Confirm caregiver auth UI does not claim Patient code login exists.
 
+## Exit Review Evidence
+
+Implementation reviewed: commit `1a3c89c` on branch `P4`, plus the independent
+QA corrections and evidence recorded in the current P4 worktree.
+
+### Domain Sign-Off
+
+| Reviewer role | Verdict | Evidence |
+| --- | --- | --- |
+| Daniel - UI/UX | Pass | Caregiver page now provides loading, signed-out, signed-in, generic denial/error, failed-logout, and logout states; stale shell copy was removed; keyboard order and responsive layout passed at 390x844 and 1440x900 with no horizontal overflow or overlap. |
+| Al - privacy/minimization | Pass | Auth context contains only verified caregiver id, display name, Care Circle id, and role; no AI/OCR/document context was introduced; browser/server source contains no token, session, auth-header, key, or credential logging; sensitive-value scan passed. |
+| Ozan - QA/product | Pass | All eight acceptance criteria passed through source review, targeted auth/membership tests, real Owner/Family Member Supabase login, server response inspection, role-spoofing tests, logout verification, Auth-user audit, manual responsive QA, and full regression checks. |
+
+### Acceptance Criteria Verdict
+
+| # | Verdict | Evidence |
+| --- | --- | --- |
+| 1 | Pass | `resolveCaregiverAuthContext` uses Supabase `getUser()` and returns only verified user id/display name plus membership; `/api/v1/auth/me` tests and live E2E confirm no raw token or session property is returned. |
+| 2 | Pass | Active membership is loaded from Prisma with an active Care Circle requirement; live Owner and Family Member logins resolve their expected server-side roles. |
+| 3 | Pass | `requireOwner` rejects missing/unauthenticated context and Family Member context with typed generic errors; targeted membership tests pass. |
+| 4 | Pass | The resolver reads role and `careCircleId` only from the database; hostile `user_metadata` values are ignored in unit coverage. |
+| 5 | Pass | Route responses use generic `UNAUTHENTICATED`/`FORBIDDEN` messages; invalid login UI hides provider detail and clears the password field before the provider request completes. |
+| 6 | Pass | Source and artifact scans found no raw token, decoded payload, session, auth header, database URL, password, or secret value in implementation files or QA artifacts. |
+| 7 | Pass | Targeted auth tests cover unauthenticated, verified Owner/Family Member, generic failures, logout success/failure, and server-context precedence; membership tests cover both allowed roles and Family Member/unauthenticated Owner denial. |
+| 8 | Pass | Supabase admin audit found exactly the two synthetic caregiver Auth users and zero Patient-like Auth users; Patient mode remains code/session scope for Packet 05. |
+
+### Fresh Command And Manual Evidence
+
+| Command/check | Result |
+| --- | --- |
+| `npm test -- auth` | Pass; 9 tests in 3 files. |
+| `npm test -- membership` | Pass; 3 tests in 1 file. |
+| `npm run lint` | Pass. |
+| `npm run typecheck` | Pass. |
+| `npm test` | Pass; 45 tests in 11 files. |
+| `npm run build` | Pass; `/`, `/caregiver`, and `/patient/login` prerender, while `/api/v1/auth/me` remains dynamic. |
+| `npm run test:e2e` | Pass; 7 tests including real Owner/Family Member login, server role verification, server-confirmed logout, shell regressions, and both target viewports. |
+| Manual QA at 390x844 | Pass; Owner signed in with server role, all main actions were keyboard reachable, no horizontal overflow, no happy-path console/page errors, no sensitive response fields, and logout returned `/auth/me` to 401. |
+| Manual QA at 1440x900 | Pass; Family Member signed in with server role with the same keyboard, layout, console, response-minimization, and logout results. |
+| Invalid-login manual QA | Pass; generic Indonesian copy shown, provider detail hidden, password cleared from DOM. Chromium emitted only the expected status-only provider 400 resource entry, with no credential or provider message. |
+| Supabase Auth audit | Pass; two synthetic caregiver users present and no Patient Auth user detected. |
+| Env/secret/artifact scan | Pass; local `.env` is ignored, required local values are present, and 9 sensitive values were absent from 120 source/doc files and 7 QA artifacts. |
+
+### Corrected Findings
+
+- Replaced the stale caregiver shell with the actual caregiver login/session UI.
+- Updated root and caregiver copy so implemented caregiver auth is no longer
+  described as unavailable.
+- Added a local session preflight so a normal signed-out page does not create a
+  fresh `/auth/me` 401 console entry; server verification remains authoritative
+  whenever a session exists or sign-in succeeds.
+- Fixed `requireOwner` so missing context returns `UNAUTHENTICATED` instead of a
+  runtime property-access error.
+- Fixed logout handling so a real provider error keeps the verified UI state and
+  shows generic copy instead of falsely appearing signed out.
+- Rotated both synthetic caregiver demo passwords and stored them only in ignored
+  local env keys without printing or committing their values.
+
+No P4 blocker or deferred correction remains. Password reset, production invite
+flow, Patient access code/session, profile switching, daily care, deployment,
+and production migration/seed remain outside Packet 04.
+
 ## Documentation Update Rules
 
 - Do not update canonical API docs unless endpoint/auth contract intentionally changes and the task allows it.
@@ -118,3 +192,15 @@ Route handlers and server actions can resolve a verified caregiver, Care Circle 
 
 Report auth helper names, request context type, role guard names, test evidence, unsupported auth paths, and any Supabase setup gap. Packet 05 must reuse this authorization layer.
 
+Final handoff:
+
+- Auth resolver: `resolveCaregiverAuthContext`.
+- Request context: `CaregiverAuthContext`.
+- Owner guard: `requireOwner`.
+- Auth route: `GET /api/v1/auth/me`.
+- Browser client factory: `createSupabaseBrowserClient`.
+- Caregiver UI: `CaregiverAuthPanel` on `/caregiver`.
+- Unsupported paths: password reset, invite delivery, social login, and Patient
+  code/session remain intentionally outside Packet 04.
+- Supabase setup gaps: none for Packet 04.
+- Blockers: none.

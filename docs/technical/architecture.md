@@ -116,6 +116,8 @@ Route Handlers stay thin. They parse input, resolve actor, call a domain service
 Responsibilities:
 
 - Read Supabase caregiver session.
+- Bootstrap a new authenticated Owner into one Care Circle atomically and idempotently.
+- Create hashed, expiring, single-use Family invitations and consume them atomically.
 - Resolve Owner or Family Member membership.
 - Validate Patient access code and Patient session.
 - Authorize `patientProfileId` before data access.
@@ -124,6 +126,8 @@ Responsibilities:
 Forbidden:
 
 - Trusting role, `careCircleId`, or active profile from client state.
+- Allowing Family Member self-registration without an Owner invitation or allowing Patient account registration.
+- Storing raw invitation tokens or exposing them through audit events.
 - Returning different wrong-code messages for existing and non-existing profiles.
 - Sharing caregiver JWT or service-role key with Patient sessions.
 
@@ -133,11 +137,18 @@ Responsibilities:
 
 - One active Owner.
 - Up to two Patient Profiles.
+- Minimum profile creation with display name and relationship label only.
+- Explicit `UNKNOWN`, `NONE_REPORTED`, and `REPORTED` states for safety-relevant fact groups.
+- Derived setup checklist without a stored completion percentage.
 - Profile list and active-profile summaries.
 - Explicit profile isolation for every downstream service.
 - Owner-only end-of-care/deactivation flow for a Patient Profile.
 
 Profile switching is a UI selection followed by a new authorized request. It is not authorization.
+
+Optional profile information is progressive. Missing demographic fields remain `null`; safety-relevant health groups use explicit status columns. The profile service validates status/value consistency and never turns an empty array into `NONE_REPORTED` automatically.
+
+The setup checklist is a read model derived only from Patient Profile fields. It is advisory and does not authorize or block downstream features. Packet 08 medication services keep `currentMedicationsStatus` synchronized when active Medication rows are created; document upload remains optional and is not a profile-completion requirement.
 
 Deactivation is non-destructive for MVP. It removes the Patient Profile from active daily-care flows, revokes patient access, preserves audit/history, and uses sensitive UI copy such as `Akhiri perawatan profil` rather than blunt internal wording.
 
@@ -152,6 +163,8 @@ Responsibilities:
 - Dashboard aggregation.
 
 Every query starts with authorized `patientProfileId`. Dashboard caching is disabled for personalized health data.
+
+Creating/reactivating an active Medication and setting `currentMedicationsStatus = REPORTED` happen in one transaction. Pausing/ending the last active Medication sets the status to `UNKNOWN`. Profile PATCH cannot set `REPORTED` directly, and a non-reported status is rejected while an active Medication exists.
 
 ### 4.4 Documents and OCR
 
@@ -191,6 +204,13 @@ Responsibilities:
 - Return a labeled fallback on timeout, quota, or provider error.
 
 The browser never calls Azure directly.
+
+Sparse profile context rules:
+
+- `UNKNOWN` facts are omitted from model context and never converted to negative statements.
+- `NONE_REPORTED` is qualified as caregiver-reported information.
+- Missing profile facts do not trigger speculative completion by AI.
+- The chatbot may state that relevant information has not been recorded and suggest a safe next step.
 
 ### 4.6 SOS
 
@@ -310,6 +330,7 @@ The visual alert must appear even if audio is blocked. UI exposes sound status a
 | Realtime disconnects | Show disconnected badge and poll SOS list on focus | SOS database remains source of truth |
 | Audio blocked | Keep visual alert and show `Aktifkan suara notifikasi` | No failure claim |
 | No facility result | Empty state and source confirmation guidance | No invented result |
+| Optional profile data unknown | Show `Belum diketahui` and setup action; continue available workflows | Stored status remains `UNKNOWN` |
 
 ## 10. Security Boundaries
 
@@ -317,6 +338,8 @@ The visual alert must appear even if audio is blocked. UI exposes sound status a
 - Raw OCR text, prompt, document, BPJS number, phone, and address never enter logs.
 - Original documents stay private.
 - Confirmed OCR is still untrusted user data, not medical truth.
+- Unknown profile data remains unknown; the system never substitutes a default medical fact.
+- Full BPJS numbers are not accepted or stored for MVP; only an optional four-digit suffix may be retained for recognition.
 - AI response and OCR extraction display safety labels.
 - The product makes no HIPAA, medical, legal, or production compliance claim.
 
@@ -332,9 +355,18 @@ Required cross-profile tests:
 - SOS Maya never renders as Raka alert.
 - Realtime membership prevents another Care Circle from receiving events.
 
+Required progressive-profile tests:
+
+- Minimum profile creation succeeds with only display name and relationship label.
+- Skipped facts remain `UNKNOWN`.
+- Contradictory fact status/value combinations fail validation.
+- Empty arrays do not become `NONE_REPORTED` implicitly.
+- Active Medication creation updates the profile medication status atomically.
+- Setup checklist reflects database state and does not block check-in, document upload, chatbot, or SOS.
+
 ## 12. Deployment
 
-Vercel builds `/web` with `npm run build`. Supabase hosts Auth, PostgreSQL, private Storage, and Realtime. Azure hosts OpenAI and Document Intelligence. Environment values live in Vercel project settings and local `.env.local`, never in Git.
+Vercel builds `/web` with `npm run build`. Supabase hosts Auth, PostgreSQL, private Storage, and Realtime. Azure hosts OpenAI and Document Intelligence. Environment values live in Vercel project settings and local `.env`, never in Git.
 
 Provider calls use Node.js runtime. Do not move Prisma, Azure, or secret-bearing handlers to Edge runtime without an approved architecture change.
 
@@ -342,5 +374,6 @@ Provider calls use Node.js runtime. Do not move Prisma, Azure, or secret-bearing
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
+| 2026-07-16 | Menambahkan progressive minimum profile architecture, explicit fact states, derived setup checklist, dan sparse-context behavior | Menjaga data tidak lengkap tetap jujur dan implementable dalam Packet 03 | Ozan | Bernard |
 | 2026-07-16 | Mengubah kontrak teknis ke Patient Profile, demo diabetes tipe 2, dan lifecycle deactivation | Challenge pivot ke chronic illness | Bernard | Ozan |
 | 2026-07-15 | Mengunci Next.js modular monolith, Supabase, Prisma, Azure OCR/AI, Vercel, dan SOS Realtime | Human stack and scope verdict | Bernard | Ozan |

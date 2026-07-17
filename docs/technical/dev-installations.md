@@ -109,9 +109,11 @@ Do not install browser-only OpenAI clients. Azure credentials must remain server
 Run from `/web`:
 
 ```powershell
-npm install --save-dev prisma tsx @types/pg vitest @vitejs/plugin-react jsdom vite-tsconfig-paths @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event @playwright/test supabase
+npm install --save-dev prisma tsx @types/pg vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event @playwright/test supabase
 npx playwright install chromium
 ```
+
+Vite 8 resolves TypeScript path aliases through the native `resolve.tsconfigPaths` option. Do not install `vite-tsconfig-paths`; the plugin is redundant with the locked Vite/Vitest versions and emits a deprecation warning.
 
 `supabase` CLI is installed locally so the version is locked in `package-lock.json`. Docker is only required if the team chooses to run the full Supabase stack locally. The hackathon default uses a managed development project, so `npx supabase start` is optional.
 
@@ -134,7 +136,7 @@ Run from `/web`:
 npx prisma init --output ../src/generated/prisma
 ```
 
-The command creates `web/prisma/schema.prisma`, `web/prisma.config.ts`, and a local environment file. Keep scaffold placeholders minimal during Packet 01, then replace the generated sample schema with the locked model in `docs/technical/data-model.md` during Packet 03.
+The command creates `web/prisma/schema.prisma`, `web/prisma.config.ts`, and a local environment file. ChroniCare uses `web/.env` for local secret values. Keep scaffold placeholders minimal during Packet 01, then replace the generated sample schema with the locked model in `docs/technical/data-model.md` during Packet 03.
 
 Use two Supabase connection strings:
 
@@ -142,6 +144,8 @@ Use two Supabase connection strings:
 - `DIRECT_URL`: direct or session-mode connection for Prisma migration, introspection, seed, and Studio.
 
 Never put either value in Git.
+`web/prisma.config.ts` loads `web/.env` through `dotenv/config` and must select
+`DIRECT_URL` as its datasource URL.
 
 ## 8. Required Package Scripts
 
@@ -172,7 +176,7 @@ These scripts are planned, not currently available. They become implementation t
 
 ## 9. Environment File
 
-Create `web/.env.example` with variable names and non-secret defaults only. Developers copy it to `web/.env.local` and insert credentials outside Git.
+Create `web/.env.example` with variable names and non-secret defaults only. Developers copy it to `web/.env` and insert credentials outside Git.
 
 ```bash
 NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -190,6 +194,9 @@ AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT=
 AZURE_DOCUMENT_INTELLIGENCE_KEY=
 AZURE_DOCUMENT_INTELLIGENCE_MODEL=prebuilt-layout
 OCR_FALLBACK_MODE=disabled
+OCR_MAX_FILE_BYTES=5242880
+OCR_MAX_PAGES=3
+SOS_AUDIO_ENABLED_BY_DEFAULT=false
 ```
 
 Generate a local session secret in PowerShell:
@@ -200,7 +207,7 @@ $bytes = New-Object byte[] 32
 [Convert]::ToBase64String($bytes)
 ```
 
-Copy the output manually into `web/.env.local`. Do not paste it into chat, issues, screenshots, or committed files.
+Copy the output manually into `web/.env`. Do not paste it into chat, issues, screenshots, or committed files.
 
 ## 10. Supabase Setup
 
@@ -213,7 +220,7 @@ In the Supabase dashboard:
 5. Set the file limit to 5 MB.
 6. Enable Realtime for `sos_events` after the migration creates the table.
 7. Apply RLS policies described in `docs/technical/data-model.md`.
-8. Copy the publishable key, service role key, transaction pooler URL, and direct URL into `web/.env.local`.
+8. Copy the publishable key, service role key, transaction pooler URL, and direct URL into `web/.env`.
 
 The service role key bypasses RLS. It may only be used by server-only modules after application authorization succeeds.
 
@@ -284,3 +291,10 @@ Do not run migrations against a production database during development.
 ## 14. Update Rule
 
 Do not edit a command based on memory. Check the current official documentation and the installed package version first. Any changed dependency, command, env name, or provider must also update `README.md`, `AGENTS.md`, `docs/technical/env-and-deploy.md`, and the relevant packet.
+
+## 15. Change Log
+
+| Date | Change | Reason | DRI | Reviewer |
+| --- | --- | --- | --- | --- |
+| 2026-07-16 | Use `web/.env` for local secrets and `DIRECT_URL` for Prisma CLI | Align local Next.js and Prisma setup for Packet 03 | Ozan | Bernard |
+| 2026-07-16 | Replaced `vite-tsconfig-paths` with Vite 8 native `resolve.tsconfigPaths` configuration | Remove a redundant deprecated plugin while preserving TypeScript alias resolution | Bernard | Ozan |

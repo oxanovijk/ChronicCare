@@ -1,0 +1,115 @@
+[
+  {
+    "id": "cek-status-kepesertaan",
+    "version": "packet10.v1",
+    "title": "Cek Status Kepesertaan JKN",
+    "category": "MEMBERSHIP",
+    "summary": "Gunakan menu Info Peserta di Mobile JKN untuk melihat status kepesertaan dan fasilitas kesehatan tingkat pertama yang tercatat.",
+    "steps": [
+      "Buka aplikasi Mobile JKN dan masuk ke akun peserta.",
+      "Pilih menu Info Peserta.",
+      "Periksa status kepesertaan dan informasi fasilitas kesehatan yang ditampilkan tanpa menyalin nomor JKN lengkap ke ChroniCare."
+    ],
+    "caveat": "Informasi pada aplikasi dapat berubah. Konfirmasi status melalui Mobile JKN, BPJS Kesehatan, atau fasilitas sebelum mengandalkannya untuk kunjungan.",
+    "sourceLabel": "BPJS Kesehatan",
+    "sourceUrl": "https://bpjs-kesehatan.go.id/user-manual-mobile-jkn/administrasi%20JKN.html",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "id": "ubah-fktp-mobile-jkn",
+    "version": "packet10.v1",
+    "title": "Mengubah FKTP melalui Mobile JKN",
+    "category": "FKTP",
+    "summary": "Perubahan fasilitas kesehatan tingkat pertama dapat diajukan melalui menu Ubah Data Peserta di Mobile JKN apabila opsi tersebut tersedia untuk segmen peserta.",
+    "steps": [
+      "Buka menu Lainnya lalu pilih Ubah Data Peserta.",
+      "Pilih peserta yang akan diperbarui dan pilih bagian Faskes 1.",
+      "Pilih FKTP, simpan perubahan, lalu selesaikan verifikasi yang diminta aplikasi."
+    ],
+    "caveat": "Kelayakan, waktu berlaku, dan ketentuan perubahan FKTP dapat berbeda menurut segmen dan kondisi peserta. Konfirmasi melalui Mobile JKN atau BPJS Kesehatan.",
+    "sourceLabel": "BPJS Kesehatan",
+    "sourceUrl": "https://bpjs-kesehatan.go.id/user-manual-mobile-jkn/mobilejkn/mengubahfaskes.html",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "id": "antrean-fktp-mobile-jkn",
+    "version": "packet10.v1",
+    "title": "Mengambil Antrean FKTP",
+    "category": "QUEUE",
+    "summary": "Antrean FKTP dapat diambil melalui Mobile JKN untuk FKTP terdaftar yang sudah terintegrasi dengan sistem antrean BPJS Kesehatan.",
+    "steps": [
+      "Buka menu Pendaftaran Pelayanan di Mobile JKN.",
+      "Pilih peserta dan poli yang tersedia pada FKTP terdaftar.",
+      "Ikuti proses pendaftaran hingga nomor antrean ditampilkan."
+    ],
+    "caveat": "Fitur bergantung pada status peserta, integrasi sistem, dan jadwal yang diperbarui fasilitas. Konfirmasi melalui Mobile JKN atau FKTP bila antrean tidak tersedia.",
+    "sourceLabel": "BPJS Kesehatan",
+    "sourceUrl": "https://bpjs-kesehatan.go.id/user-manual-mobile-jkn/mobilejkn/antreanfktp.html",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "id": "antrean-fkrtl-mobile-jkn",
+    "version": "packet10.v1",
+    "title": "Mengambil Antrean FKRTL",
+    "category": "QUEUE",
+    "summary": "Mobile JKN menyediakan pengambilan nomor antrean untuk fasilitas kesehatan rujukan tingkat lanjut yang mendukung fitur tersebut.",
+    "steps": [
+      "Buka layanan antrean FKRTL pada Mobile JKN.",
+      "Pilih fasilitas, poli, dan jadwal yang tersedia pada aplikasi.",
+      "Periksa kembali detail antrean dan dokumen administratif yang diminta fasilitas."
+    ],
+    "caveat": "Antrean daring tidak menjamin layanan, jadwal dokter, rujukan, atau penjaminan diterima. Konfirmasi melalui Mobile JKN, BPJS Kesehatan, atau fasilitas.",
+    "sourceLabel": "BPJS Kesehatan",
+    "sourceUrl": "https://bpjs-kesehatan.go.id/user-manual-mobile-jkn/mobilejkn/antreanfkrtl.html",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "id": "lihat-riwayat-pelayanan",
+    "version": "packet10.v1",
+    "title": "Melihat Riwayat Pelayanan sebelum Kunjungan Kontrol",
+    "category": "CONTROL_VISIT",
+    "summary": "Menu Info Riwayat Pelayanan di Mobile JKN dapat digunakan untuk meninjau catatan pelayanan yang tampil pada akun peserta.",
+    "steps": [
+      "Buka Mobile JKN dan pilih menu Lainnya.",
+      "Pilih Info Riwayat Pelayanan.",
+      "Tinjau informasi yang tersedia dan konfirmasi dokumen kontrol atau rujukan langsung kepada fasilitas."
+    ],
+    "caveat": "Riwayat pelayanan tidak menggantikan surat kontrol, rujukan, atau persyaratan fasilitas. Konfirmasi dokumen melalui Mobile JKN, BPJS Kesehatan, atau fasilitas.",
+    "sourceLabel": "BPJS Kesehatan",
+    "sourceUrl": "https://bpjs-kesehatan.go.id/user-manual-mobile-jkn/pelayanan%20jkn.html",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "id": "cari-lokasi-faskes",
+    "version": "packet10.v1",
+    "title": "Mencari Lokasi Fasilitas Kesehatan",
+    "category": "SUPPORT",
+    "summary": "Mobile JKN memiliki fitur informasi lokasi fasilitas kesehatan untuk membantu pengguna menemukan fasilitas berdasarkan pencarian atau lokasi terdekat.",
+    "steps": [
+      "Buka menu Lainnya pada Mobile JKN.",
+      "Pilih Info Lokasi Faskes.",
+      "Cari fasilitas yang dibutuhkan dan periksa kembali nama serta alamatnya sebelum berkunjung."
+    ],
+    "caveat": "Hasil lokasi tidak menjamin fasilitas buka, layanan tersedia, atau menerima kebutuhan administrasi tertentu. Konfirmasi langsung sebelum berkunjung.",
+    "sourceLabel": "BPJS Kesehatan",
+    "sourceUrl": "https://bpjs-kesehatan.go.id/user-manual-mobile-jkn/mobilejkn/melihatlokasifaskes.html",
+    "lastReviewedAt": "2026-07-17"
+  },
+  {
+    "id": "kanal-bantuan-resmi-bpjs",
+    "version": "packet10.v1",
+    "title": "Menghubungi Kanal Bantuan Resmi BPJS Kesehatan",
+    "category": "SUPPORT",
+    "summary": "Care Center 165 dan PANDAWA merupakan kanal resmi untuk informasi, administrasi, dan pengaduan terkait Program JKN.",
+    "steps": [
+      "Gunakan Care Center 165 untuk informasi atau pengaduan melalui telepon.",
+      "Untuk layanan administrasi yang tersedia, akses PANDAWA melalui nomor resmi yang tercantum pada situs BPJS Kesehatan.",
+      "Jangan memasukkan nomor JKN lengkap atau data sensitif ke ChroniCare; sampaikan data hanya melalui kanal resmi ketika diperlukan."
+    ],
+    "caveat": "Jenis layanan dan jam layanan kanal dapat berubah. Periksa kembali informasi terbaru pada situs resmi BPJS Kesehatan.",
+    "sourceLabel": "BPJS Kesehatan",
+    "sourceUrl": "https://www.bpjs-kesehatan.go.id/",
+    "lastReviewedAt": "2026-07-17"
+  }
+]
+

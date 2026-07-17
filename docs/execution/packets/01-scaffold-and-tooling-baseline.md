@@ -1,6 +1,6 @@
 # Packet 01: Scaffold and Tooling Baseline
 
-Status: Draft
+Status: Done
 
 Driver / DRI: Bernard
 
@@ -117,6 +117,20 @@ The repo has a runnable `/web` app with root, caregiver shell, Patient login she
 - shadcn/ui or Next.js initialization would require a different framework or package manager.
 - Any scaffold step asks for real credentials.
 
+## Completion Evidence
+
+Status remains `Done`.
+
+- Reverified on 2026-07-16 at Packet 02 HEAD `9afe1fc` plus the local pre-Packet-03 polish diff.
+- Node `v24.16.0`, npm `11.13.0`, and credential-free `npm install` with Prisma postinstall passed.
+- `npm run lint`, `npm run typecheck`, all 23 Vitest tests, all 3 Playwright shell tests, and `npm run build` passed.
+- Build prerendered `/`, `/caregiver`, and `/patient/login`.
+- Manual QA passed for all three routes at 390x844 and 1440x900 with keyboard reachability, no horizontal scroll, no fresh console/page/request errors, and no provider request.
+- The progressive Patient Profile data-model refinement does not change Packet 01 scripts, routes, scaffold dependencies, or Prisma placeholder responsibilities. Schema implementation remains Packet 03 scope.
+- Known residual: `npm audit --omit=dev` reports five moderate transitive advisories under the locked Prisma/Next dependency graph. The available forced fixes would introduce breaking Prisma/Next downgrades, so no dependency mutation was made inside Packet 01/02 polish.
+
 ## Handoff Notes
 
 Report changed paths, exact commands run, script availability, local URL if dev server was started, and any unavailable dependency. Packet 02 starts only after `/web` and package scripts exist.
+
+QA must use the latest `origin/P1` HEAD as the Packet 01 baseline and record the resolved SHA at the start of the session. Earlier SHAs in pre-final handoff messages are historical references, not the verification baseline.

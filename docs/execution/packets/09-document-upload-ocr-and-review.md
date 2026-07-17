@@ -47,6 +47,7 @@ Caregiver uploads a synthetic document, sees extraction as draft, edits one fiel
 
 - Packet 02 provider boundary must exist.
 - Packet 05 profile isolation must exist.
+- Packet 06 lifecycle exclusion must exist.
 - Packet 08 caregiver dashboard must exist.
 
 ## Soft Dependencies / Parallel Prep
@@ -76,6 +77,7 @@ Caregiver uploads a synthetic document, sees extraction as draft, edits one fiel
 - Clinical interpretation, lab safety interpretation, or diagnosis.
 - Diabetes lab interpretation, target recommendation, or food/pantangan advice.
 - Background OCR queue.
+- Automatic content classification for KTP or other identity documents.
 
 ## Acceptance Criteria
 
@@ -86,8 +88,10 @@ Caregiver uploads a synthetic document, sees extraction as draft, edits one fiel
 - Caregiver can edit, confirm, or reject the draft.
 - Confirmation is atomic and audit logged.
 - Confirmed-summary selector returns only confirmed extraction for one authorized `patientProfileId`.
+- Document upload, extraction, review, and confirmed-summary selection reject a deactivated Patient Profile before storage or provider work begins.
 - Pending/rejected/failed extraction never enters chatbot context.
 - Raw OCR text, file bytes, BPJS number, and provider errors are not logged.
+- Upload UI lists supported health-document categories and tells users not to upload KTP or other identity documents.
 
 ## Automated Checks
 
@@ -106,7 +110,9 @@ Caregiver uploads a synthetic document, sees extraction as draft, edits one fiel
 - Correct one field and confirm.
 - Try invalid type, oversize file, and unreadable file.
 - Switch to Raka and confirm Maya document does not appear.
+- Try the document entry points with a deactivated resettable profile and confirm no upload, extraction, or confirmed summary is available.
 - Confirm `DEMO_FALLBACK` is visible when fixture mode is used.
+- Confirm upload copy does not request KTP and warns against uploading identity documents.
 
 ## Documentation Update Rules
 
@@ -124,4 +130,3 @@ Caregiver uploads a synthetic document, sees extraction as draft, edits one fiel
 ## Handoff Notes
 
 Provide confirmed OCR summary selector, provider mode, fallback trigger, review-state evidence, private storage evidence, and cross-profile document isolation evidence. Packet 11 must use only the confirmed selector.
-

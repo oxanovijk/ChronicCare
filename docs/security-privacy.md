@@ -29,6 +29,18 @@ Data sensitif mencakup:
 
 Private by default. UI, API, log, screenshot, dan demo hanya menampilkan data minimum untuk tugas aktif.
 
+## 2.1 Data Minimization During Setup
+
+- Patient Profile dapat dibuat hanya dengan nama tampilan dan label hubungan.
+- Tanggal lahir, lokasi umum, kondisi, alergi, obat, BPJS, fasilitas biasa, kontak darurat, dan dokumen tidak wajib untuk menyelesaikan onboarding.
+- UI harus menyediakan `Belum tahu, isi nanti`; caregiver tidak boleh didorong menebak data kesehatan.
+- `UNKNOWN` berbeda dari `NONE_REPORTED`. Sistem tidak boleh mengubah field yang dilewati menjadi klaim bahwa data tersebut tidak ada.
+- `NONE_REPORTED` berarti caregiver melaporkan tidak ada yang diketahui saat itu, bukan verifikasi klinis.
+- KTP atau identitas resmi lengkap tidak dikumpulkan untuk MVP karena tidak ada identity-verification, Dukcapil, hospital-registration, atau claim-processing flow.
+- KTP bukan kategori dokumen yang didukung atau diminta oleh UI. Upload content-classification untuk mendeteksi KTP di file `OTHER` berada di luar MVP, sehingga copy upload harus meminta pengguna tidak mengunggah identitas resmi.
+- Patient Profile MVP tidak menyimpan gender, nomor telepon pribadi, alamat lengkap, atau provinsi; lokasi umum memakai kota/label area dan kontak yang dapat dihubungi memakai emergency-contact fields.
+- Setup checklist bersifat advisory dan tidak boleh menjadi medical risk score.
+
 ## 3. Actor and Authorization
 
 ### Owner
@@ -60,6 +72,11 @@ Cross-profile leakage is a P0 blocker. Do not ship a demo workaround that hides 
 Caregiver:
 
 - Supabase Auth email/password.
+- Owner may self-register; public User, Care Circle, and Owner membership are created server-side in one idempotent transaction after Auth verification.
+- Family Member registration requires an unexpired, unrevoked, unused Owner invitation. Role and Care Circle are derived by the server, never supplied by the browser.
+- Invitation tokens use cryptographically secure randomness, are stored only as SHA-256 hashes, expire after 24 hours by default, and are single-use.
+- Invalid, expired, revoked, and used invitation responses are generic and do not reveal Care Circle membership.
+- A removed caregiver cannot use Owner onboarding to regain access or create a new Care Circle.
 - SSR cookie managed through `@supabase/ssr`.
 - Server resolves application membership on every protected request.
 
@@ -93,9 +110,12 @@ Changing a Patient access code revokes the old code and active Patient sessions.
 - `users.id` maps to `auth.users.id`.
 - Partial unique constraints protect one active Owner and one active Patient code.
 - Database trigger protects the two-Patient limit.
+- Database checks protect profile fact status/value consistency; service transactions protect Medication cross-table consistency.
 - Foreign keys use restrictive delete behavior for sensitive records.
 
 Browser code must not mutate application tables directly.
+
+Supabase Auth stores caregiver email and password identity. Application tables store only the minimum display identity and authorization membership; passwords, raw Auth tokens, and raw invitation tokens are never copied into Prisma-managed tables or audit metadata.
 
 ## 8. Health Document Storage
 
@@ -165,8 +185,11 @@ Excluded by default:
 - Full chat history.
 - Other Patient Profile.
 - Hidden system prompt.
+- Patient Profile facts with status `UNKNOWN`.
 
 System prompts are not stored in `chat_messages`. Logs use request ID and provider status only.
+
+`NONE_REPORTED` may enter context only with wording that preserves its source, such as `caregiver melaporkan belum ada alergi yang diketahui`. It must not become an absolute statement.
 
 ## 11. SOS Privacy and Delivery
 
@@ -204,6 +227,8 @@ Never commit or expose:
 - Azure OpenAI key.
 - Azure Document Intelligence key.
 - Signed upload token, signed download URL, access code, or session token.
+
+The profile API does not accept or store a full BPJS number for MVP. It may store an optional four-digit suffix for recognition when membership status is `REGISTERED`. Health documents and OCR text may still contain sensitive BPJS content and remain private/masked under the document rules.
 
 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` is a client publishable value, not a server secret. RLS remains mandatory.
 
@@ -250,6 +275,7 @@ Record actor, role, Care Circle, Patient Profile when relevant, action, target, 
 - OCR start, failure, confirmation, and rejection.
 - Chat fallback category without prompt text.
 - SOS creation and handling.
+- Changes between `UNKNOWN`, `NONE_REPORTED`, and `REPORTED` for safety-relevant Patient Profile fact groups, without copying the sensitive values into the audit summary.
 
 Audit summary must not duplicate sensitive content.
 
@@ -290,9 +316,14 @@ Not covered by this hackathon posture:
 - Realtime subscriber from another Care Circle denied.
 - Visual SOS alert appears if audio is blocked.
 - Logs and error responses contain no secret or private body.
+- Minimum profile creation works without optional sensitive data.
+- Skipped values remain `UNKNOWN`; no API or UI path converts them to `NONE_REPORTED`.
+- Contradictory fact statuses and values are rejected.
+- Full BPJS number is rejected by the profile API and absent from database profile fields, response bodies, logs, and browser storage.
 
 ## 19. Change Log
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
+| 2026-07-16 | Menambahkan progressive setup data minimization, explicit unknown semantics, dan last-four-only BPJS handling | Mengurangi forced disclosure dan mencegah caregiver mengarang data yang tidak diketahui | Ozan | Bernard, Daniel |
 | 2026-07-15 | Mengunci Supabase security boundary, OCR privacy, Patient session, dan browser-only SOS | Human stack and scope verdict | Bernard | Daniel |

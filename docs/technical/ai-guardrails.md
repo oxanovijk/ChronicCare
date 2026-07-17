@@ -218,6 +218,9 @@ Context builder harus:
 - Menyertakan patient name atau label aktif agar response tidak ambigu.
 - Menghindari raw sensitive documents.
 - Hanya memakai ekstraksi dokumen berstatus `CONFIRMED`.
+- Menghilangkan fact berstatus `UNKNOWN` dari provider context.
+- Mempertahankan qualifier caregiver bila fact berstatus `NONE_REPORTED`.
+- Tidak mengisi sendiri data yang belum diketahui berdasarkan diagnosis demo, kebiasaan umum, atau dokumen lain.
 
 Data yang boleh dipakai jika relevan:
 
@@ -232,6 +235,12 @@ Data yang boleh dipakai jika relevan:
 - Catatan kesehatan ringkas.
 - Informasi BPJS yang diperlukan.
 - Faskes dari dataset statis.
+
+Status profile fact:
+
+- `REPORTED`: nilai terkait boleh dipakai bila relevan dan authorized.
+- `NONE_REPORTED`: hanya boleh diringkas sebagai `caregiver melaporkan tidak ada yang diketahui/dilaporkan`.
+- `UNKNOWN`: tidak dikirim sebagai fakta medis; chatbot boleh mengatakan informasi tersebut belum tersedia.
 
 Data yang harus dibatasi:
 
@@ -394,6 +403,20 @@ Safe response:
 
 > Saya tidak bisa menentukan target gula darah personal atau membuat pantangan makanan untuk Maya. Target dan pola makan perlu disesuaikan oleh dokter atau ahli gizi. Saya bisa membantu menyiapkan pertanyaan untuk kontrol, misalnya target gula darah yang disarankan, tanda bahaya, dan makanan yang perlu dibatasi menurut tenaga medis.
 
+### 12.8 Missing Profile Information
+
+User:
+
+> Maya punya alergi obat apa?
+
+Jika `allergiesStatus = UNKNOWN`, safe response:
+
+> Informasi alergi Maya belum tercatat di ChroniCare. Jangan menganggap tidak ada alergi. Coba konfirmasi kepada Maya, keluarga yang mengetahui, atau tenaga kesehatan sebelum menggunakan informasi ini.
+
+Jika `allergiesStatus = NONE_REPORTED`, safe response:
+
+> Caregiver melaporkan belum ada alergi yang diketahui untuk Maya. Informasi ini bukan verifikasi medis; konfirmasikan kepada tenaga kesehatan bila diperlukan.
+
 ## 13. Fallback Jika AI Gagal
 
 Jika AI provider gagal, timeout, rate-limited, atau response tidak valid:
@@ -441,7 +464,8 @@ Expected behavior:
 
 - Jawab berdasarkan reminder/obat patient profile aktif.
 - Jangan mengubah dosis.
-- Jika data tidak ada, minta Patient cek ke keluarga.
+- Jika status obat `UNKNOWN`, jelaskan bahwa informasi belum tercatat dan minta Patient cek ke keluarga.
+- Jika status obat `NONE_REPORTED`, jangan menyimpulkan Patient pasti tidak menggunakan obat.
 
 ### Caregiver Chatbot
 
@@ -486,6 +510,8 @@ Sebelum mengaktifkan chatbot dalam demo, cek:
 - Tidak ada full prompt berisi data pribadi di logs.
 - OCR output divalidasi dengan `document-extraction.v1`.
 - Extraction belum dikonfirmasi tidak masuk chatbot context.
+- Fact profile berstatus `UNKNOWN` tidak dikirim sebagai fakta atau diubah menjadi `none`.
+- Fact `NONE_REPORTED` selalu mempertahankan qualifier caregiver.
 - File asli tidak dikirim ke Azure OpenAI.
 - Demo fallback OCR diberi label yang jujur.
 
@@ -509,4 +535,5 @@ Dokumen berikutnya yang terkait:
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
+| 2026-07-16 | Menambahkan sparse-profile context rules untuk `UNKNOWN`, `NONE_REPORTED`, dan `REPORTED` | Mencegah AI mengarang atau mengabsolutkan data Patient yang belum diketahui | Ozan | Al |
 | 2026-07-15 | Menambahkan OCR review gate, confirmed-only AI context, dan Azure provider lock | OCR masuk scope MVP | Al | Ozan |

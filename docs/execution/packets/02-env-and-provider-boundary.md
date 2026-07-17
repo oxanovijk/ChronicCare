@@ -1,6 +1,6 @@
 # Packet 02: Env and Provider Boundary
 
-Status: Draft
+Status: Done
 
 Driver / DRI: Bernard
 
@@ -115,7 +115,17 @@ The app has safe env parsing, placeholder-only env documentation, server-only Su
 - Any implementation path requires committing real `.env` values.
 - Server-only protection cannot be verified with available tooling.
 
+## Completion Evidence
+
+- Verified on 2026-07-16 at HEAD `9afe1fc` plus the local pre-Packet-03 polish diff.
+- `.env.example` contains exactly the 18 locked names and non-secret defaults; only `.env.example` is tracked.
+- Public and server schemas, Supabase admin, Azure OpenAI, Azure Document Intelligence, and labeled OCR fallback boundaries are implemented without live provider calls.
+- `npm test -- env-validation` passed 7 tests and `npm test -- provider-boundary` passed 6 tests against the real provider entry points.
+- A disposable Client Component import of `@/lib/env/server` made `npm run build` fail with the expected `server-only` error. After removing it, the production build passed.
+- Full verification passed: install/postinstall, lint, typecheck, 23 Vitest tests in 5 files, 3 Playwright tests, and production build.
+- Manual production-server QA at 390x844 and 1440x900 emitted no provider request and no fresh console, page, or failed-request error.
+- The progressive Patient Profile data model adds no Packet 02 env variable or provider dependency. Its schema, constraints, and seed behavior begin in Packet 03.
+
 ## Handoff Notes
 
 Report env files touched, placeholder names added, provider factory names, fallback flags, checks run, and any unavailable provider credential. Packet 03 may start after env parsing and scripts are stable.
-

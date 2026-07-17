@@ -30,6 +30,8 @@ Reviewer: Ozan
 
 Caregiver sign-in memakai Supabase Auth email/password. Browser menyimpan Supabase session dalam cookie melalui `@supabase/ssr`. Route Handler membaca user ID dari session, lalu mengambil membership aplikasi dari `care_circle_members`.
 
+Owner baru boleh self-register melalui Supabase Auth, lalu menyelesaikan bootstrap server-side yang membuat `users`, satu `care_circles`, dan membership `OWNER` secara atomik dan idempotent. Family Member tidak boleh self-assign role atau Care Circle; ia hanya dapat bergabung melalui invitation token valid yang dibuat Owner. Patient tidak memakai Supabase Auth dan tetap masuk dengan access code.
+
 ### 2.2 Patient
 
 Patient mengirim access code ke endpoint login. Server membandingkan hash, membuat opaque session token, menyimpan hash token di `patient_sessions`, dan mengirim cookie:
@@ -107,12 +109,37 @@ Public error codes:
 | 504 | `PROVIDER_TIMEOUT` | Provider exceeded request budget |
 | 500 | `INTERNAL_ERROR` | Unexpected server failure without internal detail |
 
+Caregiver Auth user yang sudah terverifikasi tetapi belum memiliki row `users` menerima `409 ONBOARDING_REQUIRED`. Auth user yang pernah menjadi anggota tetapi tidak lagi memiliki membership aktif menerima `403 FORBIDDEN` dan tidak boleh membuat Care Circle baru melalui bootstrap.
+
 ## 4. Common Types
 
 ```ts
 type MemberRole = "OWNER" | "FAMILY_MEMBER"
 type PatientStatus = "ACTIVE" | "INACTIVE" | "END_OF_CARE" | "DECEASED"
 type PatientDeactivationReason = "NO_LONGER_CARED" | "PATIENT_DECEASED" | "OTHER"
+type ProfileFactStatus = "UNKNOWN" | "NONE_REPORTED" | "REPORTED"
+type BpjsMembershipStatus = "UNKNOWN" | "NOT_REGISTERED" | "REGISTERED"
+type PatientProfileSetupAction =
+  | "ADD_DATE_OF_BIRTH"
+  | "ADD_LOCATION"
+  | "REVIEW_PRIMARY_CONDITIONS"
+  | "REVIEW_ALLERGIES"
+  | "REVIEW_CURRENT_MEDICATIONS"
+  | "REVIEW_EMERGENCY_CONTACT"
+  | "REVIEW_BPJS_STATUS"
+  | "ADD_USUAL_FACILITY"
+type PatientProfileSetupChecklist = {
+  minimumIdentityComplete: true
+  primaryConditionsStatus: ProfileFactStatus
+  allergiesStatus: ProfileFactStatus
+  currentMedicationsStatus: ProfileFactStatus
+  emergencyContactStatus: ProfileFactStatus
+  bpjsMembershipStatus: BpjsMembershipStatus
+  dateOfBirthRecorded: boolean
+  broadLocationRecorded: boolean
+  usualFacilityRecorded: boolean
+  recommendedActions: PatientProfileSetupAction[]
+}
 type DocumentCategory =
   | "BPJS_CARD"
   | "REFERRAL_LETTER"
@@ -192,13 +219,28 @@ Rules:
 
 Revokes the current Patient session and clears the cookie. Response status is `204`.
 
+### `POST /onboarding/owner`
+
+Authenticated Supabase user only. Request:
+
+```json
+{
+  "displayName": "Nadia Santoso",
+  "careCircleName": "Keluarga Nadia"
+}
+```
+
+The server serializes concurrent attempts, creates the public user, Care Circle, active Owner membership, and audit event in one transaction, and returns the same verified caregiver context on an idempotent retry. Client metadata, role, and `careCircleId` are never authorization inputs.
+
 ## 6. Care Circle and Patient Profiles
 
 | Method | Path | Actor | Purpose |
 |---|---|---|---|
 | GET | `/care-circle` | Caregiver | Current Care Circle and membership summary |
 | GET | `/care-circle/members` | Caregiver | Active members and roles |
-| POST | `/care-circle/invitations` | Owner | Create P1 invitation code |
+| POST | `/care-circle/invitations` | Owner | Create a one-time Family invitation |
+| GET | `/care-circle/invitations/{token}` | Public token holder | Preview valid invitation using minimum Care Circle data |
+| POST | `/care-circle/invitations/{token}/accept` | Authenticated caregiver | Atomically consume invitation and create Family membership |
 | DELETE | `/care-circle/members/{userId}` | Owner | Mark Family Member removed |
 | GET | `/patient-profiles` | Caregiver | List up to two profiles |
 | POST | `/patient-profiles` | Owner | Add first or second profile |
@@ -207,21 +249,90 @@ Revokes the current Patient session and clears the cookie. Response status is `2
 | POST | `/patient-profiles/{patientProfileId}/access-code` | Owner | Regenerate Patient access code |
 | POST | `/patient-profiles/{patientProfileId}/deactivate` | Owner | End active care for a profile without hard delete |
 
+Invitation rules:
+
+- The generated token has at least 256 bits of entropy; only its SHA-256 hash is stored.
+- Default expiry is 24 hours and the token is single-use and revocable.
+- Preview returns only Care Circle name and expiry. Invalid, expired, revoked, and used tokens share a generic `404` response.
+- Accept fixes role to `FAMILY_MEMBER` server-side. Request body contains only `displayName`.
+- An existing active Owner or a user belonging to another Care Circle cannot consume the invitation.
+- The raw token may appear in the invitation URL but never in logs, audit metadata, or database rows.
+
 Create Patient Profile request:
 
 ```json
 {
   "displayName": "Maya Pratama",
-  "relationshipLabel": "Maya",
-  "dateOfBirth": "1982-08-12",
-  "city": "Tangerang",
-  "locationLabel": "Karawaci, Tangerang",
-  "primaryConditions": ["Diabetes tipe 2"],
-  "allergies": []
+  "relationshipLabel": "Maya"
 }
 ```
 
+Only `displayName` and `relationshipLabel` are required. The server initializes:
+
+```json
+{
+  "primaryConditionsStatus": "UNKNOWN",
+  "allergiesStatus": "UNKNOWN",
+  "currentMedicationsStatus": "UNKNOWN",
+  "emergencyContactStatus": "UNKNOWN",
+  "bpjsMembershipStatus": "UNKNOWN"
+}
+```
+
+Optional information is added after profile creation through `PATCH /patient-profiles/{patientProfileId}`. Document upload starts only after the profile ID exists.
+
 The third profile returns `409 PATIENT_PROFILE_LIMIT_REACHED`.
+
+### `PATCH /patient-profiles/{patientProfileId}`
+
+Owner or Family Member. All fields are optional, but the merged resulting state must satisfy the status/value rules.
+
+Example progressive detail request:
+
+```json
+{
+  "dateOfBirth": "1982-08-12",
+  "city": "Tangerang",
+  "locationLabel": "Karawaci, Tangerang",
+  "primaryConditionsStatus": "REPORTED",
+  "primaryConditions": ["Diabetes tipe 2"],
+  "allergiesStatus": "UNKNOWN",
+  "currentMedicationsStatus": "UNKNOWN",
+  "emergencyContactStatus": "REPORTED",
+  "emergencyContactName": "Dimas Pratama",
+  "emergencyContactPhone": "081200000001",
+  "bpjsMembershipStatus": "REGISTERED",
+  "bpjsNumberLast4": "1234",
+  "usualFacilityName": null
+}
+```
+
+Rules:
+
+- `UNKNOWN` means not known/not reviewed and must not be displayed as `none`.
+- `NONE_REPORTED` means the caregiver explicitly reports that none is currently known; UI and AI must preserve that qualification.
+- `REPORTED` requires the related value after applying the patch.
+- Changing conditions or allergies to a non-`REPORTED` status requires an explicit empty array; the server does not silently discard recorded values.
+- `emergencyContactStatus = REPORTED` requires at least a name or phone.
+- `bpjsMembershipStatus = REGISTERED` does not require `bpjsNumberLast4`.
+- `NOT_REGISTERED` is caregiver-reported administrative information and must not be presented as live BPJS verification.
+- `bpjsNumberLast4`, when provided, must contain exactly four digits.
+- The API does not accept a full BPJS number.
+- Setting BPJS status to `UNKNOWN` or `NOT_REGISTERED` clears any stored suffix atomically.
+- Profile PATCH may set `currentMedicationsStatus` only to `UNKNOWN` or `NONE_REPORTED`; `REPORTED` is rejected as a client-supplied value.
+- `currentMedicationsStatus = UNKNOWN` or `NONE_REPORTED` is rejected while an active Medication exists.
+- Medication create/reactivate sets `REPORTED`; pausing/ending the last active Medication sets `UNKNOWN`.
+- OCR confirmation never calls this endpoint automatically.
+
+Patient Profile responses include the fact statuses, masked BPJS metadata when available, and `setupChecklist`. There is no stored completion percentage.
+
+`broadLocationRecorded` is true when either `locationLabel` or `city` is present. `recommendedActions` is ordered deterministically: allergies, current medications, emergency contact, primary conditions, BPJS, date of birth, broad location, then usual facility. Actions for already reviewed/recorded items are omitted.
+
+### `POST /patient-profiles/{patientProfileId}/access-code`
+
+Owner only. The server validates that the active Patient Profile belongs to the Owner's Care Circle, generates a cryptographically random six-digit code, and stores only its Argon2id hash. Issuance is serialized across active Patient codes so one raw code cannot resolve to two Patient Profiles.
+
+Creating or regenerating a code atomically revokes the previous active code and all active Patient sessions for that profile, creates the new hash-only record, and writes a minimized audit event. The response returns the raw code exactly once with `Cache-Control: private, no-store`; the raw code never enters logs, audit metadata, URLs, profile DTOs, or browser persistence. Family Member and Patient requests are denied.
 
 ### `POST /patient-profiles/{patientProfileId}/deactivate`
 
@@ -257,10 +368,38 @@ Caregiver response aggregates only demo-critical data:
     "patientProfile": {
       "id": "9040f77d-dabf-4149-8a5f-38b11046bac2",
       "displayName": "Maya Pratama",
-      "relationshipLabel": "Maya"
+      "relationshipLabel": "Maya",
+      "primaryConditionsStatus": "REPORTED",
+      "allergiesStatus": "UNKNOWN",
+      "currentMedicationsStatus": "REPORTED",
+      "emergencyContactStatus": "REPORTED",
+      "bpjsMembershipStatus": "REGISTERED"
+    },
+    "setupChecklist": {
+      "minimumIdentityComplete": true,
+      "primaryConditionsStatus": "REPORTED",
+      "allergiesStatus": "UNKNOWN",
+      "currentMedicationsStatus": "REPORTED",
+      "emergencyContactStatus": "REPORTED",
+      "bpjsMembershipStatus": "REGISTERED",
+      "dateOfBirthRecorded": true,
+      "broadLocationRecorded": true,
+      "usualFacilityRecorded": false,
+      "recommendedActions": [
+        "REVIEW_ALLERGIES",
+        "ADD_USUAL_FACILITY"
+      ]
     },
     "latestCheckIn": null,
-    "activeMedications": [],
+    "activeMedications": [
+      {
+        "id": "d5e30c62-12fe-4f61-9bb6-1fd7d4b4349e",
+        "name": "Metformin",
+        "doseText": "500 mg sesuai resep",
+        "scheduleText": "Dua kali sehari sesuai catatan caregiver",
+        "status": "ACTIVE"
+      }
+    ],
     "upcomingReminders": [],
     "recentDocuments": [],
     "activeSos": null
@@ -269,6 +408,8 @@ Caregiver response aggregates only demo-critical data:
 ```
 
 No cache entry may be reused across different `patientProfileId` values.
+
+`setupChecklist` is advisory. Unknown optional information does not block dashboard, Patient access code, check-in, document upload, chatbot, or SOS.
 
 ### Check-in
 
@@ -311,6 +452,8 @@ Medication creation request stores instructions as provided by a caregiver:
   "endDate": null
 }
 ```
+
+Creating or reactivating an active Medication sets `currentMedicationsStatus` to `REPORTED` in the same transaction. Pausing or ending the last active Medication sets it to `UNKNOWN`. A caregiver cannot set the status to `UNKNOWN` or `NONE_REPORTED` while an active Medication exists, and cannot set `REPORTED` through Patient Profile PATCH.
 
 ### Reminder and health note
 
@@ -487,7 +630,7 @@ Response:
 }
 ```
 
-Only latest check-in, active medication text, upcoming reminders, confirmed OCR summaries, and relevant Patient Profile fields may enter context. Raw files, raw OCR text, unrelated profile data, BPJS number, full address, and hidden notes are excluded.
+Only latest check-in, active medication text, upcoming reminders, confirmed OCR summaries, and relevant Patient Profile fields with usable status may enter context. Facts with status `UNKNOWN` are omitted and must not be converted into negative facts. `NONE_REPORTED` may be described only as caregiver-reported information. Raw files, raw OCR text, unrelated profile data, BPJS number, full address, and hidden notes are excluded.
 
 Rate limit: 20 requests per actor per 10 minutes. Emergency prompts return short escalation copy and may skip the provider call.
 
@@ -599,6 +742,12 @@ Minimum automated scenarios:
 - Patient cannot request another `patientProfileId`.
 - Family Member cannot call Owner-only endpoints.
 - Third Patient Profile returns conflict.
+- A minimum profile can be created with only display name and relationship label.
+- Optional skipped data remains `UNKNOWN`; empty arrays are not interpreted as `NONE_REPORTED`.
+- Conditions, allergies, emergency contact, and BPJS status/value consistency rules reject contradictory requests.
+- Full BPJS numbers are rejected and are never stored; an optional four-digit suffix is accepted only for `REGISTERED`.
+- Medication create/reactivate and pause/end keep `currentMedicationsStatus` synchronized atomically; Patient Profile PATCH cannot manufacture `REPORTED`.
+- Setup checklist is derived from stored state and does not block daily-care features.
 - Deactivated Patient Profile cannot create check-in, chat, document upload, or SOS; active Patient sessions are revoked.
 - Dashboard, check-in, medication, documents, chat, and SOS reject cross-profile access.
 - Upload rejects MIME, size, page count, or path mismatch.
@@ -612,5 +761,6 @@ Minimum automated scenarios:
 
 | Tanggal | Perubahan | Alasan | DRI | Reviewer |
 |---|---|---|---|---|
+| 2026-07-16 | Mengunci minimum Patient Profile create, progressive PATCH fields, explicit fact/BPJS statuses, dan derived setup checklist | Mendukung caregiver yang belum mengetahui semua data tanpa menghasilkan fakta palsu | Ozan | Bernard |
 | 2026-07-16 | Mengubah API ke Patient Profile, demo diabetes tipe 2, dan endpoint deactivation | Challenge pivot ke chronic illness | Bernard | Ozan |
 | 2026-07-15 | Mengunci REST `/api/v1`, auth, daily care, OCR review, chatbot, SOS Realtime, dan facility endpoints | Human verdict untuk Next.js full-stack MVP | Bernard | Ozan |

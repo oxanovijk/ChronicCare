@@ -18,14 +18,17 @@ ChroniCare is a 30-hour hackathon MVP for chronic illness care coordination.
 
 Current state:
 
-- Documentation-first.
-- Pre-scaffold.
+- Packet 01 scaffold exists in `/web`.
+- Packet 02 typed env validation and server-only Supabase/Azure provider boundaries exist.
+- Root, caregiver, and Patient login shell routes exist.
+- Baseline npm scripts and Vitest/Playwright harness are available.
+- Product features beyond the Packet 01 shell and Packet 02 provider boundaries remain unimplemented until verified by their packets.
 - Stack and provider decisions are locked.
 - Product positioning has been refined to chronic illness patient care.
 - Human verdict on 2026-07-16: implementation terminology is `Patient Profile`, not legacy parent-care terminology.
 - Locked technical docs now use `Patient Profile`, `patientProfileId`, `patient_profiles`, Patient access code/session, and `/patient-profiles`.
-- `/web` and `package.json` do not exist yet.
-- Install, dev, lint, typecheck, test, seed, build, and deploy commands remain unavailable until Packet 01 creates them.
+- `/web/package.json` exists and exposes the locked Packet 01 command baseline.
+- Database, provider, and deployment commands may require later packet dependencies and credentials; command existence is not evidence that those features work.
 
 Do not claim an app feature exists because its document is complete. Do not scaffold or implement until the requested packet is explicitly selected and current docs are checked.
 
@@ -108,7 +111,9 @@ In scope:
 - One Care Circle per caregiver for the hackathon.
 - Exactly one active Owner and active Family Members.
 - Maximum two Patient Profiles.
+- Patient Profile may be created with only display name and relationship label; optional data is completed progressively.
 - Caregiver auth and Patient code/session.
+- Owner self-registration and invitation-only Family Member registration; Patient has no account registration.
 - Patient homepage and caregiver dashboard.
 - Check-in, medication/log, reminder, and health note basics.
 - Private document upload.
@@ -163,6 +168,7 @@ Caregiver UI:
 - Shows active Patient Profile clearly.
 - Prioritizes context, recent changes, documents, SOS, and next actions.
 - Avoids visual noise that slows the two-minute demo.
+- Allows `Belum tahu, isi nanti` for optional Patient data and distinguishes unknown facts from explicitly none reported.
 
 ## 10. OCR Rules
 
@@ -222,6 +228,9 @@ Use `docs/security-privacy.md`.
 - No Supabase service role, database URL, Patient secret, Azure key, signed URL, access code, or session in browser/client logs.
 - Provider SDK debug logging stays off.
 - Audit actions without duplicating sensitive content.
+- Never force or infer optional health data. `UNKNOWN`, `NONE_REPORTED`, and `REPORTED` have distinct meanings.
+- KTP or another full identity document is not collected for MVP because identity verification is out of scope.
+- The profile API does not accept or store a full BPJS number; at most four trailing digits may be kept for recognition.
 - End-of-care/deactivate profile must be non-destructive unless a later human verdict explicitly changes data retention.
 - Do not claim HIPAA, clinical validation, legal approval, or production readiness.
 
@@ -241,6 +250,9 @@ Human verdict already given for this refinement:
 - `Patient Profile` is the active implementation term.
 - End-of-care/deactivate profile enters MVP.
 - Subscription/payment remains dummy/contextual only, not a real feature.
+- Patient Profile onboarding is progressive: only `displayName` and `relationshipLabel` are required.
+- Conditions, allergies, current medications, and emergency contact use `UNKNOWN`, `NONE_REPORTED`, or `REPORTED`; BPJS uses `UNKNOWN`, `NOT_REGISTERED`, or `REGISTERED`.
+- Unknown optional data does not block Patient access code, daily care, document upload, chatbot, or SOS.
 
 ## 15. During Implementation
 
@@ -256,9 +268,9 @@ Human verdict already given for this refinement:
 
 ## 16. Commands
 
-Current status: unavailable until `/web/package.json` exists.
+Current status: Packet 01 commands are available from `/web`.
 
-Locked planned commands after Packet 01:
+Locked command baseline:
 
 ```powershell
 Set-Location web
@@ -274,7 +286,7 @@ npm run db:migrate
 npm run db:seed
 ```
 
-Do not invent a command or report it as available before checking `web/package.json`. Installation source is `docs/technical/dev-installations.md`.
+Do not report a command or feature as passing before running the relevant verification. Database commands remain dependent on Packet 03 setup. Installation source is `docs/technical/dev-installations.md`.
 
 ## 17. Verification
 
@@ -286,6 +298,7 @@ Before saying done, fixed, working, passing, ready, implemented, or deployed:
 - Test OCR success, invalid file, provider failure, review, confirmation, and confirmed-only context.
 - Test AI allowed, diagnosis, dose, diabetes target/lab/diet request, emergency, hidden context, profile switching, and fallback.
 - Test SOS Realtime, audio enabled/blocked, reconnect, handler conflict, and wrong Care Circle.
+- Test minimum Patient Profile creation, status/value contradictions, sparse-profile rendering, and that unknown data is not treated as none.
 - Scan for secrets, real data, placeholders, contradictions, and overclaims.
 
 `docs/qa/demo-readiness-checklist.md` stays `Not Run` until checks run with evidence.
@@ -313,5 +326,8 @@ Before saying done, fixed, working, passing, ready, implemented, or deployed:
 
 | Date | Change | Reason | DRI | Reviewer |
 | --- | --- | --- | --- | --- |
+| 2026-07-16 | Locked progressive minimum Patient Profile onboarding and explicit unknown/none/reported data semantics | Prevent forced guesses and false negative medical facts | Ozan | Pending: Bernard, Daniel |
+| 2026-07-16 | Updated project state and command availability after Packet 01 scaffold | Keep guardrail aligned with verified repository state | Ozan | Bernard |
 | 2026-07-16 | Finalized Patient terminology as current implementation truth across guardrails | Step 6/7 consistency pass | Ozan | Bernard |
 | 2026-07-16 | Updated guardrail positioning to chronic illness Patient care; recorded diabetes tipe 2 demo condition, Patient terminology, and deactivation verdict | Human challenge update and scope verdict | Ozan | Bernard |
+| 2026-07-17 | Locked caregiver registration model: Owner self-registers, Family Member joins only by hashed expiring Owner invitation, and Patient remains access-code only | Human registration feature verdict | Ozan | Bernard |
