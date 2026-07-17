@@ -11,7 +11,6 @@ const coreServerConfigured = Boolean(
 );
 const mayaProfileId = "10000000-0000-4000-8000-000000000004";
 const rakaProfileId = "10000000-0000-4000-8000-000000000005";
-const appOrigin = "http://localhost:3100";
 
 async function removeSyntheticCheckIn(checkInId: string) {
   const client = new Client({ connectionString: process.env.DATABASE_URL });
@@ -49,7 +48,7 @@ test("Maya completes an isolated Patient check-in at mobile and desktop", async 
     await expect(
       page.getByRole("heading", { level: 1, name: "Halo, Maya Pratama" }),
     ).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText("Profil aktif: Maya")).toBeVisible();
+    await expect(page.getByText("Maya Pratama · Maya", { exact: true })).toBeVisible();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth > window.innerWidth,
@@ -63,6 +62,8 @@ test("Maya completes an isolated Patient check-in at mobile and desktop", async 
     await page
       .getByLabel("Kondisi hari ini (opsional)")
       .fill("Check-in sintetis P7 untuk verifikasi QA.");
+    await page.getByText("Biasa saja", { exact: true }).click();
+    await expect(okayMood).toBeChecked();
     const createResponse = page.waitForResponse(
       (response) =>
         response.url().endsWith(`/patient-profiles/${mayaProfileId}/check-ins`) &&
@@ -81,7 +82,7 @@ test("Maya completes an isolated Patient check-in at mobile and desktop", async 
     const crossProfile = await page.request.post(
       `/api/v1/patient-profiles/${rakaProfileId}/check-ins`,
       {
-        headers: { Origin: appOrigin },
+        headers: { Origin: new URL(page.url()).origin },
         data: { mood: "GOOD" },
       },
     );
