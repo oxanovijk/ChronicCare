@@ -9,7 +9,9 @@ const { redirect, resolvePatientAuthContext } = vi.hoisted(() => ({
 import CaregiverPage from "@/app/caregiver/page";
 
 vi.mock("@/components/auth/caregiver-auth-panel", () => ({
-  CaregiverAuthPanel: () => <div>Caregiver auth panel</div>,
+  CaregiverAuthPanel: ({ activeSection = "overview" }: { activeSection?: string }) => (
+    <div data-section={activeSection}>Caregiver auth panel</div>
+  ),
 }));
 
 vi.mock("next/navigation", () => ({ redirect }));
@@ -59,6 +61,19 @@ describe("caregiver page", () => {
     render(await CaregiverPage());
 
     expect(screen.getByText("Caregiver auth panel")).toBeInTheDocument();
+  });
+
+  it("uses the URL query as the caregiver section source of truth", async () => {
+    render(
+      await CaregiverPage({
+        searchParams: Promise.resolve({ section: "care" }),
+      }),
+    );
+
+    expect(screen.getByText("Caregiver auth panel")).toHaveAttribute(
+      "data-section",
+      "care",
+    );
   });
 
   it("links back to the home page", async () => {

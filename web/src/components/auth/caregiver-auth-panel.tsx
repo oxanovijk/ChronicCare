@@ -88,7 +88,11 @@ async function resolveInitialAuthState(): Promise<AuthState> {
   return fetchCaregiverContext();
 }
 
-export function CaregiverAuthPanel() {
+export function CaregiverAuthPanel({
+  activeSection = "overview",
+}: {
+  activeSection?: "overview" | "care";
+}) {
   const [state, setState] = useState<AuthState>({ status: "checking" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -184,6 +188,7 @@ export function CaregiverAuthPanel() {
 
     return (
       <CaregiverProductionShell
+        activeSection={activeSection}
         caregiverName={state.context.user.displayName}
         role={state.context.membership.role}
         onLogout={() => void handleLogout()}
@@ -200,16 +205,16 @@ export function CaregiverAuthPanel() {
               <AlertDescription>{formError}</AlertDescription>
             </Alert>
           ) : null}
-          <Alert>
+          {activeSection === "overview" ? <Alert>
             <ShieldCheck aria-hidden="true" />
             <AlertTitle>Akun siap digunakan</AlertTitle>
             <AlertDescription>
               Pilih Patient untuk melihat dan memperbarui informasi
               perawatannya.
             </AlertDescription>
-          </Alert>
-          <CaregiverProfilePanel role={state.context.membership.role} caregiverName={state.context.user.displayName} />
-          {state.context.membership.role === "OWNER" ? <details className="care-owner-tools"><summary>Kelola undangan Family Member</summary><InvitationPanel /></details> : null}
+          </Alert> : null}
+          <CaregiverProfilePanel activeSection={activeSection} role={state.context.membership.role} caregiverName={state.context.user.displayName} />
+          {activeSection === "overview" && state.context.membership.role === "OWNER" ? <details className="care-owner-tools"><summary>Kelola undangan Family Member</summary><InvitationPanel /></details> : null}
         </div>
       </CaregiverProductionShell>
     );

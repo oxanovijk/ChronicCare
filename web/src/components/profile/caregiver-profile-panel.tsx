@@ -499,9 +499,11 @@ function ProfileEditor({
 export function CaregiverProfilePanel({
   role,
   caregiverName = "Caregiver",
+  activeSection = "overview",
 }: {
   role: "OWNER" | "FAMILY_MEMBER";
   caregiverName?: string;
+  activeSection?: "overview" | "care";
 }) {
   const [profiles, setProfiles] = useState<PatientProfile[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -666,7 +668,7 @@ export function CaregiverProfilePanel({
         </Alert>
       ) : null}
 
-      {profiles?.length ? (
+      {profiles && profiles.length > 1 ? (
         <div className="care-active-profile space-y-2">
           <Label htmlFor="active-patient-profile">Patient Profile aktif</Label>
           <select
@@ -682,11 +684,11 @@ export function CaregiverProfilePanel({
             ))}
           </select>
         </div>
-      ) : (
+      ) : profiles?.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           Belum ada Patient yang ditambahkan.
         </p>
-      )}
+      ) : null}
 
       {selectedId && !profile && !error ? (
         <div className="care-profile-loading flex min-h-24 items-center gap-2 text-sm text-muted-foreground">
@@ -698,10 +700,12 @@ export function CaregiverProfilePanel({
         <>
           <CaregiverDashboard
             key={profile.id}
+            section={activeSection}
             patientProfile={profile}
             caregiverName={caregiverName}
             role={role}
           />
+          {activeSection === "overview" ? <>
           <Separator />
           <details className="care-profile-management" open>
             <summary>Kelola detail Patient Profile</summary>
@@ -734,10 +738,11 @@ export function CaregiverProfilePanel({
             </>
           ) : null}
           </details>
+          </> : null}
         </>
       ) : null}
 
-      {role === "OWNER" && (profiles?.length ?? 0) < 2 ? (
+      {activeSection === "overview" && role === "OWNER" && profiles?.length === 0 ? (
         <>
           <Separator />
           <form className="care-create-profile space-y-3" onSubmit={createProfile}>
@@ -778,11 +783,6 @@ export function CaregiverProfilePanel({
         </>
       ) : null}
 
-      {role === "OWNER" && profiles?.length === 2 ? (
-        <p className="text-sm text-muted-foreground">
-          Anda sudah mencapai batas Patient untuk Care Circle ini.
-        </p>
-      ) : null}
     </div>
   );
 }

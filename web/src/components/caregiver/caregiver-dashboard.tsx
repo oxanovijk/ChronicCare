@@ -40,7 +40,7 @@ function readableDate(value: string) {
   return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 }
 
-export function CaregiverDashboard({ patientProfile, caregiverName, role }: { patientProfile: PatientProfileSummary; caregiverName: string; role: "OWNER" | "FAMILY_MEMBER" }) {
+export function CaregiverDashboard({ section = "overview", patientProfile, caregiverName, role }: { section?: "overview" | "care"; patientProfile: PatientProfileSummary; caregiverName: string; role: "OWNER" | "FAMILY_MEMBER" }) {
   const [state, setState] = useState<{ profileId: string; status: "loading" | "ready" | "error" | "expired"; data: DashboardData | null }>({ profileId: patientProfile.id, status: "loading", data: null });
   const [activeForm, setActiveForm] = useState<FormKind | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -101,32 +101,37 @@ export function CaregiverDashboard({ patientProfile, caregiverName, role }: { pa
     : { title: "Tidak ada yang dilaporkan oleh caregiver", copy: "Ini adalah informasi yang dicatat, bukan kepastian klinis." };
 
   return (
-    <div className="care-dashboard" id="daily-care">
+    <div className="care-dashboard" id={section === "care" ? "caregiver-care" : "caregiver-overview"}>
       <header className="care-dashboard-heading">
-        <div><span className="section-kicker"><span aria-hidden="true" /> Ringkasan harian</span><h1>Selamat datang, {firstName}</h1><p>Berikut konteks perawatan {patientProfile.displayName} sesuai informasi yang dicatat.</p></div>
+        {section === "overview" ? (
+          <div><span className="section-kicker"><span aria-hidden="true" /> Ringkasan harian</span><h1>Selamat datang, {firstName}</h1><p>Berikut konteks perawatan {patientProfile.displayName} sesuai informasi yang dicatat.</p></div>
+        ) : (
+          <div><span className="section-kicker"><span aria-hidden="true" /> Perawatan harian</span><h1>Perawatan {patientProfile.displayName}</h1><p>Kelola obat, pengingat, dan catatan perawatan pada Patient aktif.</p></div>
+        )}
         <span className="care-role-tag"><CheckCircle size={16} weight="fill" aria-hidden="true" />{role === "OWNER" ? "Owner" : "Family Member"}</span>
       </header>
 
       {notice ? <p className="care-dashboard-notice" role="status" aria-live="polite">{notice}</p> : null}
 
-      <div className="care-dashboard-columns">
+      <div className={section === "overview" ? "care-dashboard-columns" : "care-dashboard-care-view"}>
         <div className="care-dashboard-primary">
-          <section className="care-motion-card">
+          {section === "care" ? <section className="care-motion-card">
             <div><span className="card-index">Aksi utama</span><h2>Jaga rutinitas tetap mudah diikuti</h2><p>Tambahkan pengingat yang benar-benar tersedia untuk Patient Profile aktif.</p></div>
             <Button type="button" onClick={() => setActiveForm("reminder")}><Clock aria-hidden="true" />Tambah pengingat</Button>
-          </section>
+          </section> : null}
 
           <div className="care-summary-grid">
-            <section className="care-data-card">
+            {section === "overview" ? <section className="care-data-card">
               <div className="care-card-title"><ClipboardText size={22} aria-hidden="true" /><span>Check-in terbaru</span></div>
               {data.latestCheckIn ? <><h2>Kabar terbaru {patientProfile.relationshipLabel}</h2><p className="care-data-primary">{data.latestCheckIn.conditionText ?? data.latestCheckIn.complaintText ?? "Check-in tersimpan tanpa catatan tambahan."}</p><p className="care-metadata">{readableDate(data.latestCheckIn.createdAt)} · {data.latestCheckIn.needsFamilyHelp ? "Meminta dukungan keluarga" : "Sesuai catatan Patient"}</p></> : <><h2>Belum ada check-in untuk {patientProfile.relationshipLabel}</h2><p>Patient belum menyimpan check-in. Daily care tetap dapat digunakan.</p></>}
-            </section>
+            </section> : null}
             <section className="care-data-card">
               <div className="care-card-title"><Pill size={22} aria-hidden="true" /><span>Obat tercatat</span></div>
-              {data.activeMedications.length ? <ul className="care-record-list">{data.activeMedications.map((item) => <li key={item.id}><div><strong>{item.name}</strong><span>{item.doseText}</span><small>{item.scheduleText}</small></div><div className="care-record-actions"><Button size="sm" variant="outline" onClick={() => void mutate(`/medications/${item.id}/logs`, "POST", { status: "TAKEN", scheduledFor: null }, "Log obat tersimpan sesuai catatan.")}>Catat diminum</Button><Button size="sm" variant="ghost" onClick={() => void mutate(`/medications/${item.id}`, "PATCH", { status: "PAUSED", updatedAt: item.updatedAt }, "Status obat diperbarui.")}>Jeda</Button></div></li>)}</ul> : <><h2>{medicationEmpty.title}</h2><p>{medicationEmpty.copy}</p></>}
+              {data.activeMedications.length ? <ul className="care-record-list">{data.activeMedications.map((item) => <li key={item.id}><div><strong>{item.name}</strong><span>{item.doseText}</span><small>{item.scheduleText}</small></div>{section === "care" ? <div className="care-record-actions"><Button size="sm" variant="outline" onClick={() => void mutate(`/medications/${item.id}/logs`, "POST", { status: "TAKEN", scheduledFor: null }, "Log obat tersimpan sesuai catatan.")}>Catat diminum</Button><Button size="sm" variant="ghost" onClick={() => void mutate(`/medications/${item.id}`, "PATCH", { status: "PAUSED", updatedAt: item.updatedAt }, "Status obat diperbarui.")}>Jeda</Button></div> : null}</li>)}</ul> : <><h2>{medicationEmpty.title}</h2><p>{medicationEmpty.copy}</p></>}
             </section>
           </div>
 
+          {section === "care" ? <>
           <section className="care-data-card">
             <div className="care-card-title"><Clock size={22} aria-hidden="true" /><span>Pengingat berikutnya</span></div>
             {data.upcomingReminders.length ? <ul className="care-record-list">{data.upcomingReminders.map((item) => <li key={item.id}><div><strong>{item.title}</strong><span>{item.scheduleText ?? (item.scheduledAt ? readableDate(item.scheduledAt) : "Waktu belum dicatat")}</span><small>Pengingat koordinasi · tidak menjamin notifikasi terkirim</small></div><Button size="sm" variant="outline" onClick={() => void mutate(`/reminders/${item.id}`, "PATCH", { status: "DONE", updatedAt: item.updatedAt }, "Pengingat ditandai selesai.")}>Tandai selesai</Button></li>)}</ul> : <div className="care-empty-inline"><h2>Belum ada pengingat</h2><p>Gunakan aksi utama di atas untuk menambahkan waktu atau jadwal sesuai informasi yang dicatat caregiver.</p></div>}
@@ -143,12 +148,13 @@ export function CaregiverDashboard({ patientProfile, caregiverName, role }: { pa
           </div>
 
           {activeForm ? <DailyCareForms kind={activeForm} patientProfileId={patientProfile.id} patientName={patientProfile.displayName} medications={data.activeMedications.map(({ id, name }) => ({ id, name }))} onClose={() => setActiveForm(null)} onSaved={() => { setNotice("Catatan perawatan sudah disimpan."); setReload((value) => value + 1); }} /> : null}
+          </> : null}
         </div>
 
-        <aside className="care-dashboard-rail" aria-label="Konteks Packet 08">
+        {section === "overview" ? <aside className="care-dashboard-rail" aria-label="Konteks Packet 08">
           <section className="care-setup-card"><div className="care-card-title"><FirstAid size={22} aria-hidden="true" /><span>Checklist setup</span></div><p>Advisory saja. Data yang belum diketahui tidak memblokir daily care.</p>{data.setupChecklist.recommendedActions.length ? <ul>{data.setupChecklist.recommendedActions.slice(0, 4).map((action) => <li key={action}><WarningCircle size={16} aria-hidden="true" />{setupLabels[action] ?? "Tinjau data Patient"}</li>)}</ul> : <p className="care-complete-line"><CheckCircle size={18} weight="fill" aria-hidden="true" />Tidak ada saran pengisian saat ini.</p>}</section>
           <section className="care-unavailable-card"><h2>Fitur berikutnya</h2><ul><li><span>Dokumen & OCR</span><small>Belum tersedia</small></li><li><span>Asisten caregiver</span><small>Belum tersedia</small></li><li><span>SOS Realtime</span><small>Belum tersedia</small></li><li><span>Faskes/BPJS</span><small>Belum tersedia</small></li></ul></section>
-        </aside>
+        </aside> : null}
       </div>
     </div>
   );

@@ -109,6 +109,8 @@ describe("Owner onboarding service", () => {
     expect(result.membership.careCircleId).toBe("circle-existing");
     expect(tx.user.create).not.toHaveBeenCalled();
     expect(tx.careCircle.create).not.toHaveBeenCalled();
+    expect(tx.careCircleMember.create).not.toHaveBeenCalled();
+    expect(tx.auditEvent.create).not.toHaveBeenCalled();
   });
 
   it("does not let a removed application user create a new Owner circle", async () => {

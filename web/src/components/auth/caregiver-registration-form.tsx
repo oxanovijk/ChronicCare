@@ -12,6 +12,112 @@ import { Label } from "@/components/ui/label";
 import { caregiverRegistrationSchema } from "@/lib/onboarding/schemas";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
+type RegistrationValues = {
+  displayName: string;
+  careCircleName: string;
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+};
+
+type RegistrationField = keyof RegistrationValues;
+type RegistrationErrors = Partial<Record<RegistrationField, string>>;
+
+const registrationFields: RegistrationField[] = [
+  "displayName",
+  "careCircleName",
+  "email",
+  "password",
+  "passwordConfirmation",
+];
+
+const registrationFieldIds: Record<RegistrationField, string> = {
+  displayName: "registration-display-name",
+  careCircleName: "registration-circle-name",
+  email: "registration-email",
+  password: "registration-password",
+  passwordConfirmation: "registration-password-confirmation",
+};
+
+const existingIdentityErrorCodes = new Set([
+  "email_exists",
+  "user_already_exists",
+]);
+
+function validationMessage(
+  field: RegistrationField,
+  value: string,
+  issueCode: string,
+) {
+  const empty = value.trim().length === 0;
+
+  if (field === "displayName") {
+    if (empty) return "Masukkan nama tampilan.";
+    return issueCode === "too_big"
+      ? "Nama tampilan maksimal 120 karakter."
+      : "Nama tampilan minimal 2 karakter.";
+  }
+  if (field === "careCircleName") {
+    if (empty) return "Masukkan nama Care Circle.";
+    return issueCode === "too_big"
+      ? "Nama Care Circle maksimal 120 karakter."
+      : "Nama Care Circle minimal 2 karakter.";
+  }
+  if (field === "email") {
+    if (empty) return "Masukkan email.";
+    return issueCode === "too_big"
+      ? "Email maksimal 254 karakter."
+      : "Masukkan alamat email yang valid.";
+  }
+  if (field === "password") {
+    if (empty) return "Masukkan kata sandi.";
+    return issueCode === "too_big"
+      ? "Kata sandi maksimal 72 karakter."
+      : "Kata sandi minimal 8 karakter.";
+  }
+  if (empty) return "Ulangi kata sandi.";
+  if (issueCode === "too_small") {
+    return "Konfirmasi kata sandi minimal 8 karakter.";
+  }
+  if (issueCode === "too_big") {
+    return "Konfirmasi kata sandi maksimal 72 karakter.";
+  }
+  return "Kata sandi belum sama.";
+}
+
+function validateRegistration(values: RegistrationValues) {
+  const result = caregiverRegistrationSchema.safeParse(values);
+  const errors: RegistrationErrors = {};
+
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      const field = issue.path[0];
+      if (
+        typeof field !== "string" ||
+        !registrationFields.includes(field as RegistrationField)
+      ) {
+        continue;
+      }
+      const registrationField = field as RegistrationField;
+      errors[registrationField] ??= validationMessage(
+        registrationField,
+        values[registrationField],
+        issue.code,
+      );
+    }
+  }
+
+  return { result, errors };
+}
+
+function FieldError({ id, message }: { id: string; message?: string }) {
+  return message ? (
+    <p id={id} className="text-sm text-destructive" role="alert">
+      {message}
+    </p>
+  ) : null;
+}
+
 export function CaregiverRegistrationForm() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState("");
@@ -21,9 +127,10 @@ export function CaregiverRegistrationForm() {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [state, setState] = useState<"form" | "verification" | "error">("form");
-  const [validationMessage, setValidationMessage] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<RegistrationErrors>({});
   const statusRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (state === "verification") statusRef.current?.focus();
@@ -32,7 +139,6 @@ export function CaregiverRegistrationForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setValidationMessage(null);
     setState("form");
     const values = {
       displayName,
@@ -41,15 +147,23 @@ export function CaregiverRegistrationForm() {
       password,
       passwordConfirmation,
     };
-    const parsed = caregiverRegistrationSchema.safeParse(values);
-    if (!parsed.success) {
-      setValidationMessage(
-        password !== passwordConfirmation
-          ? "Kata sandi belum sama."
-          : "Periksa kembali data pendaftaran.",
+    const validation = validateRegistration(values);
+    if (!validation.result.success) {
+      setValidationErrors(validation.errors);
+      const firstInvalidField = registrationFields.find(
+        (field) => validation.errors[field],
       );
+      if (firstInvalidField) {
+        formRef.current
+          ?.querySelector<HTMLInputElement>(
+            `#${registrationFieldIds[firstInvalidField]}`,
+          )
+          ?.focus();
+      }
       return;
     }
+    setValidationErrors({});
+    const parsed = validation.result;
 
     const submittedPassword = parsed.data.password;
     setPassword("");
@@ -70,7 +184,13 @@ export function CaregiverRegistrationForm() {
           },
         },
       });
-      if (error) throw new Error("SIGN_UP_FAILED");
+      if (error) {
+        if (error.code && existingIdentityErrorCodes.has(error.code)) {
+          setState("verification");
+          return;
+        }
+        throw new Error("SIGN_UP_FAILED");
+      }
       if (!data.session) {
         setState("verification");
         return;
@@ -95,6 +215,11 @@ export function CaregiverRegistrationForm() {
     }
   }
 
+  function revalidate(nextValues: RegistrationValues) {
+    if (Object.keys(validationErrors).length === 0) return;
+    setValidationErrors(validateRegistration(nextValues).errors);
+  }
+
   if (state === "verification") {
     return (
       <Alert
@@ -104,10 +229,10 @@ export function CaregiverRegistrationForm() {
         className="border-emerald-200 bg-emerald-50 text-emerald-950"
       >
         <MailCheck aria-hidden="true" />
-        <AlertTitle>Periksa email Anda</AlertTitle>
+        <AlertTitle>Periksa email atau masuk</AlertTitle>
         <AlertDescription>
-          Kami mengirim tautan konfirmasi ke email Anda. Setelah dikonfirmasi,
-          kembali dan masuk untuk melanjutkan.
+          Jika alamat ini dapat didaftarkan, kami mengirim tautan konfirmasi.
+          Jika Anda sudah punya akun, gunakan tombol masuk di bawah.
         </AlertDescription>
       </Alert>
     );
@@ -132,29 +257,110 @@ export function CaregiverRegistrationForm() {
             </AlertDescription>
           </Alert>
         ) : null}
-        {validationMessage ? (
-          <p className="mb-4 text-sm text-destructive">{validationMessage}</p>
-        ) : null}
-        <form className="space-y-4" onSubmit={submit} noValidate>
+        <form ref={formRef} className="space-y-4" onSubmit={submit} noValidate>
           <div className="space-y-2">
             <Label htmlFor="registration-display-name">Nama tampilan</Label>
-            <Input id="registration-display-name" value={displayName} onChange={(event) => setDisplayName(event.target.value)} autoComplete="name" required disabled={submitting} />
+            <Input
+              id="registration-display-name"
+              value={displayName}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                setDisplayName(nextValue);
+                revalidate({ displayName: nextValue, careCircleName, email, password, passwordConfirmation });
+              }}
+              autoComplete="name"
+              minLength={2}
+              maxLength={120}
+              required
+              disabled={submitting}
+              aria-invalid={validationErrors.displayName ? true : undefined}
+              aria-describedby={validationErrors.displayName ? "registration-display-name-error" : undefined}
+            />
+            <FieldError id="registration-display-name-error" message={validationErrors.displayName} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="registration-circle-name">Nama Care Circle</Label>
-            <Input id="registration-circle-name" value={careCircleName} onChange={(event) => setCareCircleName(event.target.value)} required disabled={submitting} />
+            <Input
+              id="registration-circle-name"
+              value={careCircleName}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                setCareCircleName(nextValue);
+                revalidate({ displayName, careCircleName: nextValue, email, password, passwordConfirmation });
+              }}
+              minLength={2}
+              maxLength={120}
+              required
+              disabled={submitting}
+              aria-invalid={validationErrors.careCircleName ? true : undefined}
+              aria-describedby={validationErrors.careCircleName ? "registration-circle-name-error" : undefined}
+            />
+            <FieldError id="registration-circle-name-error" message={validationErrors.careCircleName} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="registration-email">Email</Label>
-            <Input id="registration-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required disabled={submitting} />
+            <Input
+              id="registration-email"
+              type="email"
+              value={email}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                setEmail(nextValue);
+                revalidate({ displayName, careCircleName, email: nextValue, password, passwordConfirmation });
+              }}
+              autoComplete="email"
+              maxLength={254}
+              required
+              disabled={submitting}
+              aria-invalid={validationErrors.email ? true : undefined}
+              aria-describedby={validationErrors.email ? "registration-email-error" : undefined}
+            />
+            <FieldError id="registration-email-error" message={validationErrors.email} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="registration-password">Kata sandi</Label>
-            <Input id="registration-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" minLength={8} maxLength={72} required disabled={submitting} />
+            <Input
+              id="registration-password"
+              type="password"
+              value={password}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                setPassword(nextValue);
+                revalidate({ displayName, careCircleName, email, password: nextValue, passwordConfirmation });
+              }}
+              autoComplete="new-password"
+              minLength={8}
+              maxLength={72}
+              required
+              disabled={submitting}
+              aria-invalid={validationErrors.password ? true : undefined}
+              aria-describedby={validationErrors.password ? "registration-password-error" : undefined}
+            />
+            <FieldError id="registration-password-error" message={validationErrors.password} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="registration-password-confirmation">Ulangi kata sandi</Label>
-            <Input id="registration-password-confirmation" type="password" value={passwordConfirmation} onChange={(event) => setPasswordConfirmation(event.target.value)} autoComplete="new-password" minLength={8} maxLength={72} required disabled={submitting} />
+            <Input
+              id="registration-password-confirmation"
+              type="password"
+              value={passwordConfirmation}
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                setPasswordConfirmation(nextValue);
+                revalidate({ displayName, careCircleName, email, password, passwordConfirmation: nextValue });
+              }}
+              autoComplete="new-password"
+              minLength={8}
+              maxLength={72}
+              required
+              disabled={submitting}
+              aria-invalid={validationErrors.passwordConfirmation ? true : undefined}
+              aria-describedby={validationErrors.passwordConfirmation ? "registration-password-confirmation-error" : undefined}
+            />
+            <FieldError
+              id="registration-password-confirmation-error"
+              message={validationErrors.passwordConfirmation}
+            />
           </div>
           <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : <UserPlus aria-hidden="true" />}

@@ -28,6 +28,55 @@ function profile(id: string, displayName: string, relationshipLabel: string) {
 }
 
 describe("caregiver profile switching", () => {
+  it("presents one Patient as the only active care context", async () => {
+    const maya = profile("maya-id", "Maya Pratama", "Ibu");
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url === "/api/v1/patient-profiles") {
+        return Response.json({ data: [maya] });
+      }
+      if (url.endsWith("maya-id")) return Response.json({ data: maya });
+      return new Response(null, { status: 404 });
+    });
+
+    render(<CaregiverProfilePanel role="OWNER" />);
+
+    expect(
+      await screen.findByRole("heading", { level: 3, name: "Maya Pratama" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("Patient Profile aktif"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Tambahkan Patient" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Anda sudah mencapai batas Patient untuk Care Circle ini."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps the selector for legacy Owners with two Patients without offering another", async () => {
+    const maya = profile("maya-id", "Maya Pratama", "Ibu");
+    const raka = profile("raka-id", "Raka Pratama", "Ayah");
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const url = String(input);
+      if (url === "/api/v1/patient-profiles") {
+        return Response.json({ data: [maya, raka] });
+      }
+      if (url.endsWith("maya-id")) return Response.json({ data: maya });
+      return new Response(null, { status: 404 });
+    });
+
+    render(<CaregiverProfilePanel role="OWNER" />);
+
+    expect(
+      await screen.findByLabelText("Patient Profile aktif"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Tambahkan Patient" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("clears Maya details while Raka is still loading", async () => {
     const maya = profile("maya-id", "Maya Pratama", "Maya");
     const raka = profile("raka-id", "Raka Pratama", "Raka");

@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { CaregiverDashboard } from "@/components/caregiver/caregiver-dashboard";
+import { CaregiverProductionShell } from "@/components/caregiver/caregiver-production-shell";
 
 const maya = { id: "maya-id", displayName: "Maya Pratama", relationshipLabel: "Maya", currentMedicationsStatus: "REPORTED" as const };
 const raka = { id: "raka-id", displayName: "Raka Pratama", relationshipLabel: "Raka", currentMedicationsStatus: "UNKNOWN" as const };
@@ -47,13 +48,51 @@ function dashboard(profile: { id: string; displayName: string; relationshipLabel
 }
 
 describe("Packet 08 caregiver dashboard UI", () => {
+  it("marks only the selected caregiver section as current", () => {
+    const view = render(
+      <CaregiverProductionShell
+        activeSection="overview"
+        caregiverName="Dimas"
+        role="OWNER"
+        onLogout={vi.fn()}
+        loggingOut={false}
+      >
+        <p>Konten</p>
+      </CaregiverProductionShell>,
+    );
+
+    for (const link of screen.getAllByRole("link", { name: "Ringkasan" })) {
+      expect(link).toHaveAttribute("aria-current", "page");
+    }
+    for (const link of screen.getAllByRole("link", { name: "Perawatan" })) {
+      expect(link).not.toHaveAttribute("aria-current");
+    }
+
+    view.rerender(
+      <CaregiverProductionShell
+        activeSection="care"
+        caregiverName="Dimas"
+        role="OWNER"
+        onLogout={vi.fn()}
+        loggingOut={false}
+      >
+        <p>Konten</p>
+      </CaregiverProductionShell>,
+    );
+
+    for (const link of screen.getAllByRole("link", { name: "Perawatan" })) {
+      expect(link).toHaveAttribute("aria-current", "page");
+    }
+  });
+
   it("shows real Packet 07–08 data and honest later-feature states", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ data: dashboard() }));
-    render(<CaregiverDashboard patientProfile={maya} caregiverName="Dimas" role="OWNER" />);
+    render(<CaregiverDashboard section="overview" patientProfile={maya} caregiverName="Dimas" role="OWNER" />);
     expect(await screen.findByRole("heading", { name: "Kabar terbaru Maya" })).toBeInTheDocument();
     expect(screen.getByText("Sedikit lelah.")).toBeInTheDocument();
     expect(screen.getByText("500 mg sesuai catatan caregiver")).toBeInTheDocument();
-    expect(screen.getByText("Belum ada pengingat")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Tambah pengingat" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Catat obat" })).not.toBeInTheDocument();
     expect(screen.queryByText(/dokumen perlu ditinjau/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/SOS aktif/i)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /prototype/i })).not.toBeInTheDocument();
@@ -86,8 +125,9 @@ describe("Packet 08 caregiver dashboard UI", () => {
   it("opens a working Packet 08 reminder form with visible labels", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ data: dashboard() }));
     const user = userEvent.setup();
-    render(<CaregiverDashboard patientProfile={maya} caregiverName="Dimas" role="OWNER" />);
+    render(<CaregiverDashboard section="care" patientProfile={maya} caregiverName="Dimas" role="OWNER" />);
     await user.click(await screen.findByRole("button", { name: "Tambah pengingat" }));
+    expect(screen.queryByRole("heading", { name: "Kabar terbaru Maya" })).not.toBeInTheDocument();
     expect(screen.getByLabelText("Judul pengingat")).toBeInTheDocument();
     expect(screen.getByText(/tidak mengirim notifikasi sistem operasi/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Batal" })).toBeInTheDocument();
@@ -96,7 +136,7 @@ describe("Packet 08 caregiver dashboard UI", () => {
   it("exposes optional recorded dates without clinical recommendations", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ data: dashboard() }));
     const user = userEvent.setup();
-    render(<CaregiverDashboard patientProfile={maya} caregiverName="Dimas" role="OWNER" />);
+    render(<CaregiverDashboard section="care" patientProfile={maya} caregiverName="Dimas" role="OWNER" />);
     await user.click(await screen.findByRole("button", { name: "Catat obat" }));
     expect(screen.getByLabelText("Tanggal mulai (opsional)")).toBeInTheDocument();
     expect(screen.getByLabelText("Tanggal selesai (opsional)")).toBeInTheDocument();

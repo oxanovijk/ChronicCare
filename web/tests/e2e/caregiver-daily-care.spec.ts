@@ -36,6 +36,13 @@ test("caregiver daily-care journey works at desktop and mobile", async ({ page }
     const profileSelector = page.getByLabel("Patient Profile aktif");
     await expect(profileSelector).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText("Berikut konteks perawatan Maya Pratama sesuai informasi yang dicatat.")).toBeVisible();
+    await page
+      .getByRole("navigation", { name: "Navigasi caregiver", exact: true })
+      .getByRole("link", { name: "Perawatan" })
+      .click();
+    await expect(page).toHaveURL(/\/caregiver\?section=care$/);
+    await expect(page.getByRole("heading", { name: "Perawatan Maya Pratama" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Kabar terbaru Maya" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Tambah pengingat" })).toBeVisible();
 
     await page.getByRole("button", { name: "Tambah pengingat" }).click();
@@ -122,12 +129,14 @@ test("caregiver daily-care journey works at desktop and mobile", async ({ page }
     await expect(page.getByText(reminderTitle)).toHaveCount(0);
 
     await profileSelector.selectOption({ label: "Raka Pratama" });
-    await expect(page.getByText("Berikut konteks perawatan Raka Pratama sesuai informasi yang dicatat.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Perawatan Raka Pratama" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Belum diketahui" })).toBeVisible();
     await expect(page.getByText(noteTitle)).toHaveCount(0);
 
     await page.setViewportSize({ width: 390, height: 844 });
-    await expect(page.getByRole("navigation", { name: "Navigasi caregiver mobile" })).toBeVisible();
+    const mobileNavigation = page.getByRole("navigation", { name: "Navigasi caregiver mobile" });
+    await expect(mobileNavigation).toBeVisible();
+    await expect(mobileNavigation.getByRole("link", { name: "Perawatan" })).toHaveAttribute("aria-current", "page");
     expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
   } finally {
     await cleanupSyntheticDailyCare({ medicationName, reminderTitle, noteTitle });

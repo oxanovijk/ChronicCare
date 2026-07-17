@@ -40,6 +40,98 @@ describe("Caregiver registration UI", () => {
     vi.restoreAllMocks();
   });
 
+  it("shows specific errors for every invalid registration field", async () => {
+    const user = userEvent.setup();
+    render(<CaregiverRegistrationForm />);
+
+    fireEvent.change(screen.getByLabelText("Nama tampilan"), {
+      target: { value: "N" },
+    });
+    fireEvent.change(screen.getByLabelText("Nama Care Circle"), {
+      target: { value: "K" },
+    });
+    fireEvent.change(screen.getByLabelText("Email"), {
+      target: { value: "email-tidak-valid" },
+    });
+    fireEvent.change(screen.getByLabelText("Kata sandi"), {
+      target: { value: "pendek" },
+    });
+    fireEvent.change(screen.getByLabelText("Ulangi kata sandi"), {
+      target: { value: "berbeda" },
+    });
+
+    await user.click(screen.getByRole("button", { name: "Daftar sebagai Owner" }));
+
+    expect(screen.getByText("Nama tampilan minimal 2 karakter.")).toBeVisible();
+    expect(screen.getByText("Nama Care Circle minimal 2 karakter.")).toBeVisible();
+    expect(screen.getByText("Masukkan alamat email yang valid.")).toBeVisible();
+    expect(screen.getByText("Kata sandi minimal 8 karakter.")).toBeVisible();
+    expect(
+      screen.getByText("Konfirmasi kata sandi minimal 8 karakter."),
+    ).toBeVisible();
+    expect(screen.getByLabelText("Nama tampilan")).toHaveFocus();
+    expect(screen.getByLabelText("Nama tampilan")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    expect(screen.getByLabelText("Nama tampilan")).toHaveAttribute(
+      "aria-describedby",
+      "registration-display-name-error",
+    );
+    expect(signUp).not.toHaveBeenCalled();
+  });
+
+  it("shows required messages and updates them after fields are corrected", async () => {
+    const user = userEvent.setup();
+    render(<CaregiverRegistrationForm />);
+
+    await user.click(screen.getByRole("button", { name: "Daftar sebagai Owner" }));
+
+    expect(screen.getByText("Masukkan nama tampilan.")).toBeVisible();
+    expect(screen.getByText("Masukkan nama Care Circle.")).toBeVisible();
+    expect(screen.getByText("Masukkan email.")).toBeVisible();
+    expect(screen.getByText("Masukkan kata sandi.")).toBeVisible();
+    expect(screen.getByText("Ulangi kata sandi.")).toBeVisible();
+
+    await user.type(screen.getByLabelText("Nama tampilan"), "Nadia Santoso");
+
+    expect(screen.queryByText("Masukkan nama tampilan.")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Nama tampilan")).not.toHaveAttribute(
+      "aria-invalid",
+    );
+  });
+
+  it("distinguishes maximum lengths and a mismatched confirmation", async () => {
+    const user = userEvent.setup();
+    render(<CaregiverRegistrationForm />);
+    fillRegistration();
+
+    fireEvent.change(screen.getByLabelText("Nama tampilan"), {
+      target: { value: "N".repeat(121) },
+    });
+    fireEvent.change(screen.getByLabelText("Nama Care Circle"), {
+      target: { value: "K".repeat(121) },
+    });
+    fireEvent.change(screen.getByLabelText("Email"), {
+      target: { value: `${"a".repeat(244)}@example.com` },
+    });
+    fireEvent.change(screen.getByLabelText("Kata sandi"), {
+      target: { value: "P".repeat(73) },
+    });
+    fireEvent.change(screen.getByLabelText("Ulangi kata sandi"), {
+      target: { value: "KonfirmasiBerbeda123!" },
+    });
+
+    await user.click(screen.getByRole("button", { name: "Daftar sebagai Owner" }));
+
+    expect(screen.getByText("Nama tampilan maksimal 120 karakter.")).toBeVisible();
+    expect(screen.getByText("Nama Care Circle maksimal 120 karakter.")).toBeVisible();
+    expect(screen.getByText("Email maksimal 254 karakter.")).toBeVisible();
+    expect(screen.getByText("Kata sandi maksimal 72 karakter.")).toBeVisible();
+    expect(screen.getByText("Kata sandi belum sama.")).toBeVisible();
+    expect(signUp).not.toHaveBeenCalled();
+  });
+
   it("creates Auth identity, bootstraps Owner, and clears passwords", async () => {
     signUp.mockResolvedValue({ data: { session: {} }, error: null });
     const fetch = vi.spyOn(globalThis, "fetch").mockResolvedValue(
@@ -87,22 +179,53 @@ describe("Caregiver registration UI", () => {
 
     await user.click(screen.getByRole("button", { name: "Daftar sebagai Owner" }));
 
-    expect(await screen.findByText("Periksa email Anda")).toBeInTheDocument();
+    expect(await screen.findByText("Periksa email atau masuk")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Jika alamat ini dapat didaftarkan, kami mengirim tautan konfirmasi. Jika Anda sudah punya akun, gunakan tombol masuk di bawah.",
+      ),
+    ).toBeVisible();
     expect(screen.getByRole("status")).toHaveFocus();
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("keeps provider detail private and validates password confirmation", async () => {
+  it("uses the same neutral state for an obfuscated existing identity", async () => {
+    signUp.mockResolvedValue({
+      data: {
+        session: null,
+        user: { id: "obfuscated-user", identities: [] },
+      },
+      error: null,
+    });
+    const fetch = vi.spyOn(globalThis, "fetch");
+    const user = userEvent.setup();
+    render(<CaregiverRegistrationForm />);
+    fillRegistration();
+
+    await user.click(screen.getByRole("button", { name: "Daftar sebagai Owner" }));
+
+    expect(await screen.findByText("Periksa email atau masuk")).toBeVisible();
+    expect(document.body.textContent).not.toContain("sudah terdaftar");
+    expect(document.body.textContent).not.toContain("nadia@example.com");
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it.each(["email_exists", "user_already_exists"])(
+    "keeps provider detail private for %s and validates password confirmation",
+    async (errorCode) => {
     signUp.mockResolvedValue({
       data: { session: null },
-      error: { message: "User already registered: nadia@example.com" },
+      error: {
+        code: errorCode,
+        message: "User already registered: nadia@example.com",
+      },
     });
     const user = userEvent.setup();
     render(<CaregiverRegistrationForm />);
 
     fillRegistration();
     fireEvent.change(screen.getByLabelText("Ulangi kata sandi"), {
-      target: { value: "berbeda" },
+      target: { value: "BerbedaPass123!" },
     });
     await user.click(screen.getByRole("button", { name: "Daftar sebagai Owner" }));
     expect(screen.getByText("Kata sandi belum sama.")).toBeInTheDocument();
@@ -112,11 +235,13 @@ describe("Caregiver registration UI", () => {
       target: { value: "SyntheticPass123!" },
     });
     await user.click(screen.getByRole("button", { name: "Daftar sebagai Owner" }));
-    expect(await screen.findByText("Pendaftaran belum dapat diselesaikan"))
+    expect(await screen.findByText("Periksa email atau masuk"))
       .toBeInTheDocument();
-    expect(screen.getByRole("alert")).toHaveFocus();
+    expect(screen.getByRole("status")).toHaveFocus();
     expect(document.body.textContent).not.toContain("User already registered");
-  });
+    expect(document.body.textContent).not.toContain("nadia@example.com");
+    },
+  );
 
   it("resumes Owner bootstrap for an authenticated account", async () => {
     const onComplete = vi.fn();

@@ -11,7 +11,14 @@ import { PatientAuthError, resolvePatientAuthContext } from "@/lib/auth/patient"
 export const metadata: Metadata = { title: "Area Caregiver" };
 export const dynamic = "force-dynamic";
 
-export default async function CaregiverPage() {
+export default async function CaregiverPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ section?: string | string[] }>;
+} = {}) {
+  const query = (await searchParams) ?? {};
+  const activeSection = query.section === "care" ? "care" : "overview";
+
   try {
     await resolvePatientAuthContext();
     redirect("/patient");
@@ -36,7 +43,7 @@ export default async function CaregiverPage() {
         </div>
 
         <div className="production-caregiver-layout">
-          <CaregiverAuthPanel />
+          <CaregiverAuthPanel activeSection={activeSection} />
           <aside className="caregiver-security-note">
             <LockKey size={24} weight="bold" aria-hidden="true" />
             <div>
