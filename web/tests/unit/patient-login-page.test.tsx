@@ -8,7 +8,10 @@ describe("patient login shell page", () => {
     render(<PatientLoginShellPage />);
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "Masuk sebagai Patient" }),
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Selamat datang. Mari mulai dengan aman.",
+      }),
     ).toBeInTheDocument();
   });
 
@@ -26,7 +29,7 @@ describe("patient login shell page", () => {
     render(<PatientLoginShellPage />);
 
     expect(
-      screen.getByRole("link", { name: "Kembali ke beranda" }),
+      screen.getByRole("link", { name: "Beranda" }),
     ).toHaveAttribute("href", "/");
   });
 });

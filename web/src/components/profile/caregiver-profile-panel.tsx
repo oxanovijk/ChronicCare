@@ -1,7 +1,9 @@
 "use client";
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { LoaderCircle, Plus, Save } from "lucide-react";
+import { FloppyDisk } from "@phosphor-icons/react/dist/csr/FloppyDisk";
+import { Plus } from "@phosphor-icons/react/dist/csr/Plus";
+import { SpinnerGap } from "@phosphor-icons/react/dist/csr/SpinnerGap";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -75,7 +77,7 @@ function FactStatusSelect({
       id={id}
       value={value}
       onChange={(event) => onChange(event.target.value as FactStatus)}
-      className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+      className="care-profile-select border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
     >
       <option value="UNKNOWN">Belum diketahui</option>
       <option value="NONE_REPORTED">Tidak ada yang dilaporkan</option>
@@ -141,7 +143,7 @@ function DeactivateProfileDialog({
       <DialogTrigger render={<Button type="button" variant="destructive" />}>
         Nonaktifkan profil
       </DialogTrigger>
-      <DialogContent showCloseButton={!submitting}>
+      <DialogContent className="care-lifecycle-dialog" showCloseButton={!submitting}>
         <DialogHeader>
           <DialogTitle>Akhiri perawatan profil</DialogTitle>
           <DialogDescription>
@@ -159,7 +161,7 @@ function DeactivateProfileDialog({
               onChange={(event) =>
                 setReason(event.target.value as DeactivationReason)
               }
-              className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+              className="care-profile-select border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
             >
               <option value="NO_LONGER_CARED">Perawatan berakhir</option>
               <option value="OTHER">Pasien berpindah perawatan</option>
@@ -201,7 +203,7 @@ function DeactivateProfileDialog({
             </DialogClose>
             <Button type="submit" variant="destructive" disabled={submitting}>
               {submitting ? (
-                <LoaderCircle className="animate-spin" aria-hidden="true" />
+                <SpinnerGap className="animate-spin" aria-hidden="true" />
               ) : null}
               Akhiri perawatan profil
             </Button>
@@ -316,8 +318,8 @@ function ProfileEditor({
   }
 
   return (
-    <form className="space-y-5" onSubmit={save}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <form className="care-profile-editor space-y-5" onSubmit={save}>
+      <div className="care-profile-editor-heading flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="font-medium">{profile.displayName}</h3>
           <p className="text-sm text-muted-foreground">
@@ -327,9 +329,9 @@ function ProfileEditor({
         </div>
         <Button type="submit" disabled={submitting}>
           {submitting ? (
-            <LoaderCircle className="animate-spin" aria-hidden="true" />
+            <SpinnerGap className="animate-spin" aria-hidden="true" />
           ) : (
-            <Save aria-hidden="true" />
+            <FloppyDisk aria-hidden="true" />
           )}
           Simpan profil
         </Button>
@@ -348,7 +350,7 @@ function ProfileEditor({
         </Alert>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="care-profile-section grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor={`birth-${profile.id}`}>Tanggal lahir</Label>
           <Input
@@ -379,7 +381,7 @@ function ProfileEditor({
 
       <Separator />
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="care-profile-section grid gap-5 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor={`conditions-status-${profile.id}`}>Kondisi utama</Label>
           <FactStatusSelect
@@ -419,7 +421,7 @@ function ProfileEditor({
               setCurrentMedicationsStatus(event.target.value as FactStatus)
             }
             disabled={currentMedicationsStatus === "REPORTED"}
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+            className="care-profile-select border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
           >
             <option value="UNKNOWN">Belum diketahui</option>
             <option value="NONE_REPORTED">Tidak ada yang dilaporkan</option>
@@ -438,7 +440,7 @@ function ProfileEditor({
 
       <Separator />
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="care-profile-section grid gap-5 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor={`contact-status-${profile.id}`}>Kontak darurat</Label>
           <FactStatusSelect
@@ -469,7 +471,7 @@ function ProfileEditor({
             onChange={(event) =>
               setBpjsMembershipStatus(event.target.value as BpjsStatus)
             }
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+            className="care-profile-select border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
           >
             <option value="UNKNOWN">Belum diketahui</option>
             <option value="NOT_REGISTERED">Dilaporkan belum terdaftar</option>
@@ -606,15 +608,15 @@ export function CaregiverProfilePanel({
 
   if (!profiles && !error) {
     return (
-      <div className="flex min-h-24 items-center gap-2 text-sm text-muted-foreground">
-        <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+      <div className="care-profile-loading flex min-h-24 items-center gap-2 text-sm text-muted-foreground">
+        <SpinnerGap className="size-4 animate-spin" aria-hidden="true" />
         Memuat Patient Profile.
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <div className="care-profile-workspace space-y-5">
       {error ? (
         <Alert variant="destructive">
           <AlertTitle>Patient Profile belum dapat dimuat</AlertTitle>
@@ -654,13 +656,13 @@ export function CaregiverProfilePanel({
       ) : null}
 
       {profiles?.length ? (
-        <div className="space-y-2">
+        <div className="care-active-profile space-y-2">
           <Label htmlFor="active-patient-profile">Patient Profile aktif</Label>
           <select
             id="active-patient-profile"
             value={selectedId ?? ""}
             onChange={(event) => chooseProfile(event.target.value)}
-            className="border-input bg-background h-10 w-full rounded-md border px-3"
+            className="care-profile-select border-input bg-background h-10 w-full rounded-md border px-3"
           >
             {profiles.map((item) => (
               <option key={item.id} value={item.id}>
@@ -676,8 +678,8 @@ export function CaregiverProfilePanel({
       )}
 
       {selectedId && !profile && !error ? (
-        <div className="flex min-h-24 items-center gap-2 text-sm text-muted-foreground">
-          <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+        <div className="care-profile-loading flex min-h-24 items-center gap-2 text-sm text-muted-foreground">
+          <SpinnerGap className="size-4 animate-spin" aria-hidden="true" />
           Memuat {profiles?.find((item) => item.id === selectedId)?.displayName}.
         </div>
       ) : null}
@@ -691,7 +693,7 @@ export function CaregiverProfilePanel({
           {role === "OWNER" ? (
             <>
               <Separator />
-              <div className="space-y-2">
+              <div className="care-danger-zone space-y-2">
                 <h3 className="font-medium">Akhiri perawatan profil</h3>
                 <p className="text-sm text-muted-foreground">
                   Gunakan hanya saat profil tidak lagi menjadi bagian dari
@@ -710,7 +712,7 @@ export function CaregiverProfilePanel({
       {role === "OWNER" && (profiles?.length ?? 0) < 2 ? (
         <>
           <Separator />
-          <form className="space-y-3" onSubmit={createProfile}>
+          <form className="care-create-profile space-y-3" onSubmit={createProfile}>
             <h3 className="font-medium">Tambah Patient Profile</h3>
             <p className="text-sm text-muted-foreground">
               Nama dan label hubungan cukup untuk membuat profil. Data opsional
@@ -738,7 +740,7 @@ export function CaregiverProfilePanel({
             </div>
             <Button type="submit" variant="outline" disabled={creating}>
               {creating ? (
-                <LoaderCircle className="animate-spin" aria-hidden="true" />
+                <SpinnerGap className="animate-spin" aria-hidden="true" />
               ) : (
                 <Plus aria-hidden="true" />
               )}

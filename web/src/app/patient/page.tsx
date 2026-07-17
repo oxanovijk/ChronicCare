@@ -1,19 +1,11 @@
+import { CheckCircle } from "@phosphor-icons/react/dist/ssr/CheckCircle";
+import { LockKey } from "@phosphor-icons/react/dist/ssr/LockKey";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PatientLogoutButton } from "@/components/auth/patient-logout-button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  PatientAuthError,
-  resolvePatientAuthContext,
-} from "@/lib/auth/patient";
+import { BrandMark } from "@/components/brand-mark";
+import { PatientAuthError, resolvePatientAuthContext } from "@/lib/auth/patient";
 
 export const metadata: Metadata = { title: "Beranda Patient" };
 export const dynamic = "force-dynamic";
@@ -28,31 +20,31 @@ export default async function PatientPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-12">
-      <Badge variant="secondary" className="w-fit">
-        Patient Profile aktif
-      </Badge>
-      <div className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Halo, {context.patientProfile.displayName}
-        </h1>
-        <p className="text-muted-foreground">
-          Sesi ini hanya terhubung ke profil{" "}
-          {context.patientProfile.relationshipLabel}.
-        </p>
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Akses Patient sudah aktif</CardTitle>
-          <CardDescription>
-            Check-in, pengingat, chatbot, dan SOS akan tersedia pada packet
-            masing-masing.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <main className="patient-session-page">
+      <header className="patient-session-header"><BrandMark /></header>
+      <section className="patient-session-content" aria-labelledby="patient-session-title">
+        <div className="patient-session-identity">
+          <span className="patient-session-badge"><CheckCircle size={19} weight="fill" aria-hidden="true" />Patient Profile aktif</span>
+          <h1 id="patient-session-title">Halo, {context.patientProfile.displayName}</h1>
+          <p>{context.patientProfile.relationshipLabel}</p>
+        </div>
+
+        <div className="patient-session-card">
+          <span className="patient-session-card-icon" aria-hidden="true"><LockKey size={26} weight="bold" /></span>
+          <div>
+            <h2>Akses Patient sudah aktif</h2>
+            <p>
+              Sesi ini hanya terhubung ke profil {context.patientProfile.displayName}.
+              Kamu tidak dapat melihat atau memilih Patient Profile lain.
+            </p>
+            <p className="patient-session-notice">
+              Fitur perawatan harian belum tersedia pada tahap ini.
+            </p>
+          </div>
           <PatientLogoutButton />
-        </CardContent>
-      </Card>
+        </div>
+      </section>
+      <footer className="patient-session-footer">Koordinasi perawatan, bukan pengganti bantuan medis.</footer>
     </main>
   );
 }

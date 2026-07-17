@@ -1,19 +1,9 @@
 "use client";
 
+import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
+import { LockKey } from "@phosphor-icons/react/dist/csr/LockKey";
+import { ShieldCheck } from "@phosphor-icons/react/dist/csr/ShieldCheck";
 import { type FormEvent, useState } from "react";
-import { LoaderCircle, LogIn } from "lucide-react";
-
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export function PatientLoginForm() {
   const [code, setCode] = useState("");
@@ -53,24 +43,19 @@ export function PatientLoginForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Kode akses</CardTitle>
-        <CardDescription>
-          Gunakan kode yang diberikan oleh Owner Care Circle.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {error ? (
-          <Alert variant="destructive" aria-live="assertive">
-            <AlertTitle>Belum dapat masuk</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        ) : null}
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="patient-access-code">Kode akses Patient</Label>
-            <Input
+    <section className="access-panel" aria-labelledby="access-form-title">
+      <div className="panel-marker" aria-hidden="true"><span>01</span><i /></div>
+      <div className="access-panel-heading">
+        <span>Akses privat</span>
+        <h2 id="access-form-title">Masukkan kode dari caregiver</h2>
+      </div>
+
+      <form className="access-form" onSubmit={handleSubmit}>
+        <div className="field-group">
+          <label htmlFor="patient-access-code">Kode akses Patient</label>
+          <div className="code-input-wrap">
+            <LockKey size={22} weight="bold" aria-hidden="true" />
+            <input
               id="patient-access-code"
               name="code"
               type="password"
@@ -80,18 +65,25 @@ export function PatientLoginForm() {
               onChange={(event) => setCode(event.target.value)}
               required
               disabled={submitting}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "patient-access-error" : "patient-access-hint"}
+              placeholder="Masukkan kode akses"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? (
-              <LoaderCircle className="animate-spin" aria-hidden="true" />
-            ) : (
-              <LogIn aria-hidden="true" />
-            )}
-            Masuk
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+          <p id="patient-access-hint" className="field-hint">Gunakan kode yang diberikan oleh Owner Care Circle.</p>
+          {error ? <p id="patient-access-error" className="field-error" role="alert">{error}</p> : null}
+        </div>
+
+        <button type="submit" className="primary-button" disabled={submitting}>
+          <span>{submitting ? "Memeriksa kode…" : "Masuk"}</span>
+          {submitting ? <span className="button-spinner" aria-hidden="true" /> : <ArrowRight size={21} weight="bold" aria-hidden="true" />}
+        </button>
+
+        <div className="privacy-note">
+          <ShieldCheck size={21} weight="bold" aria-hidden="true" />
+          <span><strong>Kode tetap privat.</strong>Kode tidak disimpan di browser atau ditampilkan kembali setelah dikirim.</span>
+        </div>
+      </form>
+    </section>
   );
 }
