@@ -79,6 +79,41 @@ enum CheckInMood {
   @@map("check_in_mood")
 }
 
+enum MedicationStatus {
+  ACTIVE
+  PAUSED
+  ENDED
+
+  @@map("medication_status")
+}
+
+enum MedicationLogStatus {
+  TAKEN
+  MISSED
+  SKIPPED
+
+  @@map("medication_log_status")
+}
+
+enum ReminderType {
+  MEDICATION
+  CHECK_IN
+  DOCTOR_VISIT
+  BPJS
+  OTHER
+
+  @@map("reminder_type")
+}
+
+enum ReminderStatus {
+  UPCOMING
+  DONE
+  MISSED
+  SKIPPED
+
+  @@map("reminder_status")
+}
+
 model User {
   id                         String                 @id @db.Uuid
   displayName                String                 @map("display_name") @db.VarChar(120)
@@ -96,6 +131,12 @@ model User {
   deactivatedPatientProfiles PatientProfile[]       @relation("PatientProfileDeactivatedBy")
   createdPatientAccessCodes  PatientAccessCode[]    @relation("PatientAccessCodeCreatedBy")
   submittedCheckIns          CheckIn[]              @relation("CheckInSubmittedByUser")
+  createdMedications         Medication[]           @relation("MedicationCreatedBy")
+  updatedMedications         Medication[]           @relation("MedicationUpdatedBy")
+  recordedMedicationLogs     MedicationLog[]        @relation("MedicationLogRecordedBy")
+  createdReminders           Reminder[]             @relation("ReminderCreatedBy")
+  createdHealthNotes         HealthNote[]           @relation("HealthNoteCreatedBy")
+  updatedHealthNotes         HealthNote[]           @relation("HealthNoteUpdatedBy")
   auditEvents                AuditEvent[]           @relation("AuditActorUser")
 
   @@map("users")
@@ -189,6 +230,10 @@ model PatientProfile {
   accessCodes              PatientAccessCode[]
   sessions                 PatientSession[]
   checkIns                 CheckIn[]
+  medications             Medication[]
+  medicationLogs          MedicationLog[]
+  reminders               Reminder[]
+  healthNotes             HealthNote[]
   auditEvents              AuditEvent[]               @relation("AuditTargetPatientProfile")
   actorAuditEvents         AuditEvent[]               @relation("AuditActorPatientProfile")
 
@@ -245,6 +290,87 @@ model CheckIn {
 
   @@index([patientProfileId, createdAt(sort: Desc)])
   @@map("check_ins")
+}
+
+model Medication {
+  id               String           @id @default(uuid()) @db.Uuid
+  patientProfileId String           @map("patient_profile_id") @db.Uuid
+  name             String           @db.VarChar(160)
+  doseText         String           @map("dose_text") @db.VarChar(160)
+  scheduleText     String           @map("schedule_text") @db.VarChar(240)
+  instructions     String?          @db.Text
+  startDate        DateTime?        @map("start_date") @db.Date
+  endDate          DateTime?        @map("end_date") @db.Date
+  status           MedicationStatus @default(ACTIVE)
+  createdByUserId  String           @map("created_by_user_id") @db.Uuid
+  updatedByUserId  String           @map("updated_by_user_id") @db.Uuid
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+  patientProfile   PatientProfile   @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
+  createdBy        User             @relation("MedicationCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy        User             @relation("MedicationUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: Restrict)
+  logs             MedicationLog[]
+  reminders        Reminder[]
+
+  @@index([patientProfileId, status])
+  @@map("medications")
+}
+
+model MedicationLog {
+  id                String              @id @default(uuid()) @db.Uuid
+  patientProfileId  String              @map("patient_profile_id") @db.Uuid
+  medicationId      String              @map("medication_id") @db.Uuid
+  status            MedicationLogStatus
+  scheduledFor      DateTime?           @map("scheduled_for") @db.Timestamptz(6)
+  recordedByUserId  String?             @map("recorded_by_user_id") @db.Uuid
+  recordedByPatient Boolean             @default(false) @map("recorded_by_patient")
+  recordedAt        DateTime            @default(now()) @map("recorded_at") @db.Timestamptz(6)
+  patientProfile    PatientProfile      @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
+  medication        Medication          @relation(fields: [medicationId], references: [id], onDelete: Restrict)
+  recordedBy        User?               @relation("MedicationLogRecordedBy", fields: [recordedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([patientProfileId, recordedAt(sort: Desc)])
+  @@index([medicationId, recordedAt(sort: Desc)])
+  @@map("medication_logs")
+}
+
+model Reminder {
+  id                  String         @id @default(uuid()) @db.Uuid
+  patientProfileId    String         @map("patient_profile_id") @db.Uuid
+  type                ReminderType
+  title               String         @db.VarChar(160)
+  description         String?        @db.Text
+  scheduledAt         DateTime?      @map("scheduled_at") @db.Timestamptz(6)
+  scheduleText        String?        @map("schedule_text") @db.VarChar(240)
+  status              ReminderStatus @default(UPCOMING)
+  relatedMedicationId String?        @map("related_medication_id") @db.Uuid
+  createdByUserId     String         @map("created_by_user_id") @db.Uuid
+  createdAt           DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  patientProfile      PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
+  relatedMedication   Medication?    @relation(fields: [relatedMedicationId], references: [id], onDelete: Restrict)
+  createdBy           User           @relation("ReminderCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([patientProfileId, status, scheduledAt])
+  @@map("reminders")
+}
+
+model HealthNote {
+  id               String         @id @default(uuid()) @db.Uuid
+  patientProfileId String         @map("patient_profile_id") @db.Uuid
+  title            String         @db.VarChar(160)
+  noteText         String         @map("note_text") @db.Text
+  category         String         @db.VarChar(48)
+  createdByUserId  String         @map("created_by_user_id") @db.Uuid
+  updatedByUserId  String         @map("updated_by_user_id") @db.Uuid
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+  patientProfile   PatientProfile @relation(fields: [patientProfileId], references: [id], onDelete: Restrict)
+  createdBy        User           @relation("HealthNoteCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy        User           @relation("HealthNoteUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([patientProfileId, createdAt(sort: Desc)])
+  @@map("health_notes")
 }
 
 model AuditEvent {

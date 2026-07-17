@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { PatientAccessCodePanel } from "@/components/profile/patient-access-code-panel";
+import { CaregiverDashboard } from "@/components/caregiver/caregiver-dashboard";
 
 type FactStatus = "UNKNOWN" | "NONE_REPORTED" | "REPORTED";
 type BpjsStatus = "UNKNOWN" | "NOT_REGISTERED" | "REGISTERED";
@@ -497,8 +498,10 @@ function ProfileEditor({
 
 export function CaregiverProfilePanel({
   role,
+  caregiverName = "Caregiver",
 }: {
   role: "OWNER" | "FAMILY_MEMBER";
+  caregiverName?: string;
 }) {
   const [profiles, setProfiles] = useState<PatientProfile[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -693,6 +696,15 @@ export function CaregiverProfilePanel({
       ) : null}
       {profile ? (
         <>
+          <CaregiverDashboard
+            key={profile.id}
+            patientProfile={profile}
+            caregiverName={caregiverName}
+            role={role}
+          />
+          <Separator />
+          <details className="care-profile-management" open>
+            <summary>Kelola detail Patient Profile</summary>
           <ProfileEditor
             key={profile.id}
             profile={profile}
@@ -721,6 +733,7 @@ export function CaregiverProfilePanel({
               </div>
             </>
           ) : null}
+          </details>
         </>
       ) : null}
 

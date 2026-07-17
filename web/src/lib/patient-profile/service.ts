@@ -271,6 +271,13 @@ export async function updatePatientProfile(
     });
     if (!existing) throw new PatientProfileError("NOT_FOUND");
 
+    if (input.currentMedicationsStatus) {
+      const activeMedicationCount = await tx.medication.count({
+        where: { patientProfileId: existing.id, status: "ACTIVE" },
+      });
+      if (activeMedicationCount > 0) throw new PatientProfileError("CONFLICT");
+    }
+
     const facts = patientProfileFactsSchema.parse({
       primaryConditions:
         input.primaryConditions ?? existing.primaryConditions,
