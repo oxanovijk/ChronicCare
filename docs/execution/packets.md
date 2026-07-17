@@ -2,7 +2,7 @@
 
 Produk: ChroniCare
 
-Status: Locked packet structure for MVP v1; Packets 01 through 07 are `Done`, and each remaining packet status remains evidence-driven
+Status: Locked packet structure for MVP v1; Packets 01 through 08 are `Done`, and each remaining packet status remains evidence-driven
 
 DRI: Ozan
 
@@ -25,7 +25,7 @@ This index keeps execution packets small enough for one focused Codex session. I
 | 05 | [Patient Access Code and Profile Isolation](packets/05-patient-access-code-and-profile-isolation.md) | Bernard | Done | Minimum profile API, Owner-issued Patient codes, bound login/session, Maya/Raka isolation |
 | 06 | [Patient Profile Lifecycle Deactivation](packets/06-patient-profile-lifecycle-deactivation.md) | Bernard | Done | Owner-only non-destructive profile deactivation and Patient access revocation |
 | 07 | [Patient Homepage and Check-In](packets/07-patient-homepage-and-check-in.md) | Daniel | Done | Cheerful Patient homepage and profile-bound check-in flow |
-| 08 | [Caregiver Dashboard, Medication, and Reminder](packets/08-caregiver-dashboard-medication-and-reminder.md) | Daniel | Draft | Informative caregiver dashboard with medication/reminder basics |
+| 08 | [Caregiver Dashboard, Medication, and Reminder](packets/08-caregiver-dashboard-medication-and-reminder.md) | Daniel | Done | Informative caregiver dashboard with medication/reminder basics |
 | 09 | [Document Upload, OCR, and Review](packets/09-document-upload-ocr-and-review.md) | Al | Draft | Private upload, OCR/fallback, caregiver review, confirmed-only summary |
 | 10 | [Faskes and BPJS Helper](packets/10-faskes-and-bpjs-helper.md) | Daniel | Draft | Safe Tangerang facility/BPJS navigation |
 | 11 | [Chatbot Safety Gateway and Personas](packets/11-chatbot-safety-gateway-and-personas.md) | Al | Draft | Patient/Caregiver chat with profile-bound context, refusal rules, fallback |
@@ -133,6 +133,7 @@ Run `npm run test:e2e` when the packet adds or changes a user journey.
 
 | Packet | From | To | Timestamp | Evidence | Approved by |
 | --- | --- | --- | --- | --- | --- |
+| 08 | Draft | Done | 2026-07-17 14:42 +07:00 | Human team review accepted the Packet 08 caregiver dashboard and daily-care flow; Prisma generate/validate/migration status and synthetic seed passed, lint/typecheck/build passed, 186 unit/integration tests and the Packet 08 desktop/mobile E2E journey passed, with two pre-existing repo-wide E2E assertions remaining separately documented | Human team review |
 | 07 | Review | Done | 2026-07-17 10:54 +07:00 | Ozan completed human manual acceptance; fresh closure evidence passed 17 focused check-in tests and 1 mobile/desktop Patient Playwright journey, with all eight P7 acceptance criteria satisfied | Ozan |
 | 05 | Done | Done | 2026-07-17 10:33 +07:00 | Corrective P5 completion adds Owner-only hash-only Patient-code issue/rotation, one-time display, collision avoidance, old code/session revocation, Family denial, 141 unit/integration tests, 18 live E2E without skip, responsive QA, and synthetic cleanup | Ozan |
 | 07 | Ready | Review | 2026-07-17 06:51 +07:00 | Bound `/patient` check-in UI/API, locked Prisma model/migration, role and safety reviews, 101 unit tests, 15 E2E without skip, build, database constraints, cross-profile denial, responsive checks, and zero remaining QA fixtures passed; final human acceptance remains | Ozan |

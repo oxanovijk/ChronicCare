@@ -19,6 +19,9 @@ const ids = {
   raka: "10000000-0000-4000-8000-000000000005",
   mayaCode: "10000000-0000-4000-8000-000000000006",
   rakaCode: "10000000-0000-4000-8000-000000000007",
+  mayaMedication: "10000000-0000-4000-8000-000000000008",
+  mayaReminder: "10000000-0000-4000-8000-000000000009",
+  mayaHealthNote: "10000000-0000-4000-8000-000000000010",
 } as const;
 
 const demoUsers = [
@@ -255,6 +258,70 @@ async function main() {
           deactivatedByUserId: null,
           deactivatedAt: null,
           ...mayaFacts,
+        },
+      });
+
+      await tx.medication.upsert({
+        where: { id: ids.mayaMedication },
+        create: {
+          id: ids.mayaMedication,
+          patientProfileId: ids.maya,
+          name: "Metformin",
+          doseText: "500 mg sesuai catatan caregiver",
+          scheduleText: "Dua kali sehari sesuai informasi yang dicatat",
+          instructions: "Ikuti instruksi yang sudah dicatat. Perubahan obat atau dosis dikonfirmasi kepada tenaga medis.",
+          status: "ACTIVE",
+          createdByUserId: ownerId,
+          updatedByUserId: ownerId,
+        },
+        update: {
+          patientProfileId: ids.maya,
+          name: "Metformin",
+          doseText: "500 mg sesuai catatan caregiver",
+          scheduleText: "Dua kali sehari sesuai informasi yang dicatat",
+          status: "ACTIVE",
+          updatedByUserId: ownerId,
+        },
+      });
+      await tx.patientProfile.update({
+        where: { id: ids.maya },
+        data: { currentMedicationsStatus: "REPORTED" },
+      });
+      await tx.reminder.upsert({
+        where: { id: ids.mayaReminder },
+        create: {
+          id: ids.mayaReminder,
+          patientProfileId: ids.maya,
+          type: "MEDICATION",
+          title: "Catatan obat malam",
+          scheduleText: "19.00 sesuai catatan caregiver",
+          status: "UPCOMING",
+          relatedMedicationId: ids.mayaMedication,
+          createdByUserId: ownerId,
+        },
+        update: {
+          title: "Catatan obat malam",
+          scheduleText: "19.00 sesuai catatan caregiver",
+          status: "UPCOMING",
+          relatedMedicationId: ids.mayaMedication,
+        },
+      });
+      await tx.healthNote.upsert({
+        where: { id: ids.mayaHealthNote },
+        create: {
+          id: ids.mayaHealthNote,
+          patientProfileId: ids.maya,
+          title: "Persiapan kontrol",
+          noteText: "Siapkan daftar pertanyaan singkat untuk kunjungan berikutnya.",
+          category: "CARE_COORDINATION",
+          createdByUserId: ownerId,
+          updatedByUserId: ownerId,
+        },
+        update: {
+          title: "Persiapan kontrol",
+          noteText: "Siapkan daftar pertanyaan singkat untuk kunjungan berikutnya.",
+          category: "CARE_COORDINATION",
+          updatedByUserId: ownerId,
         },
       });
       await tx.patientProfile.upsert({

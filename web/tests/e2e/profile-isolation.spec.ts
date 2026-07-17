@@ -110,20 +110,20 @@ test("caregiver switches Maya and Raka without stale profile details", async ({
   const selector = page.getByLabel("Patient Profile aktif");
   await expect(selector).toBeVisible({ timeout: 15_000 });
   await expect(
-    page.getByRole("heading", { level: 3, name: "Maya Pratama" }),
+    page.getByText("Berikut konteks perawatan Maya Pratama sesuai informasi yang dicatat."),
   ).toBeVisible();
 
   await selector.selectOption({ label: "Raka Pratama" });
   await expect(
-    page.getByRole("heading", { level: 3, name: "Raka Pratama" }),
+    page.getByText("Berikut konteks perawatan Raka Pratama sesuai informasi yang dicatat."),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 3, name: "Maya Pratama" }),
+    page.getByText("Berikut konteks perawatan Maya Pratama sesuai informasi yang dicatat."),
   ).toHaveCount(0);
 
   await selector.selectOption({ label: "Maya Pratama" });
   await expect(
-    page.getByRole("heading", { level: 3, name: "Maya Pratama" }),
+    page.getByText("Berikut konteks perawatan Maya Pratama sesuai informasi yang dicatat."),
   ).toBeVisible();
 });
 
