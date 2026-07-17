@@ -1,0 +1,12 @@
+{
+  "app": {
+    "[project]/src/app/caregiver/facilities/page": [],
+    "[project]/src/app/caregiver/page": [],
+    "[project]/src/app/page": [],
+    "[project]/src/app/patient/login/page": [],
+    "[project]/src/app/patient/page": []
+  },
+  "appUsingSizeAdjust": true,
+  "pages": {},
+  "pagesUsingSizeAdjust": false
+}
