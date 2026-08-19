@@ -1,3 +1,0 @@
-{
-  "/api/v1/patient-profiles/[patientProfileId]/check-ins/route": "app/api/v1/patient-profiles/[patientProfileId]/check-ins/route.js"
-}
