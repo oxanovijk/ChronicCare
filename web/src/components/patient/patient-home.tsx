@@ -16,6 +16,7 @@ import { Warning } from "@phosphor-icons/react/dist/csr/Warning";
 
 import { PatientLogoutButton } from "@/components/auth/patient-logout-button";
 import { BrandMark } from "@/components/brand-mark";
+import { PatientChatSurface } from "@/components/chat/chat-panel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -526,6 +527,13 @@ export function PatientHome({ patientProfile }: { patientProfile: PatientProfile
             </ol>
           )}
         </section>
+        </div>
+
+        <div className="mt-6">
+          <PatientChatSurface
+            patientProfileId={patientProfile.id}
+            patientName={patientProfile.displayName}
+          />
         </div>
       </div>
     </main>

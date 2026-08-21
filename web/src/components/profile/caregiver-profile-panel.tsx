@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { PatientAccessCodePanel } from "@/components/profile/patient-access-code-panel";
 import { CaregiverDashboard } from "@/components/caregiver/caregiver-dashboard";
+import { CaregiverChatSurface } from "@/components/chat/chat-panel";
 import { FacilityHelper } from "@/components/facilities/facility-helper";
 
 type FactStatus = "UNKNOWN" | "NONE_REPORTED" | "REPORTED";
@@ -502,7 +503,7 @@ export function CaregiverProfilePanel({
 }: {
   role: "OWNER" | "FAMILY_MEMBER";
   caregiverName?: string;
-  view?: "dashboard" | "facilities";
+  view?: "dashboard" | "facilities" | "chat";
 }) {
   const [profiles, setProfiles] = useState<PatientProfile[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -692,6 +693,13 @@ export function CaregiverProfilePanel({
       ) : null}
       {profile && view === "facilities" ? (
         <FacilityHelper
+          key={profile.id}
+          patientProfileId={profile.id}
+          patientName={profile.displayName}
+        />
+      ) : null}
+      {profile && view === "chat" ? (
+        <CaregiverChatSurface
           key={profile.id}
           patientProfileId={profile.id}
           patientName={profile.displayName}

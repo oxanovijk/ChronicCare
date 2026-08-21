@@ -91,7 +91,7 @@ async function resolveInitialAuthState(): Promise<AuthState> {
 export function CaregiverAuthPanel({
   activeSection = "overview",
 }: {
-  activeSection?: "overview" | "facilities";
+  activeSection?: "overview" | "facilities" | "chat";
 } = {}) {
   const [state, setState] = useState<AuthState>({ status: "checking" });
   const [email, setEmail] = useState("");
@@ -213,7 +213,11 @@ export function CaregiverAuthPanel({
               Circle dan peran akun ini.
             </AlertDescription>
           </Alert> : null}
-          <CaregiverProfilePanel role={state.context.membership.role} caregiverName={state.context.user.displayName} view={activeSection === "facilities" ? "facilities" : "dashboard"} />
+          <CaregiverProfilePanel
+            role={state.context.membership.role}
+            caregiverName={state.context.user.displayName}
+            view={activeSection === "overview" ? "dashboard" : activeSection}
+          />
           {activeSection === "overview" && state.context.membership.role === "OWNER" ? <details className="care-owner-tools"><summary>Kelola undangan Family Member</summary><InvitationPanel /></details> : null}
         </div>
       </CaregiverProductionShell>
@@ -291,6 +295,14 @@ export function CaregiverAuthPanel({
               required
               disabled={submitting}
             />
+            <div className="text-right">
+              <Link
+                href="/caregiver/forgot-password"
+                className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+              >
+                Lupa kata sandi?
+              </Link>
+            </div>
           </div>
           <Button type="submit" className="caregiver-primary-button w-full" disabled={submitting}>
             {submitting ? (
