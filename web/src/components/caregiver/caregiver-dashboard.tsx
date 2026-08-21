@@ -102,7 +102,7 @@ export function CaregiverDashboard({ patientProfile, caregiverName, role }: { pa
     : { title: "Tidak ada yang dilaporkan oleh caregiver", copy: "Ini adalah informasi yang dicatat, bukan kepastian klinis." };
 
   return (
-    <div className="care-dashboard" id="daily-care">
+    <div className="care-dashboard">
       <header className="care-dashboard-heading">
         <div><span className="section-kicker"><span aria-hidden="true" /> Ringkasan harian</span><h1>Selamat datang, {firstName}</h1><p>Berikut konteks perawatan {patientProfile.displayName} sesuai informasi yang dicatat.</p></div>
         <span className="care-role-tag"><CheckCircle size={16} weight="fill" aria-hidden="true" />{role === "OWNER" ? "Owner" : "Family Member"}</span>
@@ -112,7 +112,7 @@ export function CaregiverDashboard({ patientProfile, caregiverName, role }: { pa
 
       <div className="care-dashboard-columns">
         <div className="care-dashboard-primary">
-          <section className="care-motion-card">
+          <section className="care-motion-card" id="daily-care">
             <div><span className="card-index">Aksi utama</span><h2>Jaga rutinitas tetap mudah diikuti</h2><p>Tambahkan pengingat yang benar-benar tersedia untuk Patient Profile aktif.</p></div>
             <Button type="button" onClick={() => setActiveForm("reminder")}><Clock aria-hidden="true" />Tambah pengingat</Button>
           </section>
@@ -151,7 +151,7 @@ export function CaregiverDashboard({ patientProfile, caregiverName, role }: { pa
 
         <aside className="care-dashboard-rail" aria-label="Konteks Packet 08">
           <section className="care-setup-card"><div className="care-card-title"><FirstAid size={22} aria-hidden="true" /><span>Checklist setup</span></div><p>Advisory saja. Data yang belum diketahui tidak memblokir daily care.</p>{data.setupChecklist.recommendedActions.length ? <ul>{data.setupChecklist.recommendedActions.slice(0, 4).map((action) => <li key={action}><WarningCircle size={16} aria-hidden="true" />{setupLabels[action] ?? "Tinjau data Patient"}</li>)}</ul> : <p className="care-complete-line"><CheckCircle size={18} weight="fill" aria-hidden="true" />Tidak ada saran pengisian saat ini.</p>}</section>
-          <section className="care-unavailable-card"><h2>Fitur berikutnya</h2><ul><li><span>Asisten caregiver</span><small>Belum tersedia</small></li><li><span>SOS Realtime</span><small>Belum tersedia</small></li><li><span>Faskes/BPJS</span><small>Belum tersedia</small></li></ul></section>
+          <section className="care-unavailable-card"><h2>Fitur berikutnya</h2><ul><li><span>SOS Realtime</span><small>Belum tersedia</small></li><li><span>Faskes/BPJS</span><small>Belum tersedia</small></li></ul></section>
         </aside>
       </div>
     </div>

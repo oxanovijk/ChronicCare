@@ -226,8 +226,12 @@ describe("Packet 10 facility helper UI", () => {
     expect(await screen.findByRole("heading", { name: "Selamat datang, Dimas" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Faskes & panduan BPJS" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Buka Faskes & BPJS" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Asisten caregiver" })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Jaga rutinitas tetap mudah diikuti" }).closest("section"),
+    ).toHaveAttribute("id", "daily-care");
     expect(screen.getByText("SOS Realtime")).toBeInTheDocument();
-    expect(screen.getAllByText("Belum tersedia", { selector: "small" })).toHaveLength(3);
+    expect(screen.getAllByText("Belum tersedia", { selector: "small" })).toHaveLength(2);
   });
 
   it("exposes a dedicated active facility destination in caregiver navigation", () => {
