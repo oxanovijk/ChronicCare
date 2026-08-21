@@ -42,6 +42,23 @@ describe("caregiver Auth callback", () => {
     );
   });
 
+  it("accepts the password recovery destination without Owner onboarding", async () => {
+    exchangeCodeForSession.mockResolvedValue({ error: null });
+
+    const response = await GET(
+      new Request(
+        "http://localhost/auth/callback?code=recovery-code&next=%2Fcaregiver%2Freset-password",
+      ),
+    );
+
+    expect(exchangeCodeForSession).toHaveBeenCalledWith("recovery-code");
+    expect(getUser).not.toHaveBeenCalled();
+    expect(completeOwnerOnboarding).not.toHaveBeenCalled();
+    expect(response.headers.get("location")).toBe(
+      "http://localhost/caregiver/reset-password",
+    );
+  });
+
   it("blocks open redirects and handles an invalid exchange generically", async () => {
     exchangeCodeForSession.mockResolvedValue({ error: null });
     const unsafe = await GET(

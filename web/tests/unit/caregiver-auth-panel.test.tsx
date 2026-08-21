@@ -46,6 +46,10 @@ describe("caregiver auth panel", () => {
     expect(
       screen.getByRole("button", { name: "Masuk sebagai caregiver" }),
     ).toBeEnabled();
+    expect(screen.getByRole("link", { name: "Lupa kata sandi?" })).toHaveAttribute(
+      "href",
+      "/caregiver/forgot-password",
+    );
     expect(fetch).not.toHaveBeenCalled();
   });
 

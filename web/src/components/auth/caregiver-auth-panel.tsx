@@ -291,6 +291,14 @@ export function CaregiverAuthPanel({
               required
               disabled={submitting}
             />
+            <div className="text-right">
+              <Link
+                href="/caregiver/forgot-password"
+                className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+              >
+                Lupa kata sandi?
+              </Link>
+            </div>
           </div>
           <Button type="submit" className="caregiver-primary-button w-full" disabled={submitting}>
             {submitting ? (
